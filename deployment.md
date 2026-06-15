@@ -17,6 +17,11 @@ wasted if you start simpler and graduate to ECS later.
 
 ## Target architecture
 
+![Talescape on AWS ECS Fargate architecture](docs/architecture.svg)
+
+<details>
+<summary>Text version of the diagram</summary>
+
 ```
 Reader's browser
       │  HTTPS
@@ -35,6 +40,8 @@ ECS Fargate               (Next.js container, private subnet)
 
 ECR (container image registry) ──deploy image──► ECS Fargate
 ```
+
+</details>
 
 ---
 

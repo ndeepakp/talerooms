@@ -1,0 +1,76 @@
+<svg viewBox="0 0 680 430" xmlns="http://www.w3.org/2000/svg" font-family="Helvetica, Arial, sans-serif" role="img">
+<title>Talescape on AWS ECS Fargate architecture</title>
+<desc>A reader's browser reaches Route 53 and ACM for DNS and HTTPS, then an Application Load Balancer in a public subnet, then ECS Fargate running the Next.js container in a private subnet. The container talks to RDS Postgres with pgvector, an S3 bucket for uploads, Secrets Manager for config, and CloudWatch for logs. The container image is deployed from ECR.</desc>
+<defs>
+<marker id="abBlue" markerWidth="9" markerHeight="9" refX="7" refY="4" orient="auto"><path d="M0,0 L8,4 L0,8 z" fill="#1565C0"/></marker>
+<marker id="abGray" markerWidth="9" markerHeight="9" refX="7" refY="4" orient="auto"><path d="M0,0 L8,4 L0,8 z" fill="#6B7280"/></marker>
+</defs>
+
+<rect x="0" y="0" width="680" height="430" fill="#ffffff"/>
+
+<line x1="154" y1="88" x2="154" y2="130" stroke="#1565C0" stroke-width="2" marker-end="url(#abBlue)"/>
+<line x1="154" y1="180" x2="154" y2="222" stroke="#1565C0" stroke-width="2" marker-end="url(#abBlue)"/>
+<line x1="154" y1="272" x2="154" y2="314" stroke="#1565C0" stroke-width="2" marker-end="url(#abBlue)"/>
+
+<line x1="272" y1="330" x2="428" y2="146" stroke="#6B7280" stroke-width="1.5" marker-end="url(#abGray)"/>
+<line x1="272" y1="338" x2="428" y2="216" stroke="#6B7280" stroke-width="1.5" marker-end="url(#abGray)"/>
+<line x1="272" y1="348" x2="428" y2="288" stroke="#6B7280" stroke-width="1.5" marker-end="url(#abGray)"/>
+<line x1="272" y1="356" x2="428" y2="360" stroke="#6B7280" stroke-width="1.5" marker-end="url(#abGray)"/>
+<line x1="430" y1="64" x2="242" y2="316" stroke="#6B7280" stroke-width="1.5" stroke-dasharray="5 4" marker-end="url(#abGray)"/>
+
+<text x="300" y="232" font-size="11" fill="#6B7280">SQL</text>
+<text x="300" y="262" font-size="11" fill="#6B7280">files</text>
+<text x="330" y="186" font-size="11" fill="#6B7280">deploy image</text>
+
+<g>
+<rect x="36" y="40" width="236" height="48" rx="8" fill="#E6F1FB" stroke="#1565C0"/>
+<text x="154" y="60" text-anchor="middle" font-size="14" fill="#0C447C">Reader's browser</text>
+<text x="154" y="78" text-anchor="middle" font-size="11" fill="#0C447C">request over HTTPS</text>
+</g>
+<g>
+<rect x="36" y="132" width="236" height="48" rx="8" fill="#E6F1FB" stroke="#1565C0"/>
+<text x="154" y="152" text-anchor="middle" font-size="14" fill="#0C447C">Route 53 + ACM</text>
+<text x="154" y="170" text-anchor="middle" font-size="11" fill="#0C447C">domain + TLS certificate</text>
+</g>
+<g>
+<rect x="36" y="224" width="236" height="48" rx="8" fill="#E6F1FB" stroke="#1565C0"/>
+<text x="154" y="244" text-anchor="middle" font-size="14" fill="#0C447C">Load balancer (ALB)</text>
+<text x="154" y="262" text-anchor="middle" font-size="11" fill="#0C447C">public subnet</text>
+</g>
+<g>
+<rect x="36" y="316" width="236" height="56" rx="8" fill="#E6F1FB" stroke="#1565C0"/>
+<text x="154" y="340" text-anchor="middle" font-size="14" fill="#0C447C">ECS Fargate</text>
+<text x="154" y="358" text-anchor="middle" font-size="11" fill="#0C447C">Next.js container, private subnet</text>
+</g>
+
+<g>
+<rect x="430" y="40" width="232" height="48" rx="8" fill="#F1F3F5" stroke="#6B7280"/>
+<text x="546" y="60" text-anchor="middle" font-size="14" fill="#374151">ECR</text>
+<text x="546" y="78" text-anchor="middle" font-size="11" fill="#374151">container image registry</text>
+</g>
+<g>
+<rect x="430" y="120" width="232" height="48" rx="8" fill="#F1F3F5" stroke="#6B7280"/>
+<text x="546" y="140" text-anchor="middle" font-size="14" fill="#374151">RDS Postgres</text>
+<text x="546" y="158" text-anchor="middle" font-size="11" fill="#374151">+ pgvector, private subnet</text>
+</g>
+<g>
+<rect x="430" y="192" width="232" height="48" rx="8" fill="#F1F3F5" stroke="#6B7280"/>
+<text x="546" y="212" text-anchor="middle" font-size="14" fill="#374151">S3 bucket</text>
+<text x="546" y="230" text-anchor="middle" font-size="11" fill="#374151">avatars + wallpapers</text>
+</g>
+<g>
+<rect x="430" y="264" width="232" height="48" rx="8" fill="#F1F3F5" stroke="#6B7280"/>
+<text x="546" y="284" text-anchor="middle" font-size="14" fill="#374151">Secrets Manager</text>
+<text x="546" y="302" text-anchor="middle" font-size="11" fill="#374151">db url, auth secret</text>
+</g>
+<g>
+<rect x="430" y="336" width="232" height="48" rx="8" fill="#F1F3F5" stroke="#6B7280"/>
+<text x="546" y="356" text-anchor="middle" font-size="14" fill="#374151">CloudWatch</text>
+<text x="546" y="374" text-anchor="middle" font-size="11" fill="#374151">logs + alarms</text>
+</g>
+
+<rect x="36" y="400" width="14" height="10" rx="2" fill="#1565C0"/>
+<text x="56" y="409" font-size="11" fill="#6B7280">live request path</text>
+<rect x="176" y="400" width="14" height="10" rx="2" fill="#9CA3AF"/>
+<text x="196" y="409" font-size="11" fill="#6B7280">backing services</text>
+</svg>

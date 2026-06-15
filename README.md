@@ -1,16 +1,16 @@
-# TALESCAPE
+# TALEROOMS
 
 > Where stories find their people.
 
-TALESCAPE is a creator‑first storytelling platform and IP marketplace. Writers
+TALEROOMS is a creator‑first storytelling platform and IP marketplace. Writers
 publish stories as a public summary plus private, paid chapters; readers
 discover work, buy access on their own terms, and follow the authors they love.
 
 ---
 
-## 1. What is TALESCAPE?
+## 1. What is TALEROOMS?
 
-TALESCAPE is a web application for **serialized, original fiction** where the
+TALEROOMS is a web application for **serialized, original fiction** where the
 creator owns the economics. Every story has a public **title + summary** that
 anyone can see, and **chapters** that the author controls — keep them free,
 sell them chapter‑by‑chapter, bundle the whole story, or open everything to
@@ -31,9 +31,9 @@ Core ideas:
 
 ---
 
-## 2. TALESCAPE for Content Creators
+## 2. TALEROOMS for Content Creators
 
-If you write, TALESCAPE is built so your work earns for you and stays yours.
+If you write, TALEROOMS is built so your work earns for you and stays yours.
 
 What you can do today:
 
@@ -61,9 +61,9 @@ IP — not just free content.
 
 ---
 
-## 3. TALESCAPE for Content Consumers (Readers)
+## 3. TALEROOMS for Content Consumers (Readers)
 
-If you read, TALESCAPE is built to help you find stories worth your time and pick
+If you read, TALEROOMS is built to help you find stories worth your time and pick
 up exactly where you left off.
 
 What you can do today:
@@ -145,7 +145,7 @@ do not commit directly to the main branch.
 
 ## 8. Note to Investors
 
-If you like what TALESCAPE is building, please reach out to
+If you like what TALEROOMS is building, please reach out to
 **n.deepakp@gmail.com**.
 
 ---

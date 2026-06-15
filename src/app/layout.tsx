@@ -15,7 +15,7 @@ const geistMono = Geist_Mono({
 });
 
 export const metadata: Metadata = {
-  title: "Talescape",
+  title: "Talerooms",
   description: "Where stories find their people.",
 };
 

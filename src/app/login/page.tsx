@@ -30,7 +30,7 @@ export default function LoginPage() {
     <div className="flex min-h-screen flex-col items-center justify-center bg-[var(--page)] px-6">
       <div className="w-full max-w-sm">
         <h1 className="text-center text-2xl font-bold text-zinc-900 dark:text-zinc-50">
-          Log in to Talescape
+          Log in to Talerooms
         </h1>
         <form onSubmit={handleSubmit} className="mt-8 flex flex-col gap-4">
           <Field label="Email" value={email} onChange={setEmail} type="email" placeholder="you@example.com" />

@@ -14,7 +14,7 @@ export function ShareCollection({ name }: { name: string }) {
 
   async function share() {
     const link = url();
-    const data = { title: name, text: `Check out this collection on Talescape: ${name}`, url: link };
+    const data = { title: name, text: `Check out this collection on Talerooms: ${name}`, url: link };
     if (typeof navigator !== "undefined" && navigator.share) {
       try {
         await navigator.share(data);
@@ -37,7 +37,7 @@ export function ShareCollection({ name }: { name: string }) {
   }
 
   const encoded = encodeURIComponent(url());
-  const text = encodeURIComponent(`Check out this collection on Talescape: ${name}`);
+  const text = encodeURIComponent(`Check out this collection on Talerooms: ${name}`);
 
   return (
     <div className="relative inline-block">

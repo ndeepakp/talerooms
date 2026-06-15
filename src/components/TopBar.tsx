@@ -22,9 +22,9 @@ export async function TopBar() {
   return (
     <header className="sticky top-0 z-40 border-b border-zinc-200/60 bg-[var(--page)]/80 backdrop-blur dark:border-zinc-800/60">
       <div className="mx-auto flex h-14 w-full max-w-5xl items-center gap-3 px-6 sm:gap-4">
-        <Link href="/feed" aria-label="Talescape — home" className="shrink-0">
+        <Link href="/feed" aria-label="Talerooms — home" className="shrink-0">
           {/* eslint-disable-next-line @next/next/no-img-element */}
-          <img src="/icon.svg" alt="Talescape" width={34} height={34} className="rounded-lg" />
+          <img src="/icon.svg" alt="Talerooms" width={34} height={34} className="rounded-lg" />
         </Link>
         <Link
           href={profileHref}

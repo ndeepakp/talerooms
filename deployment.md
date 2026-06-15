@@ -1,6 +1,6 @@
-# Deploying Talescape to AWS ECS (Fargate)
+# Deploying Talerooms to AWS ECS (Fargate)
 
-This document explains everything needed to take Talescape from "runs on a laptop"
+This document explains everything needed to take Talerooms from "runs on a laptop"
 to "running on AWS ECS Fargate behind a real domain."
 
 ECS Fargate is a production-grade choice, but it is one of the heavier ways to run a
@@ -17,7 +17,7 @@ wasted if you start simpler and graduate to ECS later.
 
 ## Target architecture
 
-![Talescape on AWS ECS Fargate architecture](docs/architecture.svg)
+![Talerooms on AWS ECS Fargate architecture](docs/architecture.svg)
 
 <details>
 <summary>Text version of the diagram</summary>

@@ -43,7 +43,7 @@ type EditStory = {
 type DraftChapter = { id: string; title: string; body: string; prices: PriceMap };
 
 const ORIGINALITY_NOTE =
-  "I take full responsibility for the originality of this content, and I confirm this story is not available outside TALESCAPE to avoid plagiarism. If it appears anywhere else, it was made available by me.";
+  "I take full responsibility for the originality of this content, and I confirm this story is not available outside TALEROOMS to avoid plagiarism. If it appears anywhere else, it was made available by me.";
 
 function newId() {
   return typeof crypto !== "undefined" && crypto.randomUUID

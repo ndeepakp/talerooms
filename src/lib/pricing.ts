@@ -16,14 +16,43 @@ export const TIER_LABELS: Record<Tier, string> = {
 
 // Mock currency. Change this one constant (and later wire a real provider) when
 // you start charging for real.
+// Legacy default symbol, still used for account-level prices (author
+// subscriptions, analytics earnings) that aren't tied to a single story.
 export const CURRENCY = "₹";
+
+// Currencies an author can price a story in. Code is ISO 4217; symbol is what
+// readers see. No FX conversion — the author picks one and everyone sees it.
+export type CurrencyCode =
+  | "INR" | "USD" | "EUR" | "GBP" | "SGD" | "AUD" | "CAD" | "JPY";
+
+export const CURRENCIES: { code: CurrencyCode; symbol: string; label: string }[] = [
+  { code: "INR", symbol: "₹", label: "Indian Rupee (₹)" },
+  { code: "USD", symbol: "$", label: "US Dollar ($)" },
+  { code: "EUR", symbol: "€", label: "Euro (€)" },
+  { code: "GBP", symbol: "£", label: "British Pound (£)" },
+  { code: "SGD", symbol: "S$", label: "Singapore Dollar (S$)" },
+  { code: "AUD", symbol: "A$", label: "Australian Dollar (A$)" },
+  { code: "CAD", symbol: "C$", label: "Canadian Dollar (C$)" },
+  { code: "JPY", symbol: "¥", label: "Japanese Yen (¥)" },
+];
+
+export const DEFAULT_CURRENCY: CurrencyCode = "INR";
+
+export function isCurrency(v: unknown): v is CurrencyCode {
+  return typeof v === "string" && CURRENCIES.some((c) => c.code === v);
+}
+
+// The symbol for a currency code, falling back to the legacy default.
+export function currencySymbol(code?: string | null): string {
+  return CURRENCIES.find((c) => c.code === code)?.symbol ?? CURRENCY;
+}
 
 export function isTier(v: unknown): v is Tier {
   return typeof v === "string" && (TIERS as string[]).includes(v);
 }
 
-export function formatPrice(amount: number): string {
-  return amount <= 0 ? "Free" : `${CURRENCY}${amount}`;
+export function formatPrice(amount: number, code?: string | null): string {
+  return amount <= 0 ? "Free" : `${currencySymbol(code)}${amount}`;
 }
 
 // When does access bought now, for `duration`, expire? null = never.

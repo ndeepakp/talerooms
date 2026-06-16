@@ -13,7 +13,9 @@ import {
   type Chapter,
 } from "@/lib/story-validation";
 import {
-  CURRENCY,
+  CURRENCIES,
+  DEFAULT_CURRENCY,
+  currencySymbol,
   TIERS,
   TIER_LABELS,
   type Tier,
@@ -35,6 +37,7 @@ type EditStory = {
   chaptersPublic: boolean;
   offeredDurations: Tier[];
   wholePrices: PriceMap;
+  currency: string;
 };
 
 // Local chapter shape: a stable id (so reordering keeps each editor's content
@@ -90,6 +93,7 @@ export function StoryForm({
     Object.keys(story?.wholePrices ?? {}).length > 0,
   );
   const [wholePrices, setWholePrices] = useState<PriceMap>(story?.wholePrices ?? {});
+  const [currency, setCurrency] = useState<string>(story?.currency ?? DEFAULT_CURRENCY);
   const [accepted, setAccepted] = useState(false);
   const [error, setError] = useState<string | null>(null);
   const [loading, setLoading] = useState<null | "draft" | "publish">(null);
@@ -226,6 +230,7 @@ export function StoryForm({
         chaptersPublic,
         offeredDurations: offered,
         wholePrices: chaptersPublic || !offerWhole ? {} : wholePrices,
+        currency,
         status: draft ? "draft" : "published",
         decision: opts.decision,
         inspiredById: opts.inspiredById,
@@ -420,6 +425,22 @@ export function StoryForm({
               {!chaptersPublic && (
                 <div className="ml-7 flex flex-col gap-3">
                   <div>
+                    <label className="text-sm font-medium text-zinc-700 dark:text-zinc-300">
+                      Currency
+                    </label>
+                    <select
+                      value={currency}
+                      onChange={(e) => setCurrency(e.target.value)}
+                      className="mt-1.5 block h-10 rounded-lg border border-zinc-300 bg-white px-3 text-sm text-zinc-900 outline-none focus:border-zinc-900 dark:border-zinc-700 dark:bg-zinc-950 dark:text-zinc-100"
+                    >
+                      {CURRENCIES.map((c) => (
+                        <option key={c.code} value={c.code}>
+                          {c.label}
+                        </option>
+                      ))}
+                    </select>
+                  </div>
+                  <div>
                     <span className="text-sm font-medium text-zinc-700 dark:text-zinc-300">
                       Access durations you offer
                     </span>
@@ -445,7 +466,7 @@ export function StoryForm({
                     </div>
                     <span className="mt-1 block text-xs text-zinc-500">
                       A reader picks one of these when buying. Access expires after
-                      it (Always = never). Prices are in {CURRENCY}; 0 = free.
+                      it (Always = never). Prices are in {currencySymbol(currency)}; 0 = free.
                     </span>
                   </div>
 
@@ -471,7 +492,7 @@ export function StoryForm({
                             >
                               <span>{TIER_LABELS[t]}</span>
                               <div className="flex items-center rounded-lg border border-zinc-300 bg-white pl-2 dark:border-zinc-700 dark:bg-zinc-950">
-                                <span className="text-zinc-500">{CURRENCY}</span>
+                                <span className="text-zinc-500">{currencySymbol(currency)}</span>
                                 <input
                                   type="number"
                                   min={0}
@@ -603,7 +624,7 @@ export function StoryForm({
                         >
                           <span>{TIER_LABELS[t]}</span>
                           <div className="flex items-center rounded-lg border border-zinc-300 bg-white pl-2 dark:border-zinc-700 dark:bg-zinc-950">
-                            <span className="text-zinc-500">{CURRENCY}</span>
+                            <span className="text-zinc-500">{currencySymbol(currency)}</span>
                             <input
                               type="number"
                               min={0}

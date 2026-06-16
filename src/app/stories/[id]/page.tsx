@@ -25,6 +25,7 @@ type Story = {
   chapters_public: boolean;
   offered_durations: Tier[];
   whole_prices: Partial<Record<Tier, number>>;
+  currency: string;
   created_at: string;
   author: string | null;
   author_id: string;
@@ -64,6 +65,7 @@ export default async function StoryPage({
       s.chapters_public,
       s.offered_durations,
       s.whole_prices,
+      s.currency,
       s.created_at,
       u.name AS author,
       u.id AS author_id,
@@ -406,6 +408,7 @@ export default async function StoryPage({
             storyId={story.id}
             offered={story.offered_durations}
             wholePrices={story.whole_prices}
+            currency={story.currency}
             chapters={allChapters.map((c, i) => ({
               index: i,
               title: c.title ?? "",

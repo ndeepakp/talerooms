@@ -2,7 +2,7 @@
 
 import { useState } from "react";
 import { useRouter } from "next/navigation";
-import { CURRENCY, TIER_LABELS, formatPrice, type Tier } from "@/lib/pricing";
+import { currencySymbol, TIER_LABELS, formatPrice, type Tier } from "@/lib/pricing";
 
 type PriceMap = Partial<Record<Tier, number>>;
 type ChapterOption = {
@@ -20,11 +20,13 @@ export function AccessPanel({
   offered,
   wholePrices,
   chapters,
+  currency,
 }: {
   storyId: string;
   offered: Tier[];
   wholePrices: PriceMap;
   chapters: ChapterOption[];
+  currency: string;
 }) {
   const router = useRouter();
   const [tier, setTier] = useState<Tier>(offered[0]);
@@ -53,7 +55,7 @@ export function AccessPanel({
   }
 
   async function buy(payload: object, total: number) {
-    if (!window.confirm(`Mock payment: pay ${formatPrice(total)} for this access?`)) {
+    if (!window.confirm(`Mock payment: pay ${formatPrice(total, currency)} for this access?`)) {
       return;
     }
     setBusy(true);
@@ -123,7 +125,7 @@ export function AccessPanel({
             onClick={() => buy({ scope: "whole", duration: tier }, wholePrice as number)}
             className="shrink-0 rounded-full btn-primary px-4 py-2 text-sm font-medium disabled:opacity-50"
           >
-            {formatPrice(wholePrice as number)}
+            {formatPrice(wholePrice as number, currency)}
           </button>
         </div>
       )}
@@ -148,7 +150,7 @@ export function AccessPanel({
                     {c.title || `Chapter ${c.index + 1}`}
                   </span>
                   <span className="text-zinc-500">
-                    {formatPrice(c.prices[tier] as number)}
+                    {formatPrice(c.prices[tier] as number, currency)}
                   </span>
                 </label>
               </li>
@@ -165,7 +167,7 @@ export function AccessPanel({
             }
             className="mt-3 rounded-full btn-primary px-4 py-2 text-sm font-medium disabled:opacity-50"
           >
-            Buy {picked.size > 0 ? `${picked.size} ` : ""}selected · {CURRENCY}
+            Buy {picked.size > 0 ? `${picked.size} ` : ""}selected · {currencySymbol(currency)}
             {chaptersTotal}
           </button>
         </div>

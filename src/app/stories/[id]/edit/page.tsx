@@ -28,11 +28,12 @@ export default async function EditStoryPage({
       chapters_public: boolean;
       offered_durations: ("1h" | "1d" | "1w" | "1y" | "always")[];
       whole_prices: Record<string, number>;
+      currency: string;
       author_id: string;
     }[]
   >`
     SELECT id, title, summary, chapters, status, chapters_public,
-           offered_durations, whole_prices, author_id
+           offered_durations, whole_prices, currency, author_id
     FROM stories WHERE id = ${id}
   `;
 
@@ -61,6 +62,7 @@ export default async function EditStoryPage({
         chaptersPublic: story.chapters_public,
         offeredDurations: story.offered_durations,
         wholePrices: story.whole_prices,
+        currency: story.currency,
       }}
     />
   );

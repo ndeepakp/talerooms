@@ -3,7 +3,12 @@ import { sql } from "@/lib/db";
 import { ApiError, requireSession, withErrors } from "@/lib/http";
 import { findSimilar } from "@/lib/similarity";
 import { htmlToText, normalizeChapters, validateStory } from "@/lib/story-validation";
-import { normalizeOfferedDurations, normalizePrices } from "@/lib/pricing";
+import {
+  DEFAULT_CURRENCY,
+  isCurrency,
+  normalizeOfferedDurations,
+  normalizePrices,
+} from "@/lib/pricing";
 import { notify } from "@/lib/notify";
 
 const UUID_RE = /^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i;
@@ -39,6 +44,7 @@ export const PUT = withErrors(async (
     chaptersPublic,
     offeredDurations,
     wholePrices,
+    currency,
     decision,
     inspiredById,
   } = await req.json().catch(() => ({}));
@@ -47,6 +53,7 @@ export const PUT = withErrors(async (
   const isPublic = chaptersPublic === true;
   const offered = normalizeOfferedDurations(offeredDurations);
   const wholePriceMap = normalizePrices(wholePrices, offered);
+  const storyCurrency = isCurrency(currency) ? currency : DEFAULT_CURRENCY;
 
   const invalid = validateStory(
     String(title ?? ""),
@@ -91,6 +98,7 @@ export const PUT = withErrors(async (
         chapters_public = ${isPublic},
         offered_durations = ${offered},
         whole_prices = ${sql.json(wholePriceMap)},
+        currency = ${storyCurrency},
         draft_expires_at = ${isDraft ? sql`now() + interval '7 days'` : null},
         embedding = ${vec ? sql`${vec}::vector` : null}
     WHERE id = ${id}

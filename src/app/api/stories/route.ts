@@ -3,7 +3,12 @@ import { sql } from "@/lib/db";
 import { ApiError, requireSession, withErrors } from "@/lib/http";
 import { findSimilar } from "@/lib/similarity";
 import { htmlToText, normalizeChapters, validateStory } from "@/lib/story-validation";
-import { normalizeOfferedDurations, normalizePrices } from "@/lib/pricing";
+import {
+  DEFAULT_CURRENCY,
+  isCurrency,
+  normalizeOfferedDurations,
+  normalizePrices,
+} from "@/lib/pricing";
 
 export const POST = withErrors(async (req: Request) => {
   const session = await requireSession();
@@ -18,6 +23,7 @@ export const POST = withErrors(async (req: Request) => {
     chaptersPublic,
     offeredDurations,
     wholePrices,
+    currency,
     decision,
     inspiredById,
   } = await req.json().catch(() => ({}));
@@ -26,6 +32,7 @@ export const POST = withErrors(async (req: Request) => {
   const isPublic = chaptersPublic === true;
   const offered = normalizeOfferedDurations(offeredDurations);
   const wholePriceMap = normalizePrices(wholePrices, offered);
+  const storyCurrency = isCurrency(currency) ? currency : DEFAULT_CURRENCY;
 
   const invalid = validateStory(
     String(title ?? ""),
@@ -65,13 +72,13 @@ export const POST = withErrors(async (req: Request) => {
   const [story] = await sql<{ id: string }[]>`
     INSERT INTO stories (
       author_id, title, summary, chapters, body, status, chapters_public,
-      offered_durations, whole_prices, draft_expires_at, embedding
+      offered_durations, whole_prices, currency, draft_expires_at, embedding
     )
     VALUES (
       ${session.user.id}, ${cleanTitle}, ${cleanSummary},
       ${sql.json(cleanChapters)}, ${bodyPlain},
       ${isDraft ? "draft" : "published"}, ${isPublic},
-      ${offered}, ${sql.json(wholePriceMap)},
+      ${offered}, ${sql.json(wholePriceMap)}, ${storyCurrency},
       ${isDraft ? sql`now() + interval '7 days'` : null},
       ${vec ? sql`${vec}::vector` : null}
     )

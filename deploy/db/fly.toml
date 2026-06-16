@@ -1,0 +1,26 @@
+# Self-run Postgres 17 + pgvector for Talerooms, on Fly.
+# Deploy with: fly deploy -c deploy/db/fly.toml
+#
+# Private-only: no public IP/ports. The web app reaches it over Fly's private
+# network at talerooms-pg.internal:5432. The superuser password is a Fly secret
+# (POSTGRES_PASSWORD); set it before the first deploy.
+app = "talerooms-pg"
+primary_region = "sin"
+
+[build]
+  image = "pgvector/pgvector:pg17"
+
+[env]
+  POSTGRES_DB = "talerooms"
+  # Keep data in a subdirectory of the mount so initdb doesn't trip over the
+  # volume's lost+found.
+  PGDATA = "/var/lib/postgresql/data/pgdata"
+
+# Persistent database storage (daily snapshots, 5-day retention by default).
+[mounts]
+  source = "pgdata"
+  destination = "/var/lib/postgresql/data"
+
+[[vm]]
+  size = "shared-cpu-1x"
+  memory = "512"

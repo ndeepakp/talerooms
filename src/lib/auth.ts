@@ -13,6 +13,7 @@ const trustedOrigins = [
   "http://localhost:3001",
   "https://talerooms.com",
   "https://www.talerooms.com",
+  "https://talerooms.fly.dev",
   "https://*.trycloudflare.com",
   ...(process.env.BETTER_AUTH_TRUSTED_ORIGINS?.split(",")
     .map((o) => o.trim())

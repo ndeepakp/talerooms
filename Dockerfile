@@ -31,6 +31,10 @@ RUN groupadd --system --gid 1001 nodejs \
 COPY --from=builder /app/public ./public
 COPY --from=builder --chown=nextjs:nodejs /app/.next/standalone ./
 COPY --from=builder --chown=nextjs:nodejs /app/.next/static ./.next/static
-USER nextjs
+COPY docker-entrypoint.sh /app/docker-entrypoint.sh
+RUN chmod +x /app/docker-entrypoint.sh
+# Run as root so the entrypoint can fix the mounted Fly volume's root-owned
+# lost+found directory each boot. Hardening note: drop back to the nextjs user
+# once uploads move to object storage (see deployment.md).
 EXPOSE 3000
-CMD ["node", "server.js"]
+CMD ["/app/docker-entrypoint.sh"]

@@ -101,5 +101,47 @@ TLS is issued automatically once DNS resolves (a few minutes). Verify:
 - **Memory.** `fly.toml` requests 1 GB for the in-process embedding model. If a
   publish ever OOMs, bump `[[vm]] memory` to `2048` and `fly deploy`.
 - **Redeploys.** After any code change: `git push` then `fly deploy -a talerooms`.
-- **Auth origins.** `https://talerooms.com` and `www` are already in the app's
-  trusted origins (`src/lib/auth.ts`), so login/signup work on the domain.
+- **Auth origins.** `https://talerooms.com`, `www`, and `https://talerooms.fly.dev`
+  are in the app's trusted origins (`src/lib/auth.ts`), so login/signup work on
+  the domain and on the Fly URL. Add any other host you serve from there.
+
+---
+
+## What we actually deployed (addendum)
+
+The managed-Postgres steps in sections 2–3 above describe `fly mpg`, but we did
+**not** use it: Fly Managed Postgres is **$38/mo**, and the cheap flex Postgres
+image lacks the `vector` extension. Instead we run our **own** Postgres + pgvector
+container — cheap (~$4–5/mo), always-on, and pgvector-capable.
+
+**Database (self-run, config in `deploy/db/fly.toml`):**
+
+```bash
+fly apps create talerooms-pg --org personal
+fly volumes create pgdata --region sin --size 3 -a talerooms-pg
+fly secrets set POSTGRES_PASSWORD="$(openssl rand -hex 24)" -a talerooms-pg
+fly deploy -c deploy/db/fly.toml --ha=false        # pgvector/pgvector:pg17 + volume
+```
+
+The web app connects over the private network at `talerooms-pg.internal:5432`
+(no public IP). Set `DATABASE_URL` on the web app to
+`postgres://postgres:<password>@talerooms-pg.internal:5432/talerooms?sslmode=disable`.
+
+**Schema + seed data.** The base better-auth tables and the `vector` extension
+aren't in `db/*.sql` (they were created by better-auth's CLI and a manual extension
+install locally), so reproduce the schema from a local dump, then load it as the
+superuser through a proxy:
+
+```bash
+pg_dump --schema-only --no-owner --no-privileges -d talescape -f /tmp/schema.sql
+fly proxy 15432:5432 -a talerooms-pg          # leave running
+psql "postgresql://postgres:<password>@localhost:15432/talerooms" -f /tmp/schema.sql
+# Genres are reference data — load the seed so signup shows them:
+psql "postgresql://postgres:<password>@localhost:15432/talerooms" -f db/0025_seed_genres.sql
+```
+
+**Runtime gotcha (handled in the Dockerfile).** Fly mounts the uploads volume with
+a root-owned `lost+found` that its fsck recreates each boot; the Next server
+scandirs `public/uploads` at startup and crashes on it. The image therefore runs
+as root and uses `docker-entrypoint.sh` to make `lost+found` readable and ensure
+the upload subdirs exist before starting.

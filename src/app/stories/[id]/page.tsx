@@ -86,11 +86,16 @@ export default async function StoryPage({
   // public summary.
   if (story.status === "draft" && !isAuthor) notFound();
 
-  // How many distinct readers have bought access — public social proof (🔥).
-  const [counts] = await sql<{ buyers: number }[]>`
-    SELECT COUNT(DISTINCT user_id)::int AS buyers FROM access_grants WHERE story_id = ${id}
+  // Public stats: distinct readers who bought access (used in the buy panel),
+  // and total views from readers other than the author (story_views excludes the
+  // author at insert time).
+  const [counts] = await sql<{ buyers: number; views: number }[]>`
+    SELECT
+      (SELECT COUNT(DISTINCT user_id) FROM access_grants WHERE story_id = ${id})::int AS buyers,
+      (SELECT COUNT(*) FROM story_views WHERE story_id = ${id})::int AS views
   `;
   const buyers = counts?.buyers ?? 0;
+  const views = counts?.views ?? 0;
 
   // The full chapters (with per-chapter prices). We fetch them all server-side,
   // but only ever render the BODY of chapters this viewer may read — locked
@@ -306,16 +311,13 @@ export default async function StoryPage({
           · {date}
         </p>
 
-        {/* Public social proof — how many readers have bought access (🔥).
-            Only meaningful for paid (private) stories. */}
-        {!story.chapters_public && (
-          <div className="mt-3 inline-flex items-center gap-1.5 rounded-full bg-orange-100 px-3 py-1 text-sm font-medium text-orange-700 dark:bg-orange-950/40 dark:text-orange-300">
-            <span aria-hidden="true">🔥</span>
-            <span>
-              {buyers} {buyers === 1 ? "reader" : "readers"} with access
-            </span>
-          </div>
-        )}
+        {/* View count — readers other than the author who have opened this story. */}
+        <div className="mt-3 inline-flex items-center gap-1.5 rounded-full bg-zinc-100 px-3 py-1 text-sm font-medium text-zinc-600 dark:bg-zinc-800 dark:text-zinc-300">
+          <span aria-hidden="true">👁</span>
+          <span>
+            {views} {views === 1 ? "view" : "views"}
+          </span>
+        </div>
 
         {story.genres.length > 0 && (
           <div className="mt-4 flex flex-wrap gap-1.5">

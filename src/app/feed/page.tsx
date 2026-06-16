@@ -18,7 +18,7 @@ type FeedStory = {
   genres: string[];
   likes: number;
   dislikes: number;
-  interests: number;
+  views: number;
 };
 
 export default async function FeedPage() {
@@ -62,7 +62,7 @@ export default async function FeedPage() {
       COALESCE(array_agg(g.name) FILTER (WHERE g.name IS NOT NULL), '{}') AS genres,
       (SELECT COUNT(*) FROM reactions r WHERE r.story_id = s.id AND r.value = 1)::int AS likes,
       (SELECT COUNT(*) FROM reactions r WHERE r.story_id = s.id AND r.value = -1)::int AS dislikes,
-      (SELECT COUNT(DISTINCT ag.user_id) FROM access_grants ag WHERE ag.story_id = s.id)::int AS interests
+      (SELECT COUNT(*) FROM story_views sv WHERE sv.story_id = s.id)::int AS views
     FROM stories s
     JOIN "user" u ON u.id = s.author_id
     LEFT JOIN story_genres sg ON sg.story_id = s.id
@@ -163,8 +163,8 @@ export default async function FeedPage() {
                 <div className="mt-3 flex items-center gap-4 text-sm text-zinc-500">
                   <span>👍 {story.likes}</span>
                   <span>👎 {story.dislikes}</span>
-                  <span className="font-medium text-orange-600 dark:text-orange-400">
-                    🔥 {story.interests}
+                  <span className="inline-flex items-center gap-1" title="Views">
+                    <span aria-hidden="true">👁</span> {story.views}
                   </span>
                 </div>
               </li>

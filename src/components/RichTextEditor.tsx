@@ -1,5 +1,6 @@
 "use client";
 
+import { useReducer } from "react";
 import { useEditor, EditorContent, type Editor } from "@tiptap/react";
 import StarterKit from "@tiptap/starter-kit";
 import { TextStyle, FontFamily } from "@tiptap/extension-text-style";
@@ -161,6 +162,12 @@ export function RichTextEditor({
   onChange: (html: string) => void;
   placeholder?: string;
 }) {
+  // Toolbar buttons read editor.isActive(...). Those states change on selection
+  // moves and mark toggles (e.g. clicking Bold with no selection), not just on
+  // content edits — so force a re-render on every transaction to keep the
+  // active highlight in sync.
+  const [, forceUpdate] = useReducer((x: number) => x + 1, 0);
+
   const editor = useEditor({
     // Avoids an SSR hydration mismatch in the Next.js App Router.
     immediatelyRender: false,
@@ -178,6 +185,7 @@ export function RichTextEditor({
       },
     },
     onUpdate: ({ editor }) => onChange(editor.getHTML()),
+    onTransaction: () => forceUpdate(),
   });
 
   return (

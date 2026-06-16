@@ -5,7 +5,7 @@ import { useRouter } from "next/navigation";
 import Link from "next/link";
 import {
   CHAPTER_PAGE_WORDS,
-  MAX_SUMMARY_CHARS,
+  MAX_SUMMARY_WORDS,
   MAX_TITLE_WORDS,
   htmlToText,
   validateStory,
@@ -191,6 +191,17 @@ export function StoryForm({
       ),
     );
   }
+  // Copy the previous chapter's per-tier prices onto this chapter, so authors
+  // don't have to retype the same prices for every chapter.
+  function copyPricesFromPrev(index: number) {
+    setChapters((prev) =>
+      index <= 0
+        ? prev
+        : prev.map((c, i) =>
+            i === index ? { ...c, prices: { ...prev[index - 1].prices } } : c,
+          ),
+    );
+  }
   function addChapter() {
     setChapters((prev) => [...prev, { id: newId(), title: "", body: "", prices: {} }]);
   }
@@ -349,7 +360,7 @@ export function StoryForm({
     );
   }
 
-  const summaryOver = summary.length > MAX_SUMMARY_CHARS;
+  const summaryOver = wordCount(summary) > MAX_SUMMARY_WORDS;
 
   return (
     <div className="min-h-screen bg-[var(--page)] px-6 py-12">
@@ -449,7 +460,7 @@ export function StoryForm({
               <span
                 className={"font-normal " + (summaryOver ? "text-red-600" : "text-zinc-500")}
               >
-                {summary.length}/{MAX_SUMMARY_CHARS} characters
+                {wordCount(summary)}/{MAX_SUMMARY_WORDS} words
               </span>
             </span>
             <span className="text-xs text-zinc-500">
@@ -458,7 +469,6 @@ export function StoryForm({
             <textarea
               value={summary}
               onChange={(e) => setSummary(e.target.value)}
-              maxLength={MAX_SUMMARY_CHARS}
               placeholder="One or two lines that hook the reader…"
               rows={3}
               className="rounded-lg border border-zinc-300 bg-white p-3 text-zinc-900 outline-none focus:border-zinc-900 dark:border-zinc-700 dark:bg-zinc-950 dark:text-zinc-100"
@@ -682,9 +692,20 @@ export function StoryForm({
 
                 {!chaptersPublic && offeredDurations.length > 0 && (
                   <div className="mt-3 border-t border-zinc-100 pt-3 dark:border-zinc-800">
-                    <span className="text-xs font-medium text-zinc-600 dark:text-zinc-400">
-                      Price to buy just this chapter
-                    </span>
+                    <div className="flex items-center justify-between gap-2">
+                      <span className="text-xs font-medium text-zinc-600 dark:text-zinc-400">
+                        Price to buy just this chapter
+                      </span>
+                      {i > 0 && (
+                        <button
+                          type="button"
+                          onClick={() => copyPricesFromPrev(i)}
+                          className="text-xs font-medium text-accent hover:underline"
+                        >
+                          Copy from previous chapter
+                        </button>
+                      )}
+                    </div>
                     <div className="mt-1.5 flex flex-wrap gap-3">
                       {offeredDurations.map((t) => (
                         <label

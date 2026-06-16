@@ -145,7 +145,7 @@ export default async function StoryPage({
   const bookmarks =
     allChapters.length > 0
       ? await sql<Bookmark[]>`
-          SELECT id, chapter_index, quote FROM bookmarks
+          SELECT id, chapter_index, quote, occurrence FROM bookmarks
           WHERE user_id = ${session.user.id} AND story_id = ${id}
           ORDER BY created_at
         `
@@ -402,7 +402,11 @@ export default async function StoryPage({
               chapters={allChapters.map((c, i) => ({
                 index: i,
                 title: c.title,
-                body: chapterUnlocked(i) ? c.body : null,
+                // Base64 the body so the chapter text isn't sitting in the page
+                // source; the reader decodes it client-side after mount.
+                body: chapterUnlocked(i)
+                  ? Buffer.from(c.body, "utf8").toString("base64")
+                  : null,
                 locked: !chapterUnlocked(i),
               }))}
               initialChapter={initialChapter}

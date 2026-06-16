@@ -1,7 +1,7 @@
 import { type Tier, TIERS, normalizePrices } from "./pricing";
 
 export const MAX_TITLE_WORDS = 20;
-export const MAX_SUMMARY_CHARS = 150;
+export const MAX_SUMMARY_WORDS = 150;
 // Chapters longer than this (visible words) are split into pages for readers.
 // Shared by the reader (ChapterReader) and the write form's hint.
 export const CHAPTER_PAGE_WORDS = 750;
@@ -81,8 +81,8 @@ export function validateStory(
   }
 
   const summaryTrim = summary.trim();
-  if (summaryTrim.length > MAX_SUMMARY_CHARS) {
-    return `Summary must be ${MAX_SUMMARY_CHARS} characters or fewer.`;
+  if (wordCount(summaryTrim) > MAX_SUMMARY_WORDS) {
+    return `Summary must be ${MAX_SUMMARY_WORDS} words or fewer.`;
   }
 
   // Drafts stop here — everything below is only required to publish.

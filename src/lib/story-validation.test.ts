@@ -1,7 +1,7 @@
 import { describe, it, expect } from "vitest";
 import {
   MAX_TITLE_WORDS,
-  MAX_SUMMARY_CHARS,
+  MAX_SUMMARY_WORDS,
   wordCount,
   htmlToText,
   normalizeChapters,
@@ -83,9 +83,9 @@ describe("validateStory", () => {
     );
   });
   it("rejects an over-long summary", () => {
-    const longSummary = "x".repeat(MAX_SUMMARY_CHARS + 1);
+    const longSummary = Array(MAX_SUMMARY_WORDS + 1).fill("w").join(" ");
     expect(validateStory(ok.title, longSummary, ok.chapters, ok.genres, true)).toMatch(
-      /characters/i,
+      /words/i,
     );
   });
 

@@ -14,16 +14,18 @@ export const POST = withErrors(async (
   if (!UUID_RE.test(id)) throw new ApiError(404, "Not found.");
 
   const session = await requireSession();
-  const { chapterIndex } = await req.json().catch(() => ({}));
+  const { chapterIndex, pageIndex } = await req.json().catch(() => ({}));
   if (!Number.isInteger(chapterIndex) || chapterIndex < 0) {
     throw new ApiError(400, "Bad chapter.");
   }
+  // Page within the chapter (auto page bookmark). Optional; defaults to 0.
+  const page = Number.isInteger(pageIndex) && pageIndex >= 0 ? pageIndex : 0;
 
   await sql`
-    INSERT INTO reading_progress (user_id, story_id, chapter_index)
-    VALUES (${session.user.id}, ${id}, ${chapterIndex})
+    INSERT INTO reading_progress (user_id, story_id, chapter_index, page_index)
+    VALUES (${session.user.id}, ${id}, ${chapterIndex}, ${page})
     ON CONFLICT (user_id, story_id) DO UPDATE
-      SET chapter_index = ${chapterIndex}, updated_at = now()
+      SET chapter_index = ${chapterIndex}, page_index = ${page}, updated_at = now()
   `;
 
   return NextResponse.json({ ok: true });

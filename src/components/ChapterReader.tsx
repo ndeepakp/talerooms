@@ -44,12 +44,14 @@ export function ChapterReader({
   storyId,
   chapters,
   initialChapter,
+  initialPage,
   initialBookmarks,
   autoResume,
 }: {
   storyId: string;
   chapters: ReaderChapter[];
   initialChapter: number;
+  initialPage: number;
   initialBookmarks: Bookmark[];
   autoResume: boolean;
 }) {
@@ -80,15 +82,34 @@ export function ChapterReader({
   // Direction of the last page turn, so the new page animates like a book flip.
   const [flipDir, setFlipDir] = useState<"next" | "prev" | null>(null);
 
-  // Record reading progress whenever an unlocked chapter is opened.
+  // Restore the reader to their last page in the starting chapter, once the
+  // chapter has been paginated. Runs once; for other chapters we start at page 0.
+  const restoredPageRef = useRef(false);
   useEffect(() => {
+    if (restoredPageRef.current || !mounted) return;
+    restoredPageRef.current = true;
+    if (current === clampedInitial && initialPage > 0) {
+      const target = Math.min(initialPage, pages.length - 1);
+      const raf = requestAnimationFrame(() => setPage(target));
+      return () => cancelAnimationFrame(raf);
+    }
+  }, [mounted, pages.length, current, clampedInitial, initialPage]);
+
+  // Auto-save reading progress (chapter + page) — this is the automatic page
+  // bookmark. Debounced, and held until the saved page has been restored so we
+  // don't overwrite it with page 0 on arrival.
+  useEffect(() => {
+    if (!mounted || !restoredPageRef.current) return;
     if (!chapter || chapter.locked) return;
-    fetch(`/api/stories/${storyId}/progress`, {
-      method: "POST",
-      headers: { "Content-Type": "application/json" },
-      body: JSON.stringify({ chapterIndex: current }),
-    }).catch(() => {});
-  }, [storyId, current, chapter]);
+    const t = setTimeout(() => {
+      fetch(`/api/stories/${storyId}/progress`, {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ chapterIndex: current, pageIndex: safePage }),
+      }).catch(() => {});
+    }, 400);
+    return () => clearTimeout(t);
+  }, [mounted, storyId, current, safePage, chapter]);
 
   // Unwrap any existing highlight, then highlight + scroll to `quote` within the
   // currently-rendered page.
@@ -309,18 +330,26 @@ export function ChapterReader({
               <div className="book-stage min-w-0 flex-1">
                 <div
                   key={`${current}-${safePage}`}
-                  ref={bodyRef}
-                  onMouseUp={onMouseUp}
                   className={
-                    "richtext text-lg text-zinc-800 dark:text-zinc-200 " +
+                    "book-page" +
                     (flipDir === "next"
-                      ? "pageflip-next"
+                      ? " pageflip-next"
                       : flipDir === "prev"
-                        ? "pageflip-prev"
+                        ? " pageflip-prev"
                         : "")
                   }
-                  dangerouslySetInnerHTML={{ __html: pages[safePage] ?? "" }}
-                />
+                >
+                  <div
+                    ref={bodyRef}
+                    onMouseUp={onMouseUp}
+                    onCopy={(e) => e.preventDefault()}
+                    onCut={(e) => e.preventDefault()}
+                    onContextMenu={(e) => e.preventDefault()}
+                    onDragStart={(e) => e.preventDefault()}
+                    className="richtext"
+                    dangerouslySetInnerHTML={{ __html: pages[safePage] ?? "" }}
+                  />
+                </div>
               </div>
 
               {pages.length > 1 && (

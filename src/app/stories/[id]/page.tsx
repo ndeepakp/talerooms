@@ -150,16 +150,20 @@ export default async function StoryPage({
   // Which chapter to open first: the ?chapter param (from a "continue" link),
   // else the reader's last saved position, else the first.
   let initialChapter = 0;
+  let initialPage = 0;
   const paramChapter = chapterParam ? parseInt(chapterParam, 10) : NaN;
   const autoResume = Number.isInteger(paramChapter);
   if (autoResume) {
     initialChapter = paramChapter;
   } else if (allChapters.length > 0) {
-    const [prog] = await sql<{ chapter_index: number }[]>`
-      SELECT chapter_index FROM reading_progress
+    const [prog] = await sql<{ chapter_index: number; page_index: number }[]>`
+      SELECT chapter_index, page_index FROM reading_progress
       WHERE user_id = ${session.user.id} AND story_id = ${id}
     `;
-    if (prog) initialChapter = prog.chapter_index;
+    if (prog) {
+      initialChapter = prog.chapter_index;
+      initialPage = prog.page_index;
+    }
   }
 
   // Author's roster of readers with access (for the revoke controls), grouped
@@ -390,6 +394,7 @@ export default async function StoryPage({
                 locked: !chapterUnlocked(i),
               }))}
               initialChapter={initialChapter}
+              initialPage={initialPage}
               initialBookmarks={bookmarks}
               autoResume={autoResume}
             />

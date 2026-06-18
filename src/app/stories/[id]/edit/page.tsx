@@ -4,6 +4,7 @@ import { auth } from "@/lib/auth";
 import { sql } from "@/lib/db";
 import { StoryForm } from "@/app/write/StoryForm";
 import { type Chapter } from "@/lib/story-validation";
+import { type CoverStyle } from "@/lib/cover-style";
 
 const UUID_RE = /^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i;
 
@@ -30,11 +31,12 @@ export default async function EditStoryPage({
       whole_prices: Record<string, number>;
       currency: string;
       cover_url: string | null;
+      cover_style: CoverStyle | null;
       author_id: string;
     }[]
   >`
     SELECT id, title, summary, chapters, status, chapters_public,
-           offered_durations, whole_prices, currency, cover_url, author_id
+           offered_durations, whole_prices, currency, cover_url, cover_style, author_id
     FROM stories WHERE id = ${id}
   `;
 
@@ -65,6 +67,7 @@ export default async function EditStoryPage({
         wholePrices: story.whole_prices,
         currency: story.currency,
         coverUrl: story.cover_url,
+        coverStyle: story.cover_style,
       }}
     />
   );

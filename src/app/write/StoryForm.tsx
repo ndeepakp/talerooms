@@ -21,6 +21,8 @@ import {
   type Tier,
 } from "@/lib/pricing";
 import { RichTextEditor } from "@/components/RichTextEditor";
+import { BookCover } from "@/components/BookCover";
+import { COVER_PALETTES, type CoverStyle } from "@/lib/cover-style";
 
 type Genre = { id: number; name: string };
 type Match = { id: string; title: string; author: string | null; similarity: number };
@@ -39,6 +41,7 @@ type EditStory = {
   wholePrices: PriceMap;
   currency: string;
   coverUrl: string | null;
+  coverStyle: CoverStyle | null;
 };
 
 // Local chapter shape: a stable id (so reordering keeps each editor's content
@@ -97,6 +100,11 @@ export function StoryForm({
   const [currency, setCurrency] = useState<string>(story?.currency ?? DEFAULT_CURRENCY);
   const [coverUrl, setCoverUrl] = useState<string | null>(story?.coverUrl ?? null);
   const [coverUploading, setCoverUploading] = useState(false);
+  // New stories default to a generated cover (covers boost reach); editing keeps
+  // whatever was saved. An uploaded image takes precedence over this.
+  const [coverStyle, setCoverStyle] = useState<CoverStyle | null>(
+    story ? (story.coverStyle ?? null) : { palette: 0 },
+  );
 
   async function onCoverChange(e: React.ChangeEvent<HTMLInputElement>) {
     const file = e.target.files?.[0];
@@ -265,6 +273,7 @@ export function StoryForm({
         wholePrices: chaptersPublic || !offerWhole ? {} : wholePrices,
         currency,
         coverUrl,
+        coverStyle: coverUrl ? null : coverStyle,
         status: draft ? "draft" : "published",
         decision: opts.decision,
         inspiredById: opts.inspiredById,
@@ -408,46 +417,81 @@ export function StoryForm({
           </label>
 
           {/* Optional cover image */}
-          <div className="flex flex-col gap-1.5">
+          <div className="flex flex-col gap-2">
             <span className="text-sm font-medium text-zinc-700 dark:text-zinc-300">
               Cover image <span className="font-normal text-zinc-400">(optional)</span>
             </span>
-            <div className="flex items-center gap-4">
-              {coverUrl ? (
-                // eslint-disable-next-line @next/next/no-img-element
-                <img
-                  src={coverUrl}
-                  alt="Story cover"
-                  className="h-28 w-20 rounded-md border border-zinc-200 object-cover dark:border-zinc-700"
-                />
-              ) : (
-                <div className="flex h-28 w-20 items-center justify-center rounded-md border border-dashed border-zinc-300 text-2xl text-zinc-300 dark:border-zinc-700">
-                  📖
+            <p className="text-xs text-zinc-500">
+              A cover is the first thing readers see — stories with one get noticed
+              and read more. Upload your own, pick a generated style, or skip it.
+            </p>
+            <div className="flex items-start gap-4">
+              <BookCover
+                title={title || "Your title"}
+                coverUrl={coverUrl}
+                coverStyle={coverStyle}
+                className="h-40 w-28 shrink-0 rounded-md"
+              />
+              <div className="flex min-w-0 flex-1 flex-col gap-2">
+                <div className="flex flex-wrap items-center gap-2">
+                  <label className="cursor-pointer rounded-full border border-zinc-300 px-3 py-1.5 text-sm font-medium text-zinc-700 hover:bg-zinc-100 dark:border-zinc-700 dark:text-zinc-300 dark:hover:bg-zinc-900">
+                    {coverUploading
+                      ? "Uploading…"
+                      : coverUrl
+                        ? "Replace image"
+                        : "Upload your own"}
+                    <input
+                      type="file"
+                      accept="image/*"
+                      onChange={onCoverChange}
+                      disabled={coverUploading}
+                      className="hidden"
+                    />
+                  </label>
+                  {coverUrl && (
+                    <button
+                      type="button"
+                      onClick={() => setCoverUrl(null)}
+                      className="text-xs text-zinc-400 hover:text-red-600 dark:hover:text-red-400"
+                    >
+                      Remove image
+                    </button>
+                  )}
                 </div>
-              )}
-              <div className="flex flex-col gap-1.5">
-                <label className="cursor-pointer rounded-full border border-zinc-300 px-3 py-1.5 text-sm font-medium text-zinc-700 hover:bg-zinc-100 dark:border-zinc-700 dark:text-zinc-300 dark:hover:bg-zinc-900">
-                  {coverUploading
-                    ? "Uploading…"
-                    : coverUrl
-                      ? "Replace cover"
-                      : "Upload cover"}
-                  <input
-                    type="file"
-                    accept="image/*"
-                    onChange={onCoverChange}
-                    disabled={coverUploading}
-                    className="hidden"
-                  />
-                </label>
-                {coverUrl && (
-                  <button
-                    type="button"
-                    onClick={() => setCoverUrl(null)}
-                    className="text-left text-xs text-zinc-400 hover:text-red-600 dark:hover:text-red-400"
-                  >
-                    Remove cover
-                  </button>
+
+                {!coverUrl && (
+                  <div>
+                    <p className="text-xs text-zinc-500">Or pick a generated cover:</p>
+                    <div className="mt-1.5 flex flex-wrap gap-1.5">
+                      {COVER_PALETTES.map((p, i) => (
+                        <button
+                          type="button"
+                          key={i}
+                          onClick={() => setCoverStyle({ palette: i })}
+                          aria-label={`Cover style ${i + 1}`}
+                          className={
+                            "h-7 w-7 rounded-md border-2 transition " +
+                            (coverStyle?.palette === i
+                              ? "border-zinc-900 dark:border-zinc-100"
+                              : "border-transparent")
+                          }
+                          style={{ background: p.bg }}
+                        />
+                      ))}
+                      <button
+                        type="button"
+                        onClick={() => setCoverStyle(null)}
+                        className={
+                          "flex h-7 items-center rounded-md border px-2 text-xs font-medium transition " +
+                          (coverStyle === null
+                            ? "border-zinc-900 text-zinc-900 dark:border-zinc-100 dark:text-zinc-100"
+                            : "border-zinc-300 text-zinc-500 dark:border-zinc-700")
+                        }
+                      >
+                        No cover
+                      </button>
+                    </div>
+                  </div>
                 )}
               </div>
             </div>

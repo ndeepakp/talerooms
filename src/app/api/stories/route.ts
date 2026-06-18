@@ -10,6 +10,7 @@ import {
   normalizePrices,
 } from "@/lib/pricing";
 import { COVER_PUBLIC_PREFIX } from "@/lib/cover";
+import { normalizeCoverStyle } from "@/lib/cover-style";
 
 export const POST = withErrors(async (req: Request) => {
   const session = await requireSession();
@@ -26,6 +27,7 @@ export const POST = withErrors(async (req: Request) => {
     wholePrices,
     currency,
     coverUrl,
+    coverStyle,
     decision,
     inspiredById,
   } = await req.json().catch(() => ({}));
@@ -39,6 +41,8 @@ export const POST = withErrors(async (req: Request) => {
     typeof coverUrl === "string" && coverUrl.startsWith(COVER_PUBLIC_PREFIX)
       ? coverUrl
       : null;
+  // An uploaded image wins; otherwise an optional generated cover style.
+  const coverStyleVal = cover ? null : normalizeCoverStyle(coverStyle);
 
   const invalid = validateStory(
     String(title ?? ""),
@@ -78,13 +82,15 @@ export const POST = withErrors(async (req: Request) => {
   const [story] = await sql<{ id: string }[]>`
     INSERT INTO stories (
       author_id, title, summary, chapters, body, status, chapters_public,
-      offered_durations, whole_prices, currency, cover_url, draft_expires_at, embedding
+      offered_durations, whole_prices, currency, cover_url, cover_style,
+      draft_expires_at, embedding
     )
     VALUES (
       ${session.user.id}, ${cleanTitle}, ${cleanSummary},
       ${sql.json(cleanChapters)}, ${bodyPlain},
       ${isDraft ? "draft" : "published"}, ${isPublic},
       ${offered}, ${sql.json(wholePriceMap)}, ${storyCurrency}, ${cover},
+      ${coverStyleVal ? sql.json(coverStyleVal) : null},
       ${isDraft ? sql`now() + interval '7 days'` : null},
       ${vec ? sql`${vec}::vector` : null}
     )

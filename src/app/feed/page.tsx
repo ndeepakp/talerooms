@@ -5,6 +5,8 @@ import { auth } from "@/lib/auth";
 import { sql } from "@/lib/db";
 import { getAppearance } from "@/lib/get-appearance";
 import { StarRating } from "@/components/StarRating";
+import { BookCover } from "@/components/BookCover";
+import { type CoverStyle } from "@/lib/cover-style";
 
 export const dynamic = "force-dynamic";
 
@@ -21,6 +23,7 @@ type FeedStory = {
   rating_count: number;
   views: number;
   cover_url: string | null;
+  cover_style: CoverStyle | null;
 };
 
 export default async function FeedPage() {
@@ -65,7 +68,8 @@ export default async function FeedPage() {
       (SELECT ROUND(AVG(stars), 1) FROM reviews rv WHERE rv.story_id = s.id)::float AS rating,
       (SELECT COUNT(*) FROM reviews rv WHERE rv.story_id = s.id)::int AS rating_count,
       (SELECT COUNT(*) FROM story_views sv WHERE sv.story_id = s.id)::int AS views,
-      s.cover_url
+      s.cover_url,
+      s.cover_style
     FROM stories s
     JOIN "user" u ON u.id = s.author_id
     LEFT JOIN story_genres sg ON sg.story_id = s.id
@@ -161,12 +165,13 @@ export default async function FeedPage() {
                   </div>
                 )}
                 <Link href={`/stories/${story.id}`} className="mt-3 flex gap-4">
-                  {story.cover_url && (
-                    // eslint-disable-next-line @next/next/no-img-element
-                    <img
-                      src={story.cover_url}
-                      alt=""
-                      className="h-32 w-24 shrink-0 rounded-md border border-zinc-200 object-cover dark:border-zinc-800"
+                  {(story.cover_url || story.cover_style) && (
+                    <BookCover
+                      title={story.title}
+                      author={story.author}
+                      coverUrl={story.cover_url}
+                      coverStyle={story.cover_style}
+                      className="h-32 w-24 shrink-0 rounded-md"
                     />
                   )}
                   <p className="line-clamp-4 text-zinc-700 dark:text-zinc-300">{story.summary}</p>

@@ -7,6 +7,8 @@ import { Avatar } from "@/components/Avatar";
 import { StarRating } from "@/components/StarRating";
 import { ReviewPanel } from "@/components/ReviewPanel";
 import { PinReviewButton } from "@/components/PinReviewButton";
+import { BookCover } from "@/components/BookCover";
+import { type CoverStyle } from "@/lib/cover-style";
 import { CommentForm } from "@/components/CommentForm";
 import { DeleteStoryButton } from "@/components/DeleteStoryButton";
 import { AccessPanel } from "@/components/AccessPanel";
@@ -30,6 +32,7 @@ type Story = {
   whole_prices: Partial<Record<Tier, number>>;
   currency: string;
   cover_url: string | null;
+  cover_style: CoverStyle | null;
   created_at: string;
   author: string | null;
   author_id: string;
@@ -71,6 +74,7 @@ export default async function StoryPage({
       s.whole_prices,
       s.currency,
       s.cover_url,
+      s.cover_style,
       s.created_at,
       u.name AS author,
       u.id AS author_id,
@@ -318,12 +322,13 @@ export default async function StoryPage({
             Draft — only you can see this
           </span>
         )}
-        {story.cover_url && (
-          // eslint-disable-next-line @next/next/no-img-element
-          <img
-            src={story.cover_url}
-            alt={`Cover of ${story.title}`}
-            className="mt-4 max-h-96 w-auto rounded-lg border border-zinc-200 object-contain dark:border-zinc-800"
+        {(story.cover_url || story.cover_style) && (
+          <BookCover
+            title={story.title}
+            author={story.author}
+            coverUrl={story.cover_url}
+            coverStyle={story.cover_style}
+            className="mt-4 h-64 w-44 rounded-lg"
           />
         )}
         <h1 className="mt-3 text-3xl font-bold tracking-tight text-zinc-900 dark:text-zinc-50">

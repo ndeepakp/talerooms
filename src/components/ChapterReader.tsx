@@ -100,14 +100,17 @@ export function ChapterReader({
   const [bookmarks, setBookmarks] = useState<Bookmark[]>(initialBookmarks);
   const [sel, setSel] = useState<{
     top: number;
+    bottom: number;
     left: number;
     text: string;
     occurrence: number;
   } | null>(null);
-  // The dictionary lookup card for a highlighted word.
+  // The dictionary lookup card for a highlighted word. Anchored by `top` (card
+  // grows downward) or `bottom` (card grows upward) depending on room on screen.
   const [def, setDef] = useState<{
     word: string;
-    top: number;
+    top: number | null;
+    bottom: number | null;
     left: number;
     loading: boolean;
     phonetic?: string | null;
@@ -274,7 +277,13 @@ export function ChapterReader({
       occurrence += countOccurrences(norm(stripTags(pages[i])), needle);
     }
     const rect = range.getBoundingClientRect();
-    setSel({ top: rect.top - 44, left: rect.left, text: quote, occurrence });
+    setSel({
+      top: rect.top - 44,
+      bottom: rect.bottom,
+      left: rect.left,
+      text: quote,
+      occurrence,
+    });
   }
 
   async function addBookmark() {
@@ -320,11 +329,26 @@ export function ChapterReader({
     if (!sel) return;
     const word = sel.text.trim();
     const vw = typeof window !== "undefined" ? window.innerWidth : 1200;
-    const top = sel.top + 44; // sit just below where the action buttons were
+    const vh = typeof window !== "undefined" ? window.innerHeight : 800;
     const left = Math.max(8, Math.min(sel.left, vw - 300));
+    // Decide whether the card sits below the word or flips above it, so a word
+    // near the bottom of the screen still shows its full definition. `CARD_MAX`
+    // is a generous estimate of the card's height.
+    const CARD_MAX = 300;
+    const gap = 8;
+    const wordTop = sel.top + 44; // ≈ the selection's top edge
+    const wordBottom = sel.bottom;
+    const spaceBelow = vh - wordBottom;
+    let top: number | null = null;
+    let bottom: number | null = null;
+    if (spaceBelow >= CARD_MAX + gap || spaceBelow >= wordTop) {
+      top = wordBottom + gap; // grows downward
+    } else {
+      bottom = vh - wordTop + gap; // anchor above the word, grows upward
+    }
     setSel(null);
     window.getSelection()?.removeAllRanges();
-    setDef({ word, top, left, loading: true });
+    setDef({ word, top, bottom, left, loading: true });
     try {
       const res = await fetch(`/api/define?word=${encodeURIComponent(word)}`);
       const data = await res.json().catch(() => ({}));
@@ -571,7 +595,14 @@ export function ChapterReader({
       {def && (
         <div
           onMouseDown={(e) => e.stopPropagation()}
-          style={{ position: "fixed", top: def.top, left: def.left, zIndex: 60, width: 288 }}
+          style={{
+            position: "fixed",
+            left: def.left,
+            zIndex: 60,
+            width: 288,
+            ...(def.top !== null ? { top: def.top } : {}),
+            ...(def.bottom !== null ? { bottom: def.bottom } : {}),
+          }}
           className="rounded-xl border border-zinc-200 bg-white p-3 shadow-xl dark:border-zinc-700 dark:bg-zinc-900"
         >
           <div className="flex items-start justify-between gap-2">

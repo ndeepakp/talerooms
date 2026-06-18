@@ -3,7 +3,6 @@ import { sql } from "./db";
 export type NotificationKind =
   | "purchase"
   | "follow"
-  | "comment"
   | "subscribe"
   | "reaction"
   | "sub_expiring"
@@ -15,7 +14,7 @@ export type NotificationKind =
   | "review";
 
 // Records a notification for `userId` (the recipient). Skips self-notifications
-// (e.g. commenting on your own story). Never throws into the caller's flow — a
+// (e.g. liking your own post). Never throws into the caller's flow — a
 // failed notification must not break the action that triggered it.
 export async function notify(opts: {
   userId: string;

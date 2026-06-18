@@ -6,7 +6,6 @@ export type Notification = {
   kind:
     | "purchase"
     | "follow"
-    | "comment"
     | "subscribe"
     | "reaction"
     | "sub_expiring"
@@ -99,13 +98,6 @@ export function NotificationMessage({ n }: { n: Notification }) {
       return (
         <>
           <Actor n={n} /> started following you.
-        </>
-      );
-    case "comment":
-      return (
-        <>
-          <Actor n={n} /> commented on <Story n={n} />
-          {d.snippet ? `: “${d.snippet}”` : ""}.
         </>
       );
     case "subscribe":

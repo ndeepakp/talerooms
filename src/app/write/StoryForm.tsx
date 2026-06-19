@@ -325,12 +325,12 @@ export function StoryForm({
     }
     const data = await res.json();
     const imported: DraftChapter[] = (data.chapters ?? []).map(
-      (c: { title: string | null; body: string }) => ({
+      (c: { title: string | null; body: string; questions?: Question[] }) => ({
         id: newId(),
         title: c.title ?? "",
         body: c.body ?? "",
         prices: {},
-        questions: [],
+        questions: Array.isArray(c.questions) ? c.questions : [],
       }),
     );
     if (imported.length === 0) {
@@ -597,6 +597,12 @@ export function StoryForm({
                 <li>
                   Everything under a heading (paragraphs, <strong>bold</strong>,{" "}
                   <em>italics</em>, lists) becomes that chapter’s body.
+                </li>
+                <li>
+                  Want reader <strong>Q&amp;A</strong>? End a chapter with a{" "}
+                  <strong>Heading 2</strong> called “Q&amp;A”, then one question
+                  per line — add a bulleted list under a question for
+                  multiple-choice.
                 </li>
                 <li>No headings? It comes in as a single chapter.</li>
               </ul>

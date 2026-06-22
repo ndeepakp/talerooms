@@ -93,3 +93,6 @@ export function normalizeOfferedDurations(input: unknown): Tier[] {
   // Keep canonical order.
   return TIERS.filter((t) => seen.has(t));
 }
+
+// Win-back: % off when a returning reader renews access they previously bought.
+export const RENEWAL_DISCOUNT_PCT = 25;

@@ -20,7 +20,7 @@ import { ApprovedReadersList } from "@/components/story/ApprovedReadersList";
 import { ViewTracker } from "@/components/reader/ViewTracker";
 import { ChapterReader, type Bookmark } from "@/components/reader/ChapterReader";
 import { SaveToCollection } from "@/components/story/SaveToCollection";
-import { type Tier } from "@/lib/pricing";
+import { RENEWAL_DISCOUNT_PCT, type Tier } from "@/lib/pricing";
 
 export const dynamic = "force-dynamic";
 
@@ -132,6 +132,9 @@ export default async function StoryPage({
   // they bought, as long as the grant hasn't expired.
   let unlockedWhole = isAuthor || story.chapters_public;
   const unlockedIdx = new Set<number>();
+  // A returning reader (bought access to this story before, even expired) gets a
+  // renewal discount on the buy panel.
+  let returning = false;
   if (!isAuthor && !story.chapters_public) {
     // An active subscription to the author unlocks all their private chapters.
     const [sub] = await sql<{ one: number }[]>`
@@ -150,6 +153,12 @@ export default async function StoryPage({
       if (g.scope === "whole") unlockedWhole = true;
       else if (g.chapter_index !== null) unlockedIdx.add(g.chapter_index);
     }
+
+    const [hadGrant] = await sql<{ one: number }[]>`
+      SELECT 1 AS one FROM access_grants
+      WHERE story_id = ${id} AND user_id = ${session.user.id} LIMIT 1
+    `;
+    returning = !!hadGrant;
   }
   const chapterUnlocked = (i: number) => unlockedWhole || unlockedIdx.has(i);
   const anyLocked = allChapters.some((_, i) => !chapterUnlocked(i));
@@ -449,6 +458,7 @@ export default async function StoryPage({
               prices: c.prices ?? {},
               owned: chapterUnlocked(i),
             }))}
+            renewalDiscount={returning ? RENEWAL_DISCOUNT_PCT : undefined}
           />
         ) : (
           !isAuthor &&

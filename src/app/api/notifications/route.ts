@@ -1,6 +1,7 @@
 import { NextResponse } from "next/server";
 import { sql } from "@/lib/db";
 import { requireSession, withErrors } from "@/lib/http";
+import { RENEWAL_DISCOUNT_PCT } from "@/lib/pricing";
 
 // The current user's notifications (purchases, follows, comments, subscribes),
 // read AND unread. Returns the most recent few for the bell dropdown plus
@@ -27,6 +28,27 @@ export const GET = withErrors(async () => {
     SELECT ${me}, 'sub_expiring', e.author_id,
            jsonb_build_object('amount', e.amount, 'days_left', e.days_left)
     FROM expiring e
+  `;
+
+  // Same for per-story/chapter access grants about to lapse: nudge the reader to
+  // renew (at a discount). Deduped to one notification per story (soonest expiry).
+  await sql`
+    WITH expiring AS (
+      UPDATE access_grants
+      SET expiry_notified = true
+      WHERE user_id = ${me}
+        AND expires_at IS NOT NULL
+        AND expires_at > now()
+        AND expires_at <= now() + interval '3 days'
+        AND expiry_notified = false
+      RETURNING story_id,
+        CEIL(EXTRACT(EPOCH FROM (expires_at - now())) / 86400)::int AS days_left
+    )
+    INSERT INTO notifications (user_id, kind, story_id, data)
+    SELECT ${me}, 'grant_expiring', e.story_id,
+           jsonb_build_object('days_left', min(e.days_left), 'discount', ${RENEWAL_DISCOUNT_PCT})
+    FROM expiring e
+    GROUP BY e.story_id
   `;
 
   const items = await sql`

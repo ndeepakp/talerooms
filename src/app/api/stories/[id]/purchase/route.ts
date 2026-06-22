@@ -1,7 +1,7 @@
 import { NextResponse } from "next/server";
 import { sql } from "@/lib/db";
 import { ApiError, requireSession, withErrors } from "@/lib/http";
-import { expiryFor, isTier, type Tier } from "@/lib/pricing";
+import { expiryFor, isTier, RENEWAL_DISCOUNT_PCT, type Tier } from "@/lib/pricing";
 import { notify } from "@/lib/notify";
 
 const UUID_RE = /^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i;
@@ -46,6 +46,15 @@ export const POST = withErrors(async (
   const tier = duration as Tier;
   const expires = expiryFor(tier);
 
+  // Win-back: a returning reader (anyone who has bought access to this story
+  // before, even expired) renews at a discount.
+  const [prior] = await sql<{ one: number }[]>`
+    SELECT 1 AS one FROM access_grants
+    WHERE story_id = ${id} AND user_id = ${buyer} LIMIT 1
+  `;
+  const renew = (price: number) =>
+    prior ? Math.round((price * (100 - RENEWAL_DISCOUNT_PCT)) / 100) : price;
+
   // Build the list of grant rows + total price from the server-side pricing.
   const rows: {
     story_id: string;
@@ -64,7 +73,7 @@ export const POST = withErrors(async (
     }
     rows.push({
       story_id: id, user_id: buyer, scope: "whole", chapter_index: null,
-      duration: tier, amount: price, expires_at: expires,
+      duration: tier, amount: renew(price), expires_at: expires,
     });
   } else if (body.scope === "chapters") {
     const idxs: number[] = Array.isArray(body.chapterIndexes)
@@ -78,7 +87,7 @@ export const POST = withErrors(async (
       }
       rows.push({
         story_id: id, user_id: buyer, scope: "chapter", chapter_index: i,
-        duration: tier, amount: price, expires_at: expires,
+        duration: tier, amount: renew(price), expires_at: expires,
       });
     }
   } else {

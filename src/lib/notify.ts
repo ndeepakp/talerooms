@@ -12,7 +12,8 @@ export type NotificationKind =
   | "post_like"
   | "post_comment"
   | "review"
-  | "prompt_answer";
+  | "prompt_answer"
+  | "grant_expiring";
 
 // Records a notification for `userId` (the recipient). Skips self-notifications
 // (e.g. liking your own post). Never throws into the caller's flow — a

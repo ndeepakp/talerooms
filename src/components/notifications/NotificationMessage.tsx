@@ -15,7 +15,8 @@ export type Notification = {
     | "post_like"
     | "post_comment"
     | "review"
-    | "prompt_answer";
+    | "prompt_answer"
+    | "grant_expiring";
   actor_id: string | null;
   actor_name: string | null;
   actor_handle: string | null;
@@ -31,6 +32,7 @@ export type Notification = {
     days_left?: number;
     post_id?: string;
     stars?: number;
+    discount?: number;
   };
   seen: boolean;
   created_at: string;
@@ -160,6 +162,20 @@ export function NotificationMessage({ n }: { n: Notification }) {
           <Actor n={n} /> answered your question on <Story n={n} /> in{" "}
           <PostLink id={d.post_id} label="a post" />
           {d.snippet ? `: “${d.snippet}”` : ""}.
+        </>
+      );
+    case "grant_expiring":
+      return (
+        <>
+          Your access to <Story n={n} /> ends{" "}
+          {typeof d.days_left === "number"
+            ? d.days_left <= 1
+              ? "within a day"
+              : `in ${d.days_left} days`
+            : "soon"}
+          {" — renew"}
+          {typeof d.discount === "number" ? ` and save ${d.discount}%` : ""} to keep
+          reading.
         </>
       );
     case "sub_expiring":

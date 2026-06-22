@@ -21,12 +21,15 @@ export function AccessPanel({
   wholePrices,
   chapters,
   currency,
+  renewalDiscount,
 }: {
   storyId: string;
   offered: Tier[];
   wholePrices: PriceMap;
   chapters: ChapterOption[];
   currency: string;
+  // % off shown to a returning reader renewing access (applied server-side too).
+  renewalDiscount?: number;
 }) {
   const router = useRouter();
   const [tier, setTier] = useState<Tier>(offered[0]);
@@ -36,6 +39,10 @@ export function AccessPanel({
 
   if (offered.length === 0) return null;
 
+  // Discounted price for a returning reader (matches the server's renewal logic).
+  const disc = (p: number) =>
+    renewalDiscount ? Math.round((p * (100 - renewalDiscount)) / 100) : p;
+
   const wholePrice = wholePrices[tier];
   const wholeAvailable = typeof wholePrice === "number";
   const lockedForTier = chapters.filter(
@@ -43,7 +50,7 @@ export function AccessPanel({
   );
   const chaptersTotal = lockedForTier
     .filter((c) => picked.has(c.index))
-    .reduce((s, c) => s + (c.prices[tier] as number), 0);
+    .reduce((s, c) => s + disc(c.prices[tier] as number), 0);
 
   function togglePick(i: number) {
     setPicked((prev) => {
@@ -84,6 +91,12 @@ export function AccessPanel({
         chapters you want. (Payments are mocked for now — nothing is charged.)
       </p>
 
+      {renewalDiscount ? (
+        <p className="mt-3 rounded-xl bg-accent/10 px-3 py-2 text-sm font-medium text-accent">
+          ♻️ Welcome back — {renewalDiscount}% off to renew, applied below.
+        </p>
+      ) : null}
+
       {/* Duration choice */}
       <div className="mt-4">
         <span className="text-sm font-medium text-zinc-700 dark:text-zinc-300">
@@ -122,10 +135,10 @@ export function AccessPanel({
           <button
             type="button"
             disabled={busy}
-            onClick={() => buy({ scope: "whole", duration: tier }, wholePrice as number)}
+            onClick={() => buy({ scope: "whole", duration: tier }, disc(wholePrice as number))}
             className="shrink-0 rounded-full btn-primary px-4 py-2 text-sm font-medium disabled:opacity-50"
           >
-            {formatPrice(wholePrice as number, currency)}
+            {formatPrice(disc(wholePrice as number), currency)}
           </button>
         </div>
       )}
@@ -150,7 +163,7 @@ export function AccessPanel({
                     {c.title || `Chapter ${c.index + 1}`}
                   </span>
                   <span className="text-zinc-500">
-                    {formatPrice(c.prices[tier] as number, currency)}
+                    {formatPrice(disc(c.prices[tier] as number), currency)}
                   </span>
                 </label>
               </li>

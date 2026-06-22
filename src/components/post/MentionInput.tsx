@@ -15,6 +15,7 @@ export function MentionInput({
   rows = 3,
   maxLength,
   className,
+  onSubmit,
 }: {
   value: string;
   onChange: (v: string) => void;
@@ -22,6 +23,8 @@ export function MentionInput({
   rows?: number;
   maxLength?: number;
   className?: string;
+  // Fired on Ctrl/Cmd + Enter, so the parent can submit from the keyboard.
+  onSubmit?: () => void;
 }) {
   const ref = useRef<HTMLTextAreaElement>(null);
   const [query, setQuery] = useState<string | null>(null);
@@ -89,6 +92,13 @@ export function MentionInput({
   }
 
   function onKeyDown(e: React.KeyboardEvent<HTMLTextAreaElement>) {
+    // Ctrl/Cmd + Enter submits, whether or not the mention dropdown is open.
+    if ((e.metaKey || e.ctrlKey) && e.key === "Enter") {
+      e.preventDefault();
+      setQuery(null);
+      onSubmit?.();
+      return;
+    }
     if (query === null || items.length === 0) return;
     if (e.key === "ArrowDown") {
       e.preventDefault();

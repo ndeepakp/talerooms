@@ -25,7 +25,7 @@ export function PostComposer({
   const [error, setError] = useState<string | null>(null);
 
   async function submit() {
-    if (!body.trim()) return;
+    if (busy || !body.trim()) return;
     setBusy(true);
     setError(null);
     const fullBody =
@@ -75,13 +75,17 @@ export function PostComposer({
       <MentionInput
         value={body}
         onChange={setBody}
+        onSubmit={submit}
         rows={3}
         maxLength={2000}
         placeholder={answer ? "Write your answer… type @ to tag someone" : placeholder}
         className="w-full resize-none rounded-lg border border-zinc-300 bg-white px-3 py-2 text-sm text-zinc-900 outline-none focus:border-zinc-900 dark:border-zinc-700 dark:bg-zinc-950 dark:text-zinc-100"
       />
       {error && <p className="mt-1 text-sm text-red-600">{error}</p>}
-      <div className="mt-2 flex justify-end">
+      <div className="mt-2 flex items-center justify-between gap-3">
+        <span className="text-xs text-zinc-400">
+          Tip: press Ctrl + Enter to post
+        </span>
         <button
           type="button"
           onClick={submit}

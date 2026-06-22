@@ -88,6 +88,7 @@ export function ChapterReader({
   initialBookmarks,
   autoResume,
   watermark,
+  authorName,
 }: {
   storyId: string;
   chapters: ReaderChapter[];
@@ -95,8 +96,11 @@ export function ChapterReader({
   initialPage: number;
   initialBookmarks: Bookmark[];
   autoResume: boolean;
-  // Per-reader label for the anti-leak watermark + screenshot deterrent.
+  // Per-reader label (e.g. "@handle") shown faintly in each page's footer and
+  // used to gate the screenshot deterrent. Set only for a published story.
   watermark?: string;
+  // The author's display name, shown as the attribution at the foot of a page.
+  authorName?: string | null;
 }) {
   const clampedInitial = Math.min(
     Math.max(initialChapter, 0),
@@ -130,6 +134,15 @@ export function ChapterReader({
   // A "short story" is a single, untitled chapter — render it as plain story
   // content with none of the chapter chrome (no nav, no "Chapter 1" heading).
   const isShort = chapters.length === 1 && !chapters[0]?.title;
+
+  // Date this page was opened, stamped once, for the page footer.
+  const [readStamp] = useState(() =>
+    new Date().toLocaleDateString(undefined, {
+      year: "numeric",
+      month: "short",
+      day: "numeric",
+    }),
+  );
 
   // Paginate long chapters. We only paginate after mount (DOMParser is
   // client-only); the first paint matches the server (one page) to avoid a
@@ -412,7 +425,7 @@ export function ChapterReader({
         setDef(null);
       }}
     >
-      {watermark && <ReaderShield label={watermark} />}
+      {watermark && <ReaderShield />}
 
       {/* Chapter pagination buttons — hidden for a single-piece short story. */}
       {!isShort && (
@@ -526,6 +539,19 @@ export function ChapterReader({
                     className="richtext"
                     dangerouslySetInnerHTML={{ __html: pages[safePage] ?? "" }}
                   />
+                  {/* Attribution at the foot of every page. For a published
+                      story it also carries the reader's handle + date, so a
+                      screenshot stays traceable without an overlay. */}
+                  {authorName && (
+                    <footer className="mt-8 select-none border-t border-zinc-200 pt-3 text-center text-xs text-zinc-400 dark:border-zinc-800">
+                      © {authorName} · Talerooms
+                      {watermark && (
+                        <span className="text-zinc-300 dark:text-zinc-600">
+                          {" "}· {watermark} · {readStamp}
+                        </span>
+                      )}
+                    </footer>
+                  )}
                 </div>
               </div>
 

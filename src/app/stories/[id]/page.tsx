@@ -470,6 +470,7 @@ export default async function StoryPage({
               initialBookmarks={bookmarks}
               autoResume={autoResume}
               watermark={story.status === "published" ? watermark : undefined}
+              authorName={story.author}
             />
           </section>
         )}

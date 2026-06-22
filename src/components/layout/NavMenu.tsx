@@ -35,6 +35,13 @@ export function NavMenu() {
       {open && (
         <div className="absolute right-0 z-50 mt-2 w-44 overflow-hidden rounded-xl border border-zinc-200 bg-white py-1 shadow-lg dark:border-zinc-800 dark:bg-zinc-950">
           <Link
+            href="/library"
+            onClick={() => setOpen(false)}
+            className="block px-4 py-2.5 text-sm text-zinc-800 hover:bg-zinc-100 dark:text-zinc-200 dark:hover:bg-zinc-900"
+          >
+            Library
+          </Link>
+          <Link
             href="/collections"
             onClick={() => setOpen(false)}
             className="block px-4 py-2.5 text-sm text-zinc-800 hover:bg-zinc-100 dark:text-zinc-200 dark:hover:bg-zinc-900"

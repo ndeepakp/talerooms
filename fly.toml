@@ -5,6 +5,10 @@ primary_region = "sin"   # Singapore — closest to the target market
 
 [build]
   dockerfile = "Dockerfile"
+  # Web Push public key (non-secret) — inlined into the client bundle at build.
+  # The matching VAPID_PRIVATE_KEY + VAPID_SUBJECT are runtime Fly secrets.
+  [build.args]
+    NEXT_PUBLIC_VAPID_PUBLIC_KEY = "BB1YVKGImI5P8nh17a-zwM3Q3E1SOLaoi1faXPCwqRujMshMxcSmyv9cU6YYM4PxTTMz5blJ5MHYi3ye4JUVowQ"
 
 [http_service]
   internal_port = 3000

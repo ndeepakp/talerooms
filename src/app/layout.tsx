@@ -1,8 +1,9 @@
-import type { Metadata } from "next";
+import type { Metadata, Viewport } from "next";
 import { Geist, Geist_Mono } from "next/font/google";
 import "./globals.css";
 import { getAppearance } from "@/lib/get-appearance";
 import { TopBar } from "@/components/layout/TopBar";
+import { ServiceWorker } from "@/components/layout/ServiceWorker";
 
 const geistSans = Geist({
   variable: "--font-geist-sans",
@@ -17,6 +18,16 @@ const geistMono = Geist_Mono({
 export const metadata: Metadata = {
   title: "Talerooms",
   description: "Where stories find their people.",
+  // Lets iOS launch the installed app full-screen with a dark status bar.
+  appleWebApp: {
+    capable: true,
+    title: "Talerooms",
+    statusBarStyle: "black-translucent",
+  },
+};
+
+export const viewport: Viewport = {
+  themeColor: "#111111",
 };
 
 // Decide whether to add the `.dark` class before first paint, so the page never
@@ -48,6 +59,7 @@ export default async function RootLayout({
         <script dangerouslySetInnerHTML={{ __html: themeScript }} />
       </head>
       <body className="min-h-full flex flex-col">
+        <ServiceWorker />
         <TopBar />
         {children}
       </body>

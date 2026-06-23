@@ -4,6 +4,7 @@ import { useEffect, useRef, useState } from "react";
 import { useRouter } from "next/navigation";
 import Link from "next/link";
 import { authClient } from "@/lib/auth-client";
+import { PushToggle } from "@/components/settings/PushToggle";
 import {
   ACCENTS,
   BACKGROUNDS,
@@ -155,6 +156,13 @@ export function SettingsForm({
         >
           View profile
         </Link>
+
+        <h2 className="mt-8 text-lg font-semibold text-zinc-900 dark:text-zinc-50">
+          Notifications
+        </h2>
+        <div className="mt-4">
+          <PushToggle />
+        </div>
 
         <h2 className="mt-8 text-lg font-semibold text-zinc-900 dark:text-zinc-50">
           Appearance

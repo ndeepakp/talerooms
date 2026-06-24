@@ -1,9 +1,11 @@
 import type { Metadata, Viewport } from "next";
 import { Geist, Geist_Mono } from "next/font/google";
+import Script from "next/script";
 import "./globals.css";
 import { getAppearance } from "@/lib/get-appearance";
 import { TopBar } from "@/components/layout/TopBar";
 import { ServiceWorker } from "@/components/layout/ServiceWorker";
+import { InstallPrompt } from "@/components/layout/InstallPrompt";
 
 const geistSans = Geist({
   variable: "--font-geist-sans",
@@ -53,15 +55,20 @@ export default async function RootLayout({
       data-theme-mode={appearance.themeMode}
       data-accent={appearance.accent}
       data-bg={appearance.background}
+      data-shelf={appearance.shelf}
       className={`${geistSans.variable} ${geistMono.variable} h-full antialiased`}
     >
-      <head>
-        <script dangerouslySetInnerHTML={{ __html: themeScript }} />
-      </head>
       <body className="min-h-full flex flex-col">
+        {/* Runs before paint (injected into the initial HTML) so the page never
+            flashes the wrong theme. next/script manages it outside React's
+            element rendering, avoiding the "script tag in a component" warning. */}
+        <Script id="theme-init" strategy="beforeInteractive">
+          {themeScript}
+        </Script>
         <ServiceWorker />
         <TopBar />
         {children}
+        <InstallPrompt />
       </body>
     </html>
   );

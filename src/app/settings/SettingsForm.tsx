@@ -8,20 +8,23 @@ import { PushToggle } from "@/components/settings/PushToggle";
 import {
   ACCENTS,
   BACKGROUNDS,
+  SHELF_STYLES,
   THEME_MODES,
   type AccentColor,
   type Appearance,
   type BackgroundPreset,
+  type ShelfStyle,
   type ThemeMode,
 } from "@/lib/appearance";
 
 // Apply the chosen look to <html> right away so the change is visible while the
 // user is still on this page. Mirrors the inline script in layout.tsx.
-function applyLive(a: Pick<Appearance, "themeMode" | "accent" | "background">) {
+function applyLive(a: Pick<Appearance, "themeMode" | "accent" | "background" | "shelf">) {
   const el = document.documentElement;
   el.setAttribute("data-theme-mode", a.themeMode);
   el.setAttribute("data-accent", a.accent);
   el.setAttribute("data-bg", a.background);
+  el.setAttribute("data-shelf", a.shelf);
   const dark =
     a.themeMode === "dark" ||
     (a.themeMode === "system" &&
@@ -40,6 +43,7 @@ export function SettingsForm({
   const [themeMode, setThemeMode] = useState<ThemeMode>(initial.themeMode);
   const [accent, setAccent] = useState<AccentColor>(initial.accent);
   const [background, setBackground] = useState<BackgroundPreset>(initial.background);
+  const [shelf, setShelf] = useState<ShelfStyle>(initial.shelf);
   const [saving, setSaving] = useState(false);
   const [saved, setSaved] = useState(false);
   const [error, setError] = useState<string | null>(null);
@@ -106,17 +110,17 @@ export function SettingsForm({
 
   // Reflect every change immediately on the live page.
   useEffect(() => {
-    applyLive({ themeMode, accent, background });
-  }, [themeMode, accent, background]);
+    applyLive({ themeMode, accent, background, shelf });
+  }, [themeMode, accent, background, shelf]);
 
   // When in "system" mode, follow the device if it flips light/dark.
   useEffect(() => {
     if (themeMode !== "system") return;
     const mq = window.matchMedia("(prefers-color-scheme: dark)");
-    const onChange = () => applyLive({ themeMode, accent, background });
+    const onChange = () => applyLive({ themeMode, accent, background, shelf });
     mq.addEventListener("change", onChange);
     return () => mq.removeEventListener("change", onChange);
-  }, [themeMode, accent, background]);
+  }, [themeMode, accent, background, shelf]);
 
   async function save() {
     setSaving(true);
@@ -125,7 +129,7 @@ export function SettingsForm({
     const res = await fetch("/api/me/settings", {
       method: "PUT",
       headers: { "Content-Type": "application/json" },
-      body: JSON.stringify({ themeMode, accent, background }),
+      body: JSON.stringify({ themeMode, accent, background, shelf }),
     });
     setSaving(false);
     if (!res.ok) {
@@ -248,6 +252,45 @@ export function SettingsForm({
                   }
                 >
                   {b.label}
+                </button>
+              );
+            })}
+          </div>
+        </div>
+
+        {/* Library shelf finish — applies to the bookshelf on your Library page. */}
+        <div className="mt-6 flex flex-col gap-2">
+          <span className="text-sm font-medium text-zinc-700 dark:text-zinc-300">
+            Library shelf{" "}
+            <span className="font-normal text-zinc-500">
+              (the bookshelf on your{" "}
+              <Link href="/library" className="underline">
+                Library
+              </Link>
+              )
+            </span>
+          </span>
+          <div className="grid grid-cols-2 gap-2 sm:grid-cols-4">
+            {SHELF_STYLES.map((s) => {
+              const active = shelf === s.id;
+              return (
+                <button
+                  type="button"
+                  key={s.id}
+                  onClick={() => setShelf(s.id)}
+                  className={
+                    "flex items-center gap-2 rounded-xl border px-3 py-2.5 text-sm font-medium text-zinc-900 transition-colors dark:text-zinc-100 " +
+                    (active
+                      ? "border-accent ring-1 ring-[var(--accent)]"
+                      : "border-zinc-300 hover:bg-zinc-100 dark:border-zinc-700 dark:hover:bg-zinc-900")
+                  }
+                >
+                  <span
+                    className="h-4 w-4 shrink-0 rounded-full border border-black/10 dark:border-white/15"
+                    style={{ background: s.swatch }}
+                    aria-hidden="true"
+                  />
+                  {s.label}
                 </button>
               );
             })}

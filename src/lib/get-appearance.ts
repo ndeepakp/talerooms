@@ -5,6 +5,7 @@ import {
   DEFAULT_APPEARANCE,
   isAccent,
   isBackground,
+  isShelf,
   isThemeMode,
   type Appearance,
 } from "@/lib/appearance";
@@ -28,10 +29,11 @@ export async function getAppearance(
       theme_mode: string;
       accent_color: string;
       background_preset: string;
+      shelf_style: string;
       feed_wallpaper: string | null;
     }[]
   >`
-    SELECT theme_mode, accent_color, background_preset, feed_wallpaper
+    SELECT theme_mode, accent_color, background_preset, shelf_style, feed_wallpaper
     FROM "user" WHERE id = ${resolved.user.id}
   `;
   if (!row) return DEFAULT_APPEARANCE;
@@ -42,6 +44,7 @@ export async function getAppearance(
     background: isBackground(row.background_preset)
       ? row.background_preset
       : DEFAULT_APPEARANCE.background,
+    shelf: isShelf(row.shelf_style) ? row.shelf_style : DEFAULT_APPEARANCE.shelf,
     feedWallpaper: typeof row.feed_wallpaper === "string" ? row.feed_wallpaper : null,
   };
 }

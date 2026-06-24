@@ -193,3 +193,144 @@ body {
   outline: none;
 }
 .richtext-editor .ProseMirror:focus { outline: none; }
+
+/* ---- Library bookshelf ----
+   Books are fixed at 96x144 and laid out in a grid; a wooden shelf "plank" is
+   painted under every row with a repeating background. The tile height MUST
+   equal the cover height (144px) + the grid row-gap (42px) = 186px, and the
+   plank is drawn starting at y=144 (just under each row of books). Keep these
+   numbers in sync with the .h-36/.w-24 covers in the Library page. */
+.shelf {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, 96px);
+  justify-content: center;
+  column-gap: 26px;
+  row-gap: 42px;
+  background-repeat: repeat;
+  background-size: 100% 186px;
+  background-image: linear-gradient(
+    to bottom,
+    transparent 0,
+    transparent 144px,
+    rgba(40, 25, 5, 0.22) 144px,
+    rgba(40, 25, 5, 0.10) 146px,
+    #cda86e 146px,
+    #c2995a 152px,
+    #a07b3f 152px,
+    #8a6630 162px,
+    rgba(40, 25, 5, 0.30) 162px,
+    rgba(40, 25, 5, 0) 170px,
+    transparent 186px
+  );
+}
+.dark .shelf {
+  background-image: linear-gradient(
+    to bottom,
+    transparent 0,
+    transparent 144px,
+    rgba(0, 0, 0, 0.5) 144px,
+    rgba(0, 0, 0, 0.22) 146px,
+    #5c4730 146px,
+    #503d28 152px,
+    #38291a 152px,
+    #2a1e12 162px,
+    rgba(0, 0, 0, 0.55) 162px,
+    rgba(0, 0, 0, 0) 170px,
+    transparent 186px
+  );
+}
+/* The bookcase frame the shelves sit inside. */
+.shelf-case {
+  border-radius: 16px;
+  padding: 1.5rem 1.25rem 0.5rem;
+  border: 1px solid rgba(120, 90, 50, 0.20);
+  background: linear-gradient(to bottom, rgba(180, 140, 90, 0.10), rgba(180, 140, 90, 0.03));
+  box-shadow:
+    inset 0 1px 0 rgba(255, 255, 255, 0.45),
+    inset 0 0 44px rgba(120, 90, 50, 0.07);
+}
+.dark .shelf-case {
+  border-color: rgba(120, 90, 50, 0.30);
+  background: linear-gradient(to bottom, rgba(80, 60, 35, 0.28), rgba(40, 30, 18, 0.16));
+  box-shadow: inset 0 0 50px rgba(0, 0, 0, 0.45);
+}
+
+/* Shelf finishes — selected per user via [data-shelf] on <html>. Walnut is the
+   base above; these override the plank gradient (and frame, where it helps). */
+[data-shelf="oak"] .shelf {
+  background-image: linear-gradient(
+    to bottom,
+    transparent 0, transparent 144px,
+    rgba(70, 45, 10, 0.18) 144px, rgba(70, 45, 10, 0.08) 146px,
+    #e6c98c 146px, #dcbb72 152px,
+    #c39a45 152px, #ad8438 162px,
+    rgba(70, 45, 10, 0.24) 162px, rgba(70, 45, 10, 0) 170px, transparent 186px
+  );
+}
+.dark[data-shelf="oak"] .shelf {
+  background-image: linear-gradient(
+    to bottom,
+    transparent 0, transparent 144px,
+    rgba(0, 0, 0, 0.5) 144px, rgba(0, 0, 0, 0.22) 146px,
+    #7a6038 146px, #6b5430 152px,
+    #50401f 152px, #41331a 162px,
+    rgba(0, 0, 0, 0.55) 162px, rgba(0, 0, 0, 0) 170px, transparent 186px
+  );
+}
+[data-shelf="ebony"] .shelf {
+  background-image: linear-gradient(
+    to bottom,
+    transparent 0, transparent 144px,
+    rgba(0, 0, 0, 0.30) 144px, rgba(0, 0, 0, 0.12) 146px,
+    #4a443d 146px, #3e3833 152px,
+    #2a2521 152px, #201c19 162px,
+    rgba(0, 0, 0, 0.35) 162px, rgba(0, 0, 0, 0) 170px, transparent 186px
+  );
+}
+.dark[data-shelf="ebony"] .shelf {
+  background-image: linear-gradient(
+    to bottom,
+    transparent 0, transparent 144px,
+    rgba(0, 0, 0, 0.55) 144px, rgba(0, 0, 0, 0.25) 146px,
+    #3a3531 146px, #322e2a 152px,
+    #1e1b18 152px, #15120f 162px,
+    rgba(0, 0, 0, 0.6) 162px, rgba(0, 0, 0, 0) 170px, transparent 186px
+  );
+}
+[data-shelf="minimal"] .shelf {
+  background-image: linear-gradient(
+    to bottom,
+    transparent 0, transparent 144px,
+    rgba(0, 0, 0, 0.10) 144px, rgba(0, 0, 0, 0.04) 146px,
+    #eceae4 146px, #e2dfd8 152px,
+    #cfccc4 152px, #bdb9b0 162px,
+    rgba(0, 0, 0, 0.12) 162px, rgba(0, 0, 0, 0) 170px, transparent 186px
+  );
+}
+.dark[data-shelf="minimal"] .shelf {
+  background-image: linear-gradient(
+    to bottom,
+    transparent 0, transparent 144px,
+    rgba(0, 0, 0, 0.5) 144px, rgba(0, 0, 0, 0.2) 146px,
+    #3a3a3d 146px, #313134 152px,
+    #242427 152px, #1c1c1f 162px,
+    rgba(0, 0, 0, 0.55) 162px, rgba(0, 0, 0, 0) 170px, transparent 186px
+  );
+}
+/* Frame tint for the non-wood finishes (walnut/oak keep the warm default). */
+[data-shelf="minimal"] .shelf-case {
+  border-color: rgba(0, 0, 0, 0.10);
+  background: linear-gradient(to bottom, rgba(0, 0, 0, 0.03), rgba(0, 0, 0, 0.01));
+}
+.dark[data-shelf="minimal"] .shelf-case {
+  border-color: rgba(255, 255, 255, 0.10);
+  background: linear-gradient(to bottom, rgba(255, 255, 255, 0.04), rgba(255, 255, 255, 0.01));
+}
+[data-shelf="ebony"] .shelf-case {
+  border-color: rgba(40, 35, 30, 0.25);
+  background: linear-gradient(to bottom, rgba(40, 35, 30, 0.10), rgba(40, 35, 30, 0.03));
+}
+.dark[data-shelf="ebony"] .shelf-case {
+  border-color: rgba(0, 0, 0, 0.5);
+  background: linear-gradient(to bottom, rgba(0, 0, 0, 0.35), rgba(0, 0, 0, 0.18));
+}

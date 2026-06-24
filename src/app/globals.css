@@ -259,6 +259,35 @@ body {
   box-shadow: inset 0 0 50px rgba(0, 0, 0, 0.45);
 }
 
+/* A single wooden ledge for one book to stand on (used on the feed shelf, where
+   each cover has metadata below it). Colours come from per-finish CSS variables
+   so it matches the user's chosen shelf without duplicating the gradient. */
+:root,
+[data-shelf="walnut"] { --ledge-top: #c2995a; --ledge-face: #8a6630; }
+.dark,
+.dark[data-shelf="walnut"] { --ledge-top: #503d28; --ledge-face: #2a1e12; }
+[data-shelf="oak"] { --ledge-top: #dcbb72; --ledge-face: #ad8438; }
+.dark[data-shelf="oak"] { --ledge-top: #6b5430; --ledge-face: #41331a; }
+[data-shelf="ebony"] { --ledge-top: #3e3833; --ledge-face: #201c19; }
+.dark[data-shelf="ebony"] { --ledge-top: #322e2a; --ledge-face: #15120f; }
+[data-shelf="minimal"] { --ledge-top: #e2dfd8; --ledge-face: #bdb9b0; }
+.dark[data-shelf="minimal"] { --ledge-top: #313134; --ledge-face: #1c1c1f; }
+.shelf-ledge {
+  height: 9px;
+  border-radius: 0 0 2px 2px;
+  background: linear-gradient(
+    to bottom,
+    var(--ledge-top) 0,
+    var(--ledge-top) 3.5px,
+    var(--ledge-face) 3.5px,
+    var(--ledge-face) 9px
+  );
+  box-shadow: 0 3px 6px rgba(40, 25, 5, 0.25);
+}
+.dark .shelf-ledge {
+  box-shadow: 0 3px 7px rgba(0, 0, 0, 0.5);
+}
+
 /* Shelf finishes — selected per user via [data-shelf] on <html>. Walnut is the
    base above; these override the plank gradient (and frame, where it helps). */
 [data-shelf="oak"] .shelf {

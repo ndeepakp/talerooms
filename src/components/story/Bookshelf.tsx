@@ -151,10 +151,12 @@ export function Bookshelf({
   return (
     <div className="flex flex-col gap-6 md:flex-row">
       {/* The shelf (the list of books) on the left — full width until a book is
-          opened, then it shares the row with the detail pane on the right. */}
-      <div className="grid flex-1 grid-cols-[repeat(auto-fill,minmax(130px,1fr))] gap-5">
+          opened, then it shares the row with the detail pane on the right. Each
+          book stands on a wooden ledge, inside a bookcase frame. */}
+      <div className="shelf-case flex-1">
+      <div className="grid grid-cols-[repeat(auto-fill,minmax(130px,1fr))] gap-x-5 gap-y-8">
         {stories.map((s) => (
-          <div key={s.id} className="group flex flex-col gap-2">
+          <div key={s.id} className="group flex flex-col">
             <button
               type="button"
               onClick={() => setSelId(s.id)}
@@ -174,7 +176,9 @@ export function Bookshelf({
                 }
               />
             </button>
-            <div className="min-w-0">
+            {/* Wooden ledge the cover sits on (matches the chosen shelf finish). */}
+            <div className="shelf-ledge" />
+            <div className="mt-2 min-w-0">
               <Link
                 href={`/stories/${s.slug ?? s.id}`}
                 className="block truncate text-sm font-medium text-zinc-900 hover:underline dark:text-zinc-100"
@@ -203,6 +207,7 @@ export function Bookshelf({
             </div>
           </div>
         ))}
+      </div>
       </div>
 
       {(selected || rightExtra) && (

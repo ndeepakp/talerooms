@@ -41,6 +41,7 @@ type EditStory = {
   genreIds: number[];
   status: "draft" | "published";
   chaptersPublic: boolean;
+  previewPublic: boolean;
   offeredDurations: Tier[];
   wholePrices: PriceMap;
   currency: string;
@@ -113,6 +114,7 @@ export function StoryForm({
   );
   const [selected, setSelected] = useState<number[]>(story?.genreIds ?? []);
   const [chaptersPublic, setChaptersPublic] = useState(story?.chaptersPublic ?? false);
+  const [previewPublic, setPreviewPublic] = useState(story?.previewPublic ?? false);
   const [offeredDurations, setOfferedDurations] = useState<Tier[]>(
     story?.offeredDurations ?? [],
   );
@@ -195,6 +197,7 @@ export function StoryForm({
       })),
       selected: story?.genreIds ?? [],
       chaptersPublic: story?.chaptersPublic ?? false,
+      previewPublic: story?.previewPublic ?? false,
       offeredDurations: story?.offeredDurations ?? [],
       wholePrices: story?.wholePrices ?? {},
     }),
@@ -214,6 +217,7 @@ export function StoryForm({
     })),
     selected,
     chaptersPublic,
+    previewPublic,
     offeredDurations,
     wholePrices: offerWhole ? wholePrices : {},
   });
@@ -269,6 +273,7 @@ export function StoryForm({
           genreIds: selected,
           accepted,
           chaptersPublic,
+          previewPublic: chaptersPublic ? false : previewPublic,
           offeredDurations: offered,
           wholePrices: chaptersPublic || !offerWhole ? {} : wholePrices,
           currency,
@@ -480,6 +485,7 @@ export function StoryForm({
         genreIds: selected,
         accepted,
         chaptersPublic,
+        previewPublic: chaptersPublic ? false : previewPublic,
         offeredDurations: offered,
         wholePrices: chaptersPublic || !offerWhole ? {} : wholePrices,
         currency,
@@ -927,6 +933,19 @@ export function StoryForm({
 
               {!chaptersPublic && (
                 <div className="ml-7 flex flex-col gap-3">
+                  <label className="flex items-start gap-2 rounded-lg bg-zinc-50 p-3 text-sm text-zinc-700 dark:bg-zinc-900/40 dark:text-zinc-300">
+                    <input
+                      type="checkbox"
+                      checked={previewPublic}
+                      onChange={(e) => setPreviewPublic(e.target.checked)}
+                      className="mt-0.5 h-4 w-4 accent-[var(--accent)]"
+                    />
+                    <span>
+                      <span className="font-medium">Show the first chapter for free to everyone</span>{" "}
+                      — logged-out visitors and search engines can read chapter 1
+                      as a preview; the rest stays paid. Great for discovery.
+                    </span>
+                  </label>
                   <div>
                     <label className="text-sm font-medium text-zinc-700 dark:text-zinc-300">
                       Currency

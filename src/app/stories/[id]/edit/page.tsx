@@ -27,6 +27,7 @@ export default async function EditStoryPage({
       chapters: Chapter[];
       status: "draft" | "published";
       chapters_public: boolean;
+      preview_public: boolean;
       offered_durations: ("1h" | "1d" | "1w" | "1y" | "always")[];
       whole_prices: Record<string, number>;
       currency: string;
@@ -36,7 +37,7 @@ export default async function EditStoryPage({
       draft_of: string | null;
     }[]
   >`
-    SELECT id, title, summary, chapters, status, chapters_public,
+    SELECT id, title, summary, chapters, status, chapters_public, preview_public,
            offered_durations, whole_prices, currency, cover_url, cover_style,
            author_id, draft_of
     FROM stories WHERE id = ${id}
@@ -77,6 +78,7 @@ export default async function EditStoryPage({
         genreIds: genreRows.map((g) => g.genre_id),
         status: story.status,
         chaptersPublic: story.chapters_public,
+        previewPublic: story.preview_public,
         offeredDurations: story.offered_durations,
         wholePrices: story.whole_prices,
         currency: story.currency,

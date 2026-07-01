@@ -89,6 +89,7 @@ export function ChapterReader({
   autoResume,
   watermark,
   authorName,
+  lockedNote,
 }: {
   storyId: string;
   chapters: ReaderChapter[];
@@ -101,6 +102,8 @@ export function ChapterReader({
   watermark?: string;
   // The author's display name, shown as the attribution at the foot of a page.
   authorName?: string | null;
+  // Message shown on a locked chapter (defaults to the buy-access wording).
+  lockedNote?: string;
 }) {
   const clampedInitial = Math.min(
     Math.max(initialChapter, 0),
@@ -465,8 +468,8 @@ export function ChapterReader({
 
         {chapter.locked ? (
           <div className="mt-4 rounded-xl border border-dashed border-zinc-300 p-6 text-center text-sm text-zinc-500 dark:border-zinc-700">
-            <span aria-hidden="true">🔒</span> This chapter is locked — buy access
-            below to read it.
+            <span aria-hidden="true">🔒</span>{" "}
+            {lockedNote ?? "This chapter is locked — buy access below to read it."}
           </div>
         ) : (
           <>

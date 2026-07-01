@@ -18,6 +18,7 @@ const geistMono = Geist_Mono({
 });
 
 export const metadata: Metadata = {
+  metadataBase: new URL("https://talerooms.fly.dev"),
   title: "Talerooms",
   description: "Where stories find their people.",
   // Lets iOS launch the installed app full-screen with a dark status bar.

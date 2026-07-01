@@ -24,6 +24,7 @@ export const POST = withErrors(async (req: Request) => {
     accepted,
     status,
     chaptersPublic,
+    previewPublic,
     offeredDurations,
     wholePrices,
     currency,
@@ -96,6 +97,7 @@ export const POST = withErrors(async (req: Request) => {
   const [story] = await sql<{ id: string }[]>`
     INSERT INTO stories (
       author_id, title, slug, summary, chapters, body, status, chapters_public,
+      preview_public,
       offered_durations, whole_prices, currency, cover_url, cover_style,
       draft_expires_at, embedding, draft_of
     )
@@ -103,6 +105,7 @@ export const POST = withErrors(async (req: Request) => {
       ${session.user.id}, ${cleanTitle}, ${storySlug}, ${cleanSummary},
       ${sql.json(cleanChapters)}, ${bodyPlain},
       ${isDraft ? "draft" : "published"}, ${isPublic},
+      ${previewPublic === true},
       ${offered}, ${sql.json(wholePriceMap)}, ${storyCurrency}, ${cover},
       ${coverStyleVal ? sql.json(coverStyleVal) : null},
       ${isDraft ? sql`now() + interval '7 days'` : null},

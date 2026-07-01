@@ -20,6 +20,8 @@ import { ApprovedReadersList } from "@/components/story/ApprovedReadersList";
 import { ViewTracker } from "@/components/reader/ViewTracker";
 import { ChapterReader, type Bookmark } from "@/components/reader/ChapterReader";
 import { SaveToCollection } from "@/components/story/SaveToCollection";
+import { PublicStoryView } from "./PublicStoryView";
+import type { Metadata } from "next";
 import { RENEWAL_DISCOUNT_PCT, type Tier } from "@/lib/pricing";
 import { htmlToText, wordCount, readingMinutes } from "@/lib/story-validation";
 
@@ -31,6 +33,7 @@ type Story = {
   summary: string;
   status: "draft" | "published";
   chapters_public: boolean;
+  preview_public: boolean;
   offered_durations: Tier[];
   whole_prices: Partial<Record<Tier, number>>;
   currency: string;
@@ -49,6 +52,38 @@ type Chapter = {
   prices?: Partial<Record<Tier, number>>;
 };
 
+// Per-story SEO + social-share metadata. Drafts are marked noindex; published
+// stories get a real title/description and (when there's a cover) an OG image so
+// shared links look good.
+export async function generateMetadata({
+  params,
+}: {
+  params: Promise<{ id: string }>;
+}): Promise<Metadata> {
+  const { id: param } = await params;
+  const resolved = await resolveStory(param);
+  if (!resolved) return { title: "Story · Talerooms" };
+  const [s] = await sql<
+    { title: string; summary: string; status: string; cover_url: string | null }[]
+  >`SELECT title, summary, status, cover_url FROM stories WHERE id = ${resolved.id}`;
+  if (!s || s.status !== "published") {
+    return { title: "Talerooms", robots: { index: false, follow: false } };
+  }
+  const description = (s.summary || "A story on Talerooms.").slice(0, 200);
+  const images = s.cover_url ? [{ url: s.cover_url }] : undefined;
+  return {
+    title: `${s.title} · Talerooms`,
+    description,
+    openGraph: { title: s.title, description, type: "article", images },
+    twitter: {
+      card: s.cover_url ? "summary_large_image" : "summary",
+      title: s.title,
+      description,
+      images: s.cover_url ? [s.cover_url] : undefined,
+    },
+  };
+}
+
 export default async function StoryPage({
   params,
   searchParams,
@@ -59,8 +94,8 @@ export default async function StoryPage({
   const { id: param } = await params;
   const { chapter: chapterParam } = await searchParams;
 
+  // Session is optional: logged-out visitors get a public, indexable view.
   const session = await auth.api.getSession({ headers: await headers() });
-  if (!session) redirect("/login");
 
   // The route param may be a clean slug or a legacy UUID. Resolve it, and if it
   // came in as a UUID, redirect to the canonical slug URL so the address bar
@@ -82,6 +117,7 @@ export default async function StoryPage({
       s.summary,
       s.status,
       s.chapters_public,
+      s.preview_public,
       s.offered_durations,
       s.whole_prices,
       s.currency,
@@ -103,16 +139,8 @@ export default async function StoryPage({
   const story = rows[0];
   if (!story) notFound();
 
-  const isAuthor = session.user.id === story.author_id;
-
-  // Per-reader watermark label, used to trace any leaked screenshot of the
-  // chapters back to the account that opened them.
-  const [viewer] = await sql<{ username: string | null; name: string | null }[]>`
-    SELECT username, name FROM "user" WHERE id = ${session.user.id}
-  `;
-  const watermark = viewer?.username
-    ? `@${viewer.username}`
-    : (viewer?.name ?? "reader");
+  const userId = session?.user.id ?? null;
+  const isAuthor = userId === story.author_id;
 
   // A draft is private to its author — nobody else can reach it, not even its
   // public summary.
@@ -145,6 +173,43 @@ export default async function StoryPage({
     0,
   );
   const readMinutes = readingMinutes(totalWords);
+
+  // Logged-out visitors get the public, indexable, shareable view: cover,
+  // summary, read-time, and readable chapters (free stories, or the first
+  // chapter when the author opted in), with a free-sign-up hook for the rest.
+  if (!session) {
+    return (
+      <PublicStoryView
+        story={{
+          id: story.id,
+          slug: resolved.slug,
+          title: story.title,
+          summary: story.summary,
+          author: story.author,
+          author_id: story.author_id,
+          author_handle: story.author_handle,
+          genres: story.genres,
+          cover_url: story.cover_url,
+          cover_style: story.cover_style,
+          chapters_public: story.chapters_public,
+          preview_public: story.preview_public,
+          created_at: story.created_at,
+        }}
+        chapters={allChapters}
+        readMinutes={readMinutes}
+        views={views}
+      />
+    );
+  }
+
+  // Per-reader watermark label, used to trace any leaked screenshot of the
+  // chapters back to the account that opened them.
+  const [viewer] = await sql<{ username: string | null; name: string | null }[]>`
+    SELECT username, name FROM "user" WHERE id = ${session.user.id}
+  `;
+  const watermark = viewer?.username
+    ? `@${viewer.username}`
+    : (viewer?.name ?? "reader");
 
   // Per-chapter access. The author and public stories unlock everything; a
   // reader unlocks the whole story (via a 'whole' grant) or individual chapters

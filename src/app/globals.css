@@ -93,6 +93,11 @@ body {
 ---------------------------------------------------------------------------- */
 .richtext {
   line-height: 1.8;
+  /* Long unbroken runs (pasted URLs, long names) must wrap instead of pushing
+     the chapter wider than the page — the editor's ProseMirror already breaks
+     words; this keeps the reader identical. */
+  overflow-wrap: break-word;
+  word-break: break-word;
 }
 .richtext p { margin: 0 0 0.75em; }
 .richtext h1 { font-size: 1.6em; font-weight: 700; margin: 0.8em 0 0.4em; }

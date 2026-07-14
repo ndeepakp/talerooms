@@ -32,7 +32,18 @@ function ToolbarButton({
   return (
     <button
       type="button"
-      onMouseDown={(e) => e.preventDefault()} // keep editor focus/selection
+      // Keep the editor's focus/selection: without these, tapping a toolbar
+      // button blurs the editor first (notably on touch devices, where a bare
+      // onMouseDown preventDefault is not enough) and the command hits a
+      // collapsed selection — i.e. "the buttons don't work" on phones.
+      onPointerDown={(e) => e.preventDefault()}
+      onMouseDown={(e) => e.preventDefault()}
+      onTouchEnd={(e) => {
+        // iOS Safari: prevent the synthetic mouse events + blur after touch,
+        // then run the command directly.
+        e.preventDefault();
+        onClick();
+      }}
       onClick={onClick}
       title={title}
       aria-pressed={active}

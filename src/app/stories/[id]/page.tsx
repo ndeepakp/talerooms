@@ -7,13 +7,16 @@ import { Avatar } from "@/components/layout/Avatar";
 import { StarRating } from "@/components/story/StarRating";
 import { ReviewPanel } from "@/components/story/ReviewPanel";
 import { PinReviewButton } from "@/components/story/PinReviewButton";
-import { BookCover } from "@/components/story/BookCover";
+import { StoryOverview, StoryChapters } from "@/components/story/StoryOverview";
+import { RatingBreakdown } from "@/components/story/RatingBreakdown";
+import { FollowButton } from "@/components/profile/FollowButton";
+import { ShareButton } from "@/components/story/ShareButton";
+import { clampChapter, summarizeRatings, type RatingGroup } from "@/lib/story-overview";
 import { type CoverStyle } from "@/lib/cover-style";
 import { PostCard } from "@/components/post/PostCard";
 import { PostComposer } from "@/components/post/PostComposer";
 import { getStoryPosts } from "@/lib/posts";
 import { resolveStory, isUuid } from "@/lib/slug";
-import { formatCount } from "@/lib/format";
 import { DeleteStoryButton } from "@/components/story/DeleteStoryButton";
 import { AccessPanel } from "@/components/story/AccessPanel";
 import { ApprovedReadersList } from "@/components/story/ApprovedReadersList";
@@ -43,6 +46,8 @@ type Story = {
   author: string | null;
   author_id: string;
   author_handle: string | null;
+  author_image: string | null;
+  subscription_price: number | null;
   genres: string[];
 };
 
@@ -122,6 +127,8 @@ export default async function StoryPage({
       u.name AS author,
       u.id AS author_id,
       u.username AS author_handle,
+      u.image AS author_image,
+      u.subscription_price,
       COALESCE(array_agg(g.name) FILTER (WHERE g.name IS NOT NULL), '{}') AS genres
     FROM stories s
     JOIN "user" u ON u.id = s.author_id
@@ -169,6 +176,13 @@ export default async function StoryPage({
   );
   const readMinutes = readingMinutes(totalWords);
 
+  // Public aggregate only; no reviewer identities or account state enter the guest view.
+  const ratingGroups = await sql<RatingGroup[]>`
+    SELECT stars::float AS stars, COUNT(*)::int AS count
+    FROM reviews WHERE story_id = ${id} GROUP BY stars
+  `;
+  const ratings = summarizeRatings(ratingGroups);
+
   // Logged-out visitors get the public, indexable, shareable view: cover,
   // summary, read-time, and readable chapters (free stories, or the first
   // chapter when the author opted in), with a free-sign-up hook for the rest.
@@ -183,6 +197,8 @@ export default async function StoryPage({
           author: story.author,
           author_id: story.author_id,
           author_handle: story.author_handle,
+          author_image: story.author_image,
+          subscription_price: story.subscription_price,
           genres: story.genres,
           cover_url: story.cover_url,
           cover_style: story.cover_style,
@@ -192,6 +208,9 @@ export default async function StoryPage({
         }}
         chapters={allChapters}
         readMinutes={readMinutes}
+        totalWords={totalWords}
+        ratings={ratings}
+        chapterParam={chapterParam}
         views={views}
       />
     );
@@ -214,14 +233,18 @@ export default async function StoryPage({
   // A returning reader (bought access to this story before, even expired) gets a
   // renewal discount on the buy panel.
   let returning = false;
+  const [authorSubscription] = !isAuthor ? await sql<{ one: number }[]>`
+    SELECT 1 AS one FROM subscriptions
+    WHERE subscriber_id = ${session.user.id} AND author_id = ${story.author_id}
+      AND expires_at > now()
+  ` : [];
+  const [following] = !isAuthor ? await sql<{ one: number }[]>`
+    SELECT 1 AS one FROM follows
+    WHERE follower_id = ${session.user.id} AND following_id = ${story.author_id}
+  ` : [];
   if (!isAuthor && !story.chapters_public) {
     // An active subscription to the author unlocks all their private chapters.
-    const [sub] = await sql<{ one: number }[]>`
-      SELECT 1 AS one FROM subscriptions
-      WHERE subscriber_id = ${session.user.id} AND author_id = ${story.author_id}
-        AND expires_at > now()
-    `;
-    if (sub) unlockedWhole = true;
+    if (authorSubscription) unlockedWhole = true;
 
     const grants = await sql<{ scope: string; chapter_index: number | null }[]>`
       SELECT scope, chapter_index FROM access_grants
@@ -261,6 +284,7 @@ export default async function StoryPage({
   // else the reader's last saved position, else the first.
   let initialChapter = 0;
   let initialPage = 0;
+  let hasReadingPosition = false;
   const paramChapter = chapterParam ? parseInt(chapterParam, 10) : NaN;
   const autoResume = Number.isInteger(paramChapter);
   if (autoResume) {
@@ -271,6 +295,7 @@ export default async function StoryPage({
       WHERE user_id = ${session.user.id} AND story_id = ${id}
     `;
     if (prog) {
+      hasReadingPosition = true;
       initialChapter = prog.chapter_index;
       initialPage = prog.page_index;
     }
@@ -330,10 +355,6 @@ export default async function StoryPage({
 
   // Reviews replace the old like/dislike. Only readers with access may review.
   const hasAccess = unlockedWhole || unlockedIdx.size > 0;
-  const [reviewAgg] = await sql<{ avg: number | null; count: number }[]>`
-    SELECT ROUND(AVG(stars), 1)::float AS avg, COUNT(*)::int AS count
-    FROM reviews WHERE story_id = ${id}
-  `;
   const reviews = await sql<{
     id: string;
     stars: number;
@@ -383,159 +404,34 @@ export default async function StoryPage({
     day: "numeric",
   });
 
+  const storyHref = `/stories/${resolved.slug ?? story.id}`;
+  const selectedChapter = clampChapter(initialChapter, allChapters.length);
+  const firstReadable = allChapters.findIndex((_, i) => chapterUnlocked(i));
+  const startChapter = chapterUnlocked(selectedChapter) ? selectedChapter : Math.max(0, firstReadable);
+
   return (
-    <div className="min-h-screen bg-[var(--page)] px-6 py-12">
+    <main className="min-h-screen w-full bg-[var(--page)] px-5 py-8 text-ink sm:px-8 sm:py-12">
       {!isAuthor && <ViewTracker storyId={story.id} />}
-      <article className="mx-auto w-full max-w-5xl">
-        <div className="flex items-center justify-end">
-          <div className="flex items-center gap-4">
+      <article className="mx-auto w-full max-w-6xl">
+        <div className="mb-8 flex flex-wrap items-center justify-between gap-4">
+          <Link href="/feed" className="py-2 text-sm text-muted hover:text-ink">← Your feed</Link>
+          <div className="flex flex-wrap items-center gap-4">
+            <ShareButton title={story.title} />
             {story.status === "published" && <SaveToCollection storyId={story.id} />}
-            {isAuthor && (
-              <>
-                <Link
-                  href={`/stories/${story.id}/edit`}
-                  className="text-sm font-medium text-zinc-700 hover:underline dark:text-zinc-300"
-                >
-                  Update
-                </Link>
-                <DeleteStoryButton storyId={story.id} redirectTo="/feed" />
-              </>
-            )}
+            {isAuthor && <><Link href={`/stories/${story.id}/edit`} className="py-2 text-sm font-medium hover:underline">Edit story</Link><DeleteStoryButton storyId={story.id} redirectTo="/feed" /></>}
           </div>
         </div>
-
-        {story.status === "draft" && (
-          <span className="mt-6 inline-block rounded-full bg-amber-100 px-3 py-1 text-xs font-semibold text-amber-800 dark:bg-amber-950/40 dark:text-amber-300">
-            Draft — only you can see this
-          </span>
-        )}
-        {(story.cover_url || story.cover_style) && (
-          <BookCover
-            title={story.title}
-            author={story.author}
-            coverUrl={story.cover_url}
-            coverStyle={story.cover_style}
-            className="mt-4 h-64 w-44 rounded-lg"
-          />
-        )}
-        <h1 className="mt-3 text-3xl font-bold tracking-tight text-zinc-900 dark:text-zinc-50">
-          {story.title}
-        </h1>
-        <p className="mt-2 text-sm text-zinc-500">
-          by{" "}
-          <Link
-            href={`/${story.author_handle ?? story.author_id}`}
-            className="font-medium text-zinc-700 hover:underline dark:text-zinc-300"
-          >
-            {story.author ?? "Unknown"}
-          </Link>{" "}
-          · {date}
-        </p>
-
-        {/* Read count + reading-time estimate. */}
-        <div className="mt-3 flex flex-wrap items-center gap-2">
-          <div className="inline-flex items-center gap-1.5 rounded-full bg-zinc-100 px-3 py-1 text-sm font-medium text-zinc-600 dark:bg-zinc-800 dark:text-zinc-300">
-            <span aria-hidden="true">👁</span>
-            <span>
-              {formatCount(views)} {views === 1 ? "read" : "reads"}
-            </span>
-          </div>
-          {readMinutes > 0 && (
-            <div className="inline-flex items-center gap-1.5 rounded-full bg-zinc-100 px-3 py-1 text-sm font-medium text-zinc-600 dark:bg-zinc-800 dark:text-zinc-300">
-              <span aria-hidden="true">⏱</span>
-              <span>{readMinutes} min read</span>
+        <StoryOverview
+          story={{title:story.title,author:story.author,authorHref:`/${story.author_handle ?? story.author_id}`,authorImage:story.author_image,coverUrl:story.cover_url,coverStyle:story.cover_style,genres:story.genres}}
+          readMinutes={readMinutes} totalWords={totalWords} views={views}
+          authorActions={!isAuthor ? <><FollowButton userId={story.author_id} initialFollowing={!!following} isLoggedIn={true} />{authorSubscription && <span className="rounded-full border border-ui px-3 py-1 text-xs text-muted">Subscribed</span>}{story.subscription_price !== null && !authorSubscription && <Link href={`/${story.author_handle ?? story.author_id}`} className="py-2 text-xs text-muted underline underline-offset-4">Membership options</Link>}</> : <span className="text-xs text-muted">Your story</span>}
+          access={<>
+            <div className="rounded-2xl border border-ui bg-surface-raised p-5">
+              <p className="text-xs font-semibold uppercase tracking-wider text-muted">{isAuthor ? "Author access" : story.chapters_public ? "Free to read" : unlockedWhole ? "Whole story access" : unlockedIdx.size ? "Chapter access" : "Private chapters"}</p>
+              <p className="mt-2 text-sm leading-relaxed text-ink-soft">{isAuthor ? "Preview your chapters and manage your story." : story.chapters_public ? "All published chapters are open to you." : unlockedWhole ? "Your current access includes every chapter." : "Open a chapter below to see its access status."}</p>
+              {allChapters.length > 0 && <Link href={firstReadable >= 0 ? hasReadingPosition && chapterUnlocked(selectedChapter) ? "#reading-room" : `${storyHref}?chapter=${startChapter}#reading-room` : "#contents-title"} className="btn-primary mt-4 flex min-h-12 items-center justify-center rounded-full px-4 text-sm font-semibold">{firstReadable >= 0 ? hasReadingPosition ? "Continue reading" : "Start reading" : "View chapter list"}<span aria-hidden="true" className="ml-2">→</span></Link>}
             </div>
-          )}
-        </div>
-
-        {story.genres.length > 0 && (
-          <div className="mt-4 flex flex-wrap gap-1.5">
-            {story.genres.map((name) => (
-              <span
-                key={name}
-                className="rounded-full bg-zinc-100 px-2.5 py-0.5 text-xs text-zinc-700 dark:bg-zinc-800 dark:text-zinc-300"
-              >
-                {name}
-              </span>
-            ))}
-          </div>
-        )}
-
-        {inspiredBy.length > 0 && (
-          <div className="mt-6 rounded-xl border border-amber-300 bg-amber-50 p-4 dark:border-amber-900 dark:bg-amber-950/30">
-            <p className="text-sm font-medium text-amber-900 dark:text-amber-200">
-              Inspired by
-            </p>
-            <ul className="mt-1 flex flex-col gap-1">
-              {inspiredBy.map((a) => (
-                <li key={a.id} className="text-sm text-zinc-700 dark:text-zinc-300">
-                  <Link href={`/stories/${a.id}`} className="font-medium underline">
-                    {a.title}
-                  </Link>{" "}
-                  by {a.author ?? "Unknown"}
-                </li>
-              ))}
-            </ul>
-          </div>
-        )}
-
-        {/* The summary is public — shown to everyone. */}
-        <div className="mt-8 whitespace-pre-wrap text-lg leading-8 text-zinc-800 dark:text-zinc-200">
-          {story.summary}
-        </div>
-
-        {allChapters.length > 0 && (
-          <section className="mt-10 border-t border-zinc-200 pt-6 dark:border-zinc-800">
-            <div className="flex items-center justify-between gap-3">
-              <h2 className="text-lg font-semibold text-zinc-900 dark:text-zinc-50">
-                {allChapters.length === 1 && !allChapters[0].title ? "Story" : "Chapters"}
-              </h2>
-              <span className="rounded-full bg-zinc-100 px-3 py-1 text-xs font-medium text-zinc-600 dark:bg-zinc-800 dark:text-zinc-300">
-                {story.chapters_public
-                  ? "Public — free to read"
-                  : isAuthor
-                    ? "Private — sold to readers"
-                    : "Private"}
-              </span>
-            </div>
-
-            {isAuthor && !story.chapters_public && (
-              <>
-                <p className="mt-2 text-sm text-zinc-500">
-                  {buyers === 0
-                    ? "No readers have bought access yet."
-                    : `${buyers} ${buyers === 1 ? "reader has" : "readers have"} bought access.`}
-                </p>
-                <ApprovedReadersList storyId={story.id} readers={readers} />
-              </>
-            )}
-
-            <ChapterReader
-              storyId={story.id}
-              chapters={allChapters.map((c, i) => ({
-                index: i,
-                title: c.title,
-                // Base64 the body so the chapter text isn't sitting in the page
-                // source; the reader decodes it client-side after mount.
-                body: chapterUnlocked(i)
-                  ? Buffer.from(c.body, "utf8").toString("base64")
-                  : null,
-                locked: !chapterUnlocked(i),
-                prompts: chapterUnlocked(i)
-                  ? ((c as { prompts?: string[] }).prompts ?? [])
-                  : [],
-              }))}
-              initialChapter={initialChapter}
-              initialPage={initialPage}
-              initialBookmarks={bookmarks}
-              autoResume={autoResume}
-              watermark={story.status === "published" ? watermark : undefined}
-              authorName={story.author}
-            />
-          </section>
-        )}
-
-        {purchasable ? (
+            {purchasable ? (
           <AccessPanel
             storyId={story.id}
             offered={story.offered_durations}
@@ -553,30 +449,54 @@ export default async function StoryPage({
           !isAuthor &&
           !story.chapters_public &&
           anyLocked && (
-            <section className="mt-10 rounded-2xl border border-zinc-200 bg-white p-6 text-center text-zinc-600 dark:border-zinc-800 dark:bg-zinc-950 dark:text-zinc-400">
+            <section className="rounded-2xl border border-ui bg-surface-raised p-5 text-sm text-muted">
               The author hasn&apos;t put these chapters up for sale yet — check
               back soon.
             </section>
           )
         )}
-
-        <section className="mt-10 border-t border-zinc-200 pt-6 dark:border-zinc-800">
-          <div className="flex flex-wrap items-center justify-between gap-3">
-            <h2 className="text-lg font-semibold text-zinc-900 dark:text-zinc-50">
-              Reviews
-            </h2>
-            {reviewAgg.count > 0 ? (
-              <div className="flex items-center gap-2 text-sm text-zinc-600 dark:text-zinc-300">
-                <StarRating value={reviewAgg.avg ?? 0} size={18} />
-                <span className="font-medium">{(reviewAgg.avg ?? 0).toFixed(1)}</span>
-                <span className="text-zinc-400">
-                  · {reviewAgg.count} {reviewAgg.count === 1 ? "review" : "reviews"}
-                </span>
-              </div>
-            ) : (
-              <span className="text-sm text-zinc-400">No reviews yet</span>
-            )}
+          </>}
+        >
+          <p className="text-xs font-medium uppercase tracking-[.16em] text-muted">{story.status === "draft" ? "Draft · only you can see this" : "A Talerooms story"}</p>
+          <h1 className="mt-4 hidden break-words font-serif text-5xl leading-tight tracking-tight lg:block">{story.title}</h1>
+          <p className="mt-4 text-sm text-muted">{story.status === "draft" ? "Created" : "Published"} {date}</p>
+          {story.genres.length > 0 && <div className="mt-5 flex flex-wrap gap-2">{story.genres.map(name => <span key={name} className="rounded-full border border-ui px-3 py-1 text-xs text-ink-soft">{name}</span>)}</div>}
+          <section className="mt-8" aria-labelledby="synopsis-title"><h2 id="synopsis-title" className="text-xs font-semibold uppercase tracking-wider text-muted">About the story</h2><p className="mt-4 whitespace-pre-wrap break-words text-lg leading-relaxed text-ink-soft">{story.summary || "The author hasn't added a synopsis yet."}</p></section>
+          {inspiredBy.length > 0 && <div className="mt-6 rounded-xl border border-ui p-4"><p className="text-xs font-semibold text-muted">Inspired by</p><ul className="mt-2 space-y-2">{inspiredBy.map(a => <li key={a.id} className="text-sm text-ink-soft"><Link href={`/stories/${a.id}`} className="font-medium underline">{a.title}</Link> by {a.author ?? "Unknown"}</li>)}</ul></div>}
+          <StoryChapters storyHref={storyHref} lastOpened={hasReadingPosition ? selectedChapter : undefined} entries={allChapters.map((c,i)=>({title:c.title,index:i,access:story.chapters_public ? "Free" : isAuthor ? "Author" : authorSubscription ? "Subscriber" : chapterUnlocked(i) ? "Purchased" : "Locked"}))} />
+        </StoryOverview>
+        {allChapters.length > 0 && <section id="reading-room" aria-labelledby="reading-title" className="mt-12 scroll-mt-24 border-t border-ui pt-8">
+          <div className="mx-auto max-w-4xl"><h2 id="reading-title" className="font-serif text-3xl">The reading room</h2>
+            {isAuthor && !story.chapters_public && <div className="mt-4"><p className="text-sm text-muted">{buyers === 0 ? "No readers have bought access yet." : `${buyers} ${buyers === 1 ? "reader has" : "readers have"} bought access.`}</p><ApprovedReadersList storyId={story.id} readers={readers} /></div>}
+            <ChapterReader
+              key={`${selectedChapter}-${initialPage}`}
+              storyId={story.id}
+              chapters={allChapters.map((c, i) => ({
+                index: i,
+                title: c.title,
+                // Base64 the body so the chapter text isn't sitting in the page
+                // source; the reader decodes it client-side after mount.
+                body: chapterUnlocked(i)
+                  ? Buffer.from(c.body, "utf8").toString("base64")
+                  : null,
+                locked: !chapterUnlocked(i),
+                prompts: chapterUnlocked(i)
+                  ? ((c as { prompts?: string[] }).prompts ?? [])
+                  : [],
+              }))}
+              initialChapter={selectedChapter}
+              initialPage={initialPage}
+              initialBookmarks={bookmarks}
+              autoResume={autoResume}
+              watermark={story.status === "published" ? watermark : undefined}
+              authorName={story.author}
+            />
           </div>
+        </section>}
+        <div className="mx-auto max-w-4xl">
+        <section className="mt-10 border-t border-ui pt-6 ">
+          <h2 className="mb-5 font-serif text-2xl text-ink">Reviews</h2>
+          <RatingBreakdown ratings={ratings} />
 
           <div className="mt-4">
             <ReviewPanel
@@ -599,16 +519,16 @@ export default async function StoryPage({
               {reviews.map((r) => (
                 <li
                   key={r.id}
-                  className="rounded-xl border border-zinc-200 bg-white p-4 dark:border-zinc-800 dark:bg-zinc-950"
+                  className="rounded-xl border border-ui bg-surface-raised p-4  "
                 >
                   <div className="flex items-center justify-between gap-3">
                     <div className="flex items-center gap-3">
                       <Avatar src={r.image} name={r.author} size={36} />
                       <div className="min-w-0">
-                        <p className="text-sm font-medium text-zinc-900 dark:text-zinc-100">
+                        <p className="text-sm font-medium text-ink">
                           {r.author ?? "Reader"}
                           {r.mine && (
-                            <span className="ml-1 text-xs font-normal text-zinc-400">
+                            <span className="ml-1 text-xs font-normal text-subtle">
                               (you)
                             </span>
                           )}
@@ -628,7 +548,7 @@ export default async function StoryPage({
                     </div>
                   </div>
                   {r.liked && (
-                    <p className="mt-2 text-sm text-zinc-700 dark:text-zinc-300">
+                    <p className="mt-2 text-sm text-ink-soft">
                       <span className="font-medium text-emerald-600 dark:text-emerald-400">
                         Liked:
                       </span>{" "}
@@ -636,7 +556,7 @@ export default async function StoryPage({
                     </p>
                   )}
                   {r.disliked && (
-                    <p className="mt-1 text-sm text-zinc-700 dark:text-zinc-300">
+                    <p className="mt-1 text-sm text-ink-soft">
                       <span className="font-medium text-rose-600 dark:text-rose-400">
                         Could be better:
                       </span>{" "}
@@ -649,11 +569,11 @@ export default async function StoryPage({
           )}
         </section>
 
-        <section className="mt-10 border-t border-zinc-200 pt-6 dark:border-zinc-800">
-          <h2 className="text-lg font-semibold text-zinc-900 dark:text-zinc-50">
+        <section className="mt-10 border-t border-ui pt-6 ">
+          <h2 className="text-lg font-semibold text-ink">
             Posts about this story
           </h2>
-          <p className="mt-1 text-sm text-zinc-500">
+          <p className="mt-1 text-sm text-muted">
             Share your thoughts — your post goes to the community feed and links
             back here.
           </p>
@@ -666,7 +586,7 @@ export default async function StoryPage({
           </div>
 
           {storyPosts.length === 0 ? (
-            <p className="mt-6 text-sm text-zinc-500">
+            <p className="mt-6 text-sm text-muted">
               No posts about this story yet — be the first.
             </p>
           ) : (
@@ -681,13 +601,13 @@ export default async function StoryPage({
         </section>
 
         {similar.length > 0 && (
-          <section className="mt-10 border-t border-zinc-200 pt-6 dark:border-zinc-800">
-            <h2 className="text-lg font-semibold text-zinc-900 dark:text-zinc-50">
+          <section className="mt-10 border-t border-ui pt-6 ">
+            <h2 className="text-lg font-semibold text-ink">
               Similar stories
             </h2>
             <ul className="mt-4 flex flex-col gap-2">
               {similar.map((a) => (
-                <li key={a.id} className="text-sm text-zinc-700 dark:text-zinc-300">
+                <li key={a.id} className="text-sm text-ink-soft">
                   <Link href={`/stories/${a.id}`} className="font-medium underline">
                     {a.title}
                   </Link>{" "}
@@ -697,7 +617,9 @@ export default async function StoryPage({
             </ul>
           </section>
         )}
+
+        </div>
       </article>
-    </div>
+    </main>
   );
 }

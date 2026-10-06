@@ -82,11 +82,11 @@ export function AccessPanel({
   }
 
   return (
-    <section className="mt-10 rounded-2xl border border-zinc-200 bg-white p-6 dark:border-zinc-800 dark:bg-zinc-950">
-      <h2 className="text-lg font-semibold text-zinc-900 dark:text-zinc-50">
+    <section className="mt-5 rounded-2xl border border-ui bg-surface-raised p-5">
+      <h2 className="text-lg font-semibold text-ink">
         Get access to the chapters
       </h2>
-      <p className="mt-1 text-sm text-zinc-500">
+      <p className="mt-1 text-sm text-muted">
         Pick how long you want access for, then buy the whole story or just the
         chapters you want. (Payments are mocked for now — nothing is charged.)
       </p>
@@ -99,7 +99,7 @@ export function AccessPanel({
 
       {/* Duration choice */}
       <div className="mt-4">
-        <span className="text-sm font-medium text-zinc-700 dark:text-zinc-300">
+        <span className="text-sm font-medium text-ink-soft">
           Access duration
         </span>
         <div className="mt-1.5 flex flex-wrap gap-2">
@@ -109,11 +109,12 @@ export function AccessPanel({
               type="button"
               onClick={() => setTier(t)}
               className={
-                "rounded-full border px-3 py-1 text-sm transition-colors " +
+                "min-h-11 rounded-full border px-3 py-2 text-sm transition-colors " +
                 (t === tier
                   ? "chip-active"
-                  : "border-zinc-300 text-zinc-700 hover:bg-zinc-100 dark:border-zinc-700 dark:text-zinc-300 dark:hover:bg-zinc-900")
+                  : "border-ui-strong text-ink-soft hover:bg-surface-soft")
               }
+              aria-pressed={t === tier}
             >
               {TIER_LABELS[t]}
             </button>
@@ -123,12 +124,12 @@ export function AccessPanel({
 
       {/* Whole-story bundle */}
       {wholeAvailable && (
-        <div className="mt-5 flex items-center justify-between gap-3 rounded-xl border border-zinc-200 p-4 dark:border-zinc-800">
+        <div className="mt-5 flex flex-wrap items-center justify-between gap-3 rounded-xl border border-ui p-4">
           <div>
-            <p className="font-medium text-zinc-900 dark:text-zinc-100">
+            <p className="font-medium text-ink">
               Whole story
             </p>
-            <p className="text-sm text-zinc-500">
+            <p className="text-sm text-muted">
               All chapters, including any added later, for {TIER_LABELS[tier].toLowerCase()}.
             </p>
           </div>
@@ -146,23 +147,23 @@ export function AccessPanel({
       {/* Per-chapter */}
       {lockedForTier.length > 0 && (
         <div className="mt-5">
-          <p className="text-sm font-medium text-zinc-700 dark:text-zinc-300">
+          <p className="text-sm font-medium text-ink-soft">
             Or buy chapters individually
           </p>
           <ul className="mt-2 flex flex-col gap-1.5">
             {lockedForTier.map((c) => (
               <li key={c.index}>
-                <label className="flex items-center gap-3 rounded-lg border border-zinc-200 px-3 py-2 text-sm dark:border-zinc-800">
+                <label className="flex items-center gap-3 rounded-lg border border-ui px-3 py-2 text-sm">
                   <input
                     type="checkbox"
                     checked={picked.has(c.index)}
                     onChange={() => togglePick(c.index)}
                     className="h-4 w-4 accent-[var(--accent)]"
                   />
-                  <span className="flex-1 text-zinc-800 dark:text-zinc-200">
+                  <span className="min-w-0 flex-1 break-words text-ink-soft">
                     {c.title || `Chapter ${c.index + 1}`}
                   </span>
-                  <span className="text-zinc-500">
+                  <span className="text-muted">
                     {formatPrice(disc(c.prices[tier] as number), currency)}
                   </span>
                 </label>
@@ -187,7 +188,7 @@ export function AccessPanel({
       )}
 
       {!wholeAvailable && lockedForTier.length === 0 && (
-        <p className="mt-4 text-sm text-zinc-500">
+        <p className="mt-4 text-sm text-muted">
           Nothing is for sale at this duration — try another.
         </p>
       )}

@@ -1,0 +1,39 @@
+.preview { min-width: 0; }
+.stage { position: relative; isolation: isolate; height: 370px; background: #efb7a5; overflow: hidden; perspective: 1200px; }
+.stageWord { position: absolute; z-index: -1; color: #dc9781; font-size: clamp(80px, 10vw, 160px); font-weight: 700; letter-spacing: -.08em; transform: rotate(-90deg); left: -50px; top: 40px; }
+.book { -webkit-user-select: none; user-select: none; position: absolute; width: 190px; height: 285px; top: 32px; left: 50%; transform: translateX(-50%) rotate(-5deg); transform-style: preserve-3d; transition: transform 700ms cubic-bezier(.2,.75,.25,1); }
+.preview[data-open="true"] .book { transform: translateX(0) rotate(0); }
+.page { position: absolute; inset: 0; display: flex; flex-direction: column; padding: 19px 17px 12px; background: #fffdf4; color: #322a23; border-radius: 0 4px 4px 0; border: 1px solid #d9d0b9; box-shadow: inset 10px 0 18px -12px #5a3e29, 8px 12px 24px #53211830; }
+.kicker { font-size: 8px; letter-spacing: .13em; color: #70604e; }
+.synopsis { margin-top: 10px; font-family: Georgia, serif; font-size: 13px; line-height: 1.55; display: -webkit-box; -webkit-line-clamp: 5; -webkit-box-orient: vertical; overflow: hidden; }
+.readLink { margin-top: auto; padding-block: 8px; min-height: 44px; display: flex; align-items: center; font-size: 11px; font-weight: 700; text-decoration: underline; text-underline-offset: 4px; }
+.pageNumber { font-family: Georgia, serif; font-size: 9px; color: #70604e; text-align: center; }
+.cover { position: absolute; inset: 0; transform-origin: left center; transform-style: preserve-3d; transition: transform 850ms cubic-bezier(.2,.75,.25,1); cursor: pointer; border: 0; padding: 0; background: transparent; text-align: left; }
+.preview[data-open="true"] .cover { transform: rotateY(-165deg); }
+.front, .back { position: absolute; inset: 0; backface-visibility: hidden; border-radius: 0 5px 5px 0; }
+.front { transform: translateZ(1px); box-shadow: 18px 24px 30px #53211855; }
+.coverArt { width: 100%; height: 100%; }
+.back { transform: rotateY(180deg); background: #f2ecdc; color: #796b54; display: flex; flex-direction: column; align-items: center; justify-content: center; text-align: center; box-shadow: inset -14px 0 20px -18px #40271b; border: 1px solid #d9d0b9; }
+.back > span { font-family: Georgia, serif; font-size: 19px; }.back i { height: 30px; width: 1px; background: #b7a88e; margin-block: 18px; }.back small { font-family: Georgia, serif; font-size: 12px; line-height: 1.5; }
+.preview a:focus-visible, .preview button:focus-visible { outline: 3px solid currentColor; outline-offset: 4px; }
+@media (max-width: 1023px) and (min-width: 768px) { .book { width: 145px; height: 250px; }.stage { height: 335px; }.page { padding: 12px; }.synopsis { -webkit-line-clamp: 4; } }
+@media (max-width: 767px) { .stage { height: 335px; }.book { width: min(155px, 43%); height: 260px; top: 24px; }.page { padding: 14px 11px 10px; }.synopsis { -webkit-line-clamp: 5; }.back > span { font-size: 16px; }.stageWord { font-size: 110px; } }
+@media (prefers-reduced-motion: reduce) { .book, .cover { transition: none; } }
+
+/* A shelf cover expands into a readable spread above adjacent shelf items. */
+.shelf { position: relative; width: 100%; max-width: 180px; margin-inline: auto; aspect-ratio: 2/3; }
+.shelf[data-open="true"] { z-index: 30; }
+.shelf .stage { height: 100%; overflow: visible; background: transparent; }
+.shelf .stageWord { display: none; }
+.shelf .book { width: 100%; height: 100%; left: 0; top: 0; transform: none; }
+.shelf[data-open="true"] .book { width: var(--spread-width); height: calc(var(--spread-width) * 1.5); left: 50%; transform: translateX(var(--spread-shift)); }
+.shelf .page { visibility: hidden; }
+.shelf[data-open="true"] .page { visibility: visible; }
+.shelf .page { padding: 16px 13px 10px; }
+.shelf .synopsis { -webkit-line-clamp: 4; }
+.shelf .front { box-shadow: 4px 8px 16px #00000020; }
+.shelf[data-open="true"] .front { box-shadow: 18px 24px 30px #53211855; }
+
+/* Keep one continuous pointer surface across the two pages while opening. */
+.hoverArea { position: absolute; left: -100%; top: 0; width: 200%; height: 100%; visibility: hidden; transform: translateZ(-2px); }
+.preview[data-open="true"] .hoverArea { visibility: visible; }

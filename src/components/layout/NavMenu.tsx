@@ -21,44 +21,49 @@ export function NavMenu() {
   }, []);
 
   return (
-    <div className="relative" ref={ref}>
+    <div className="relative" ref={ref} onKeyDown={(e) => {
+      if (e.key === "Escape") {
+        setOpen(false);
+        ref.current?.querySelector<HTMLButtonElement>("button")?.focus();
+      }
+    }}>
       <button
         type="button"
         onClick={() => setOpen((o) => !o)}
         aria-label="Menu"
         aria-expanded={open}
-        className="flex h-11 w-11 items-center justify-center rounded-full border border-zinc-300 text-zinc-900 transition-colors hover:bg-zinc-100 dark:border-zinc-700 dark:text-zinc-100 dark:hover:bg-zinc-900"
+        className="flex h-11 w-11 items-center justify-center rounded-full border border-ui-strong text-ink transition-colors hover:bg-surface-soft"
       >
-        <span className="text-lg leading-none">☰</span>
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.6" strokeLinecap="round" aria-hidden="true" className="h-5 w-5"><path d="M5 8h14M5 16h14" /></svg>
       </button>
 
       {open && (
-        <div className="absolute right-0 z-50 mt-2 w-44 overflow-hidden rounded-xl border border-zinc-200 bg-white py-1 shadow-lg dark:border-zinc-800 dark:bg-zinc-950">
+        <div className="absolute right-0 z-50 mt-2 w-44 overflow-hidden rounded-xl border border-ui bg-surface-raised py-1 shadow-lg">
           <Link
             href="/library"
             onClick={() => setOpen(false)}
-            className="block px-4 py-2.5 text-sm text-zinc-800 hover:bg-zinc-100 dark:text-zinc-200 dark:hover:bg-zinc-900"
+            className="block px-4 py-2.5 text-sm text-ink-soft hover:bg-surface-soft"
           >
             Library
           </Link>
           <Link
             href="/collections"
             onClick={() => setOpen(false)}
-            className="block px-4 py-2.5 text-sm text-zinc-800 hover:bg-zinc-100 dark:text-zinc-200 dark:hover:bg-zinc-900"
+            className="block px-4 py-2.5 text-sm text-ink-soft hover:bg-surface-soft"
           >
             Collections
           </Link>
           <Link
             href="/drafts"
             onClick={() => setOpen(false)}
-            className="block px-4 py-2.5 text-sm text-zinc-800 hover:bg-zinc-100 dark:text-zinc-200 dark:hover:bg-zinc-900"
+            className="block px-4 py-2.5 text-sm text-ink-soft hover:bg-surface-soft"
           >
             Drafts
           </Link>
           <Link
             href="/settings"
             onClick={() => setOpen(false)}
-            className="block px-4 py-2.5 text-sm text-zinc-800 hover:bg-zinc-100 dark:text-zinc-200 dark:hover:bg-zinc-900"
+            className="block px-4 py-2.5 text-sm text-ink-soft hover:bg-surface-soft"
           >
             Settings
           </Link>
@@ -70,7 +75,7 @@ export function NavMenu() {
               router.push("/login");
               router.refresh();
             }}
-            className="block w-full px-4 py-2.5 text-left text-sm text-red-600 hover:bg-zinc-100 dark:text-red-400 dark:hover:bg-zinc-900"
+            className="block w-full px-4 py-2.5 text-left text-sm text-red-600 hover:bg-surface-soft dark:text-red-400"
           >
             Sign out
           </button>

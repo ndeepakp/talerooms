@@ -68,6 +68,7 @@ export function SearchBar({ initial = "" }: { initial?: string }) {
       <form onSubmit={submit}>
         <input
           type="search"
+          aria-label="Search stories, genres, or authors"
           value={q}
           onChange={(e) => {
             const value = e.target.value;
@@ -81,21 +82,21 @@ export function SearchBar({ initial = "" }: { initial?: string }) {
           onFocus={() => q.trim() && setOpen(true)}
           onKeyDown={(e) => e.key === "Escape" && setOpen(false)}
           placeholder="Search stories or $handles…"
-          className="h-11 w-full rounded-full border border-zinc-300 bg-white px-4 text-sm text-zinc-900 outline-none focus:border-zinc-900 dark:border-zinc-700 dark:bg-zinc-950 dark:text-zinc-100 dark:focus:border-zinc-300"
+          className="h-11 w-full rounded-full border border-ui bg-surface-soft px-4 text-sm text-ink placeholder:text-muted focus:border-ui-strong"
         />
       </form>
 
       {open && q.trim() && (
-        <div className="absolute left-0 right-0 z-50 mt-2 max-h-96 overflow-auto rounded-xl border border-zinc-200 bg-white py-1 shadow-lg dark:border-zinc-800 dark:bg-zinc-950">
+        <div className="absolute left-0 right-0 z-50 mt-2 max-h-96 overflow-auto rounded-xl border border-ui bg-surface-raised py-1 shadow-lg">
           {!hasResults ? (
-            <p className="px-4 py-3 text-sm text-zinc-500">No matches.</p>
+            <p className="px-4 py-3 text-sm text-muted">No matches.</p>
           ) : (
             <>
               {results.genres.length > 0 && (
                 <Group label="Genres">
                   {results.genres.map((g) => (
                     <Row key={`g-${g.id}`} onClick={() => go(`/genres/${g.id}`)}>
-                      <span className="text-zinc-900 dark:text-zinc-100">{g.name}</span>
+                      <span className="text-ink">{g.name}</span>
                     </Row>
                   ))}
                 </Group>
@@ -104,11 +105,11 @@ export function SearchBar({ initial = "" }: { initial?: string }) {
                 <Group label="People">
                   {results.users.map((u) => (
                     <Row key={`u-${u.id}`} onClick={() => go(`/${u.username ?? u.id}`)}>
-                      <span className="text-zinc-900 dark:text-zinc-100">
+                      <span className="text-ink">
                         {u.name ?? "Unknown"}
                       </span>
                       {u.username && (
-                        <span className="ml-2 text-zinc-500">${u.username}</span>
+                        <span className="ml-2 text-muted">${u.username}</span>
                       )}
                     </Row>
                   ))}
@@ -118,8 +119,8 @@ export function SearchBar({ initial = "" }: { initial?: string }) {
                 <Group label="Stories">
                   {results.stories.map((s) => (
                     <Row key={`s-${s.id}`} onClick={() => go(`/stories/${s.id}`)}>
-                      <span className="text-zinc-900 dark:text-zinc-100">{s.title}</span>
-                      <span className="ml-2 text-zinc-500">by {s.author ?? "Unknown"}</span>
+                      <span className="text-ink">{s.title}</span>
+                      <span className="ml-2 text-muted">by {s.author ?? "Unknown"}</span>
                     </Row>
                   ))}
                 </Group>
@@ -130,7 +131,7 @@ export function SearchBar({ initial = "" }: { initial?: string }) {
             type="button"
             onMouseDown={(e) => e.preventDefault()}
             onClick={() => go(`/search?q=${encodeURIComponent(q.trim())}`)}
-            className="block w-full border-t border-zinc-100 px-4 py-2.5 text-left text-sm font-medium text-zinc-700 hover:bg-zinc-100 dark:border-zinc-800 dark:text-zinc-300 dark:hover:bg-zinc-900"
+            className="block w-full border-t border-ui px-4 py-2.5 text-left text-sm font-medium text-ink-soft hover:bg-surface-soft"
           >
             See all results for “{q.trim()}”
           </button>
@@ -143,7 +144,7 @@ export function SearchBar({ initial = "" }: { initial?: string }) {
 function Group({ label, children }: { label: string; children: React.ReactNode }) {
   return (
     <div className="py-1">
-      <p className="px-4 pb-1 pt-1 text-xs font-semibold uppercase tracking-wide text-zinc-400">
+      <p className="px-4 pb-1 pt-1 text-xs font-semibold uppercase tracking-wide text-subtle">
         {label}
       </p>
       {children}
@@ -163,7 +164,7 @@ function Row({
       type="button"
       onMouseDown={(e) => e.preventDefault()}
       onClick={onClick}
-      className="block w-full truncate px-4 py-2 text-left text-sm hover:bg-zinc-100 dark:hover:bg-zinc-900"
+      className="block w-full truncate px-4 py-2 text-left text-sm hover:bg-surface-soft"
     >
       {children}
     </button>

@@ -1,10 +1,7 @@
-"use client";
-
-import { useState, type ReactNode } from "react";
+import { type ReactNode } from "react";
 import Link from "next/link";
-import { BookCover } from "@/components/story/BookCover";
+import { BookPreview } from "@/components/story/BookPreview";
 import { StarRating } from "@/components/story/StarRating";
-import { currencySymbol } from "@/lib/pricing";
 import { formatCount } from "@/lib/format";
 import { type CoverStyle } from "@/lib/cover-style";
 
@@ -27,112 +24,17 @@ export type BookshelfStory = {
   currency: string;
 };
 
-// Public "charges" summary for the detail pane. The real buy panel lives on the
-// story page; here we just hint free vs paid (and a from-price if there's one).
-function charges(s: BookshelfStory): string {
-  if (s.chapters_public) return "Free to read";
-  const vals = Object.values(s.whole_prices ?? {}).filter(
-    (v) => typeof v === "number" && v > 0,
-  );
-  if (vals.length) return `From ${currencySymbol(s.currency)}${Math.min(...vals)}`;
-  return "Paid";
-}
-
 function Rating({ s, size = 12 }: { s: BookshelfStory; size?: number }) {
   if (s.rating_count === 0) {
-    return <span className="text-xs text-zinc-400">No ratings yet</span>;
+    return <span className="text-xs text-subtle">No ratings yet</span>;
   }
   return (
     <span className="inline-flex items-center gap-1">
       <StarRating value={s.rating ?? 0} size={size} />
-      <span className="text-xs text-zinc-500">
+      <span className="text-xs text-muted">
         {(s.rating ?? 0).toFixed(1)} ({s.rating_count})
       </span>
     </span>
-  );
-}
-
-function DetailPane({
-  story,
-  onClose,
-}: {
-  story: BookshelfStory;
-  onClose: () => void;
-}) {
-  return (
-    <aside className="fixed inset-0 z-40 overflow-y-auto bg-[var(--page)] p-6 md:static md:z-auto md:w-full md:shrink-0 md:overflow-visible md:bg-transparent md:p-0">
-      <div className="rounded-2xl border border-zinc-200 bg-white p-5 dark:border-zinc-800 dark:bg-zinc-950 md:sticky md:top-6">
-        <button
-          type="button"
-          onClick={onClose}
-          className="mb-3 text-sm text-zinc-500 hover:underline"
-        >
-          ← Back to shelf
-        </button>
-        <div className="flex gap-4">
-          <BookCover
-            title={story.title}
-            author={story.author}
-            coverUrl={story.cover_url}
-            coverStyle={story.cover_style}
-            className="h-44 w-32 shrink-0 rounded-md shadow"
-          />
-          <div className="min-w-0">
-            <Link
-              href={`/stories/${story.slug ?? story.id}`}
-              className="text-lg font-bold leading-tight text-zinc-900 hover:underline dark:text-zinc-50"
-            >
-              {story.title}
-            </Link>
-            <p className="mt-0.5 text-sm text-zinc-500">
-              by{" "}
-              <Link
-                href={`/${story.author_handle ?? story.author_id}`}
-                className="font-medium text-zinc-700 hover:underline dark:text-zinc-300"
-              >
-                {story.author ?? "Unknown"}
-              </Link>
-            </p>
-            <Link href={`/stories/${story.slug ?? story.id}/reviews`} className="mt-2 inline-block">
-              <Rating s={story} size={13} />
-            </Link>
-            {story.views > 0 && (
-              <p className="mt-1 flex items-center gap-1 text-xs text-zinc-500">
-                <span aria-hidden="true">👁</span>
-                {formatCount(story.views)} {story.views === 1 ? "read" : "reads"}
-              </p>
-            )}
-            <p className="mt-2 text-sm font-medium text-zinc-700 dark:text-zinc-300">
-              {charges(story)}
-            </p>
-          </div>
-        </div>
-
-        {story.genres.length > 0 && (
-          <div className="mt-4 flex flex-wrap gap-1.5">
-            {story.genres.map((name) => (
-              <span
-                key={name}
-                className="rounded-full bg-zinc-100 px-2.5 py-0.5 text-xs text-zinc-700 dark:bg-zinc-800 dark:text-zinc-300"
-              >
-                {name}
-              </span>
-            ))}
-          </div>
-        )}
-
-        <p className="mt-4 text-sm leading-6 text-zinc-700 dark:text-zinc-300">
-          {story.summary}
-        </p>
-
-        <Link
-          href={`/stories/${story.slug ?? story.id}`}
-          className="mt-5 inline-flex rounded-full btn-primary px-4 py-2 text-sm font-medium"
-        >
-          Open to read →
-        </Link>
-      </div>
-    </aside>
   );
 }
 
@@ -141,53 +43,28 @@ export function Bookshelf({
   rightExtra,
 }: {
   stories: BookshelfStory[];
-  // Extra content for the right rail (e.g. the "Your week" panel). Shown on its
-  // own, and below the detail pane once a book is opened.
+  // Extra content for the right rail (e.g. the "Your week" panel).
   rightExtra?: ReactNode;
 }) {
-  const [selId, setSelId] = useState<string | null>(null);
-  const selected = stories.find((s) => s.id === selId) ?? null;
-
   return (
     <div className="flex flex-col gap-6 md:flex-row">
-      {/* The shelf (the list of books) on the left — full width until a book is
-          opened, then it shares the row with the detail pane on the right. Each
-          book stands on a wooden ledge, inside a bookcase frame. */}
       <div className="shelf-case flex-1">
-      <div className="grid grid-cols-[repeat(auto-fill,minmax(130px,1fr))] gap-x-5 gap-y-8">
+      <div className="grid grid-cols-[repeat(auto-fill,minmax(112px,1fr))] gap-x-5 gap-y-8">
         {stories.map((s) => (
           <div key={s.id} className="group flex flex-col">
-            <button
-              type="button"
-              onClick={() => setSelId(s.id)}
-              aria-label={`Preview ${s.title}`}
-              className="text-left"
-            >
-              <BookCover
-                title={s.title}
-                author={s.author}
-                coverUrl={s.cover_url}
-                coverStyle={s.cover_style}
-                className={
-                  "aspect-[2/3] w-full rounded-md shadow-sm transition group-hover:-translate-y-1 group-hover:shadow-md " +
-                  (s.id === selId
-                    ? "ring-1 ring-accent ring-offset-2 ring-offset-[var(--page)]"
-                    : "")
-                }
-              />
-            </button>
-            {/* Wooden ledge the cover sits on (matches the chosen shelf finish). */}
+            <BookPreview story={s} />
+            {/* Display ledge the cover stands on */}
             <div className="shelf-ledge" />
-            <div className="mt-2 min-w-0">
+            <div className="mt-2.5 min-w-0">
               <Link
                 href={`/stories/${s.slug ?? s.id}`}
-                className="block truncate text-sm font-medium text-zinc-900 hover:underline dark:text-zinc-100"
+                className="block truncate font-serif text-sm font-bold text-ink transition-colors group-hover:text-accent"
               >
                 {s.title}
               </Link>
               <Link
                 href={`/${s.author_handle ?? s.author_id}`}
-                className="block truncate text-xs text-zinc-500 hover:underline"
+                className="block truncate text-xs text-muted hover:text-ink"
               >
                 {s.author ?? "Unknown"}
               </Link>
@@ -199,7 +76,7 @@ export function Bookshelf({
                 <Rating s={s} size={11} />
               </Link>
               {s.views > 0 && (
-                <p className="mt-0.5 flex items-center gap-1 text-xs text-zinc-400">
+                <p className="mt-0.5 flex items-center gap-1 text-xs text-subtle">
                   <span aria-hidden="true">👁</span>
                   {formatCount(s.views)} {s.views === 1 ? "read" : "reads"}
                 </p>
@@ -210,9 +87,8 @@ export function Bookshelf({
       </div>
       </div>
 
-      {(selected || rightExtra) && (
-        <div className="flex w-full flex-col gap-5 md:w-[380px] md:shrink-0">
-          {selected && <DetailPane story={selected} onClose={() => setSelId(null)} />}
+      {rightExtra && (
+        <div className="flex w-full flex-col gap-5 md:w-[300px] md:shrink-0 lg:w-[340px]">
           {rightExtra}
         </div>
       )}

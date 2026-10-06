@@ -11,7 +11,7 @@ export type Appearance = {
   themeMode: ThemeMode;
   accent: AccentColor;
   background: BackgroundPreset;
-  // The finish of the Library bookshelf (the wooden plank look).
+  // The finish tint of the Library display ledges.
   shelf: ShelfStyle;
   // URL path of an uploaded image used as the feed-page wallpaper, or null.
   feedWallpaper: string | null;
@@ -27,21 +27,21 @@ export const THEME_MODES: { id: ThemeMode; label: string; hint: string }[] = [
 // (globals.css) keyed by the `id` via [data-accent="..."].
 export const ACCENTS = [
   { id: "graphite", label: "Graphite", swatch: "#18181b" },
-  { id: "indigo", label: "Indigo", swatch: "#6366f1" },
-  { id: "violet", label: "Violet", swatch: "#8b5cf6" },
-  { id: "sky", label: "Sky", swatch: "#0ea5e9" },
-  { id: "emerald", label: "Emerald", swatch: "#10b981" },
+  { id: "indigo", label: "Indigo", swatch: "#4f46e5" },
+  { id: "violet", label: "Violet", swatch: "#7c3aed" },
+  { id: "sky", label: "Sky", swatch: "#0369a1" },
+  { id: "emerald", label: "Emerald", swatch: "#047857" },
   { id: "amber", label: "Amber", swatch: "#f59e0b" },
-  { id: "rose", label: "Rose", swatch: "#f43f5e" },
+  { id: "rose", label: "Rose", swatch: "#be123c" },
 ] as const;
 
 export const BACKGROUNDS = [
-  { id: "plain", label: "Plain", swatch: "#fafafa" },
-  { id: "paper", label: "Warm paper", swatch: "#f5f0e6" },
-  { id: "slate", label: "Cool grey", swatch: "#eef1f5" },
+  { id: "plain", label: "Plain", swatch: "#f6f5f2" },
+  { id: "paper", label: "Warm paper", swatch: "#f6f0e5" },
+  { id: "slate", label: "Cool grey", swatch: "#eef1f6" },
 ] as const;
 
-// `swatch` previews the plank colour in the settings UI; the real shelf look
+// `swatch` previews the display ledge tint in the settings UI; the real shelf look
 // lives in CSS (globals.css) keyed by the `id` via [data-shelf="..."].
 export const SHELF_STYLES = [
   { id: "walnut", label: "Walnut", swatch: "#a07b3f" },

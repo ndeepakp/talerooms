@@ -21,17 +21,17 @@ export function ChapterPrompts({
   if (!prompts || prompts.length === 0) return null;
 
   return (
-    <section className="mt-6 rounded-2xl border border-zinc-200 bg-zinc-50 p-4 dark:border-zinc-800 dark:bg-zinc-900/40">
-      <h4 className="text-sm font-semibold text-zinc-900 dark:text-zinc-50">
+    <section className="mt-6 rounded-2xl border border-[var(--reader-border)] bg-[var(--reader-paper)] p-4">
+      <h4 className="text-sm font-semibold text-[var(--reader-ink)]">
         Join the discussion
       </h4>
-      <p className="text-xs text-zinc-400">
+      <p className="text-xs text-[var(--reader-muted)]">
         Your answer becomes a public post on the feed.
       </p>
       <div className="mt-3 flex flex-col gap-4">
         {prompts.map((p, i) => (
           <div key={i}>
-            <p className="text-sm font-medium text-zinc-800 dark:text-zinc-200">{p}</p>
+            <p className="text-sm font-medium text-[var(--reader-ink)]">{p}</p>
             {done[p] ? (
               <p className="mt-1 text-xs font-medium text-emerald-600 dark:text-emerald-400">
                 ✓ Posted — find it on the feed.
@@ -48,7 +48,7 @@ export function ChapterPrompts({
                 <button
                   type="button"
                   onClick={() => setOpenPrompt(null)}
-                  className="mt-1 text-xs text-zinc-400 hover:underline"
+                  className="mt-1 text-xs text-[var(--reader-muted)] hover:underline"
                 >
                   Cancel
                 </button>

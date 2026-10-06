@@ -35,7 +35,7 @@ function QuizItem({
 
   return (
     <div>
-      <p className="font-medium text-zinc-800 dark:text-zinc-200">{q.prompt}</p>
+      <p className="font-medium text-[var(--reader-ink)]">{q.prompt}</p>
       <div className="mt-2 flex flex-col gap-1.5">
         {q.options.map((opt, i) => {
           const isCorrect = answered && q.correct === i;
@@ -49,16 +49,16 @@ function QuizItem({
               className={
                 "rounded-lg border px-3 py-2 text-left text-sm transition-colors " +
                 (isCorrect
-                  ? "border-emerald-500 bg-emerald-50 dark:border-emerald-600 dark:bg-emerald-950/30"
+                  ? "border-emerald-500 bg-[color-mix(in_srgb,#10b981_12%,var(--reader-paper))]"
                   : isWrongPick
-                    ? "border-red-500 bg-red-50 dark:border-red-600 dark:bg-red-950/30"
+                    ? "border-red-500 bg-[color-mix(in_srgb,#ef4444_12%,var(--reader-paper))]"
                     : answered
-                      ? "border-zinc-200 dark:border-zinc-800"
-                      : "border-zinc-300 hover:bg-zinc-50 dark:border-zinc-700 dark:hover:bg-zinc-900")
+                      ? "border-[var(--reader-border)]"
+                      : "border-[var(--reader-border)] hover:bg-[var(--reader-paper)]")
               }
             >
               <span className="flex items-center justify-between gap-2">
-                <span className="text-zinc-800 dark:text-zinc-200">{opt}</span>
+                <span className="text-[var(--reader-ink)]">{opt}</span>
                 {isCorrect && <span className="text-emerald-600 dark:text-emerald-400">✓</span>}
                 {isWrongPick && <span className="text-red-600 dark:text-red-400">✗</span>}
               </span>
@@ -99,9 +99,9 @@ export function ChapterQuestions({
   ).length;
 
   return (
-    <section className="mt-6 rounded-2xl border border-zinc-200 bg-zinc-50 p-4 dark:border-zinc-800 dark:bg-zinc-900/40">
+    <section className="mt-6 rounded-2xl border border-[var(--reader-border)] bg-[var(--reader-paper)] p-4">
       <div className="flex items-center justify-between gap-3">
-        <h4 className="text-sm font-semibold text-zinc-900 dark:text-zinc-50">
+        <h4 className="text-sm font-semibold text-[var(--reader-ink)]">
           Chapter quiz
         </h4>
         {answeredAll && (

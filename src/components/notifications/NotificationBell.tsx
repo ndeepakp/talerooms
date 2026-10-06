@@ -74,7 +74,7 @@ export function NotificationBell() {
         onClick={toggleOpen}
         aria-label="Notifications"
         aria-expanded={open}
-        className="relative flex h-11 w-11 items-center justify-center rounded-full border border-zinc-300 text-zinc-900 transition-colors hover:bg-zinc-100 dark:border-zinc-700 dark:text-zinc-100 dark:hover:bg-zinc-900"
+        className="relative flex h-11 w-11 items-center justify-center rounded-full border border-ui-strong text-ink transition-colors hover:bg-surface-soft"
       >
         <svg
           xmlns="http://www.w3.org/2000/svg"
@@ -98,9 +98,9 @@ export function NotificationBell() {
       </button>
 
       {open && (
-        <div className="absolute right-0 z-50 mt-2 w-80 overflow-hidden rounded-xl border border-zinc-200 bg-white shadow-lg dark:border-zinc-800 dark:bg-zinc-950">
-          <div className="flex items-center justify-between border-b border-zinc-100 px-4 py-2.5 dark:border-zinc-800">
-            <span className="text-sm font-semibold text-zinc-900 dark:text-zinc-100">
+        <div className="absolute right-0 z-50 mt-2 w-80 overflow-hidden rounded-xl border border-ui bg-surface-raised shadow-lg">
+          <div className="flex items-center justify-between border-b border-ui px-4 py-2.5">
+            <span className="text-sm font-semibold text-ink">
               Notifications
             </span>
             <Link
@@ -113,9 +113,9 @@ export function NotificationBell() {
           </div>
 
           {!loaded ? (
-            <p className="px-4 py-6 text-center text-sm text-zinc-500">Loading…</p>
+            <p className="px-4 py-6 text-center text-sm text-muted">Loading…</p>
           ) : items.length === 0 ? (
-            <p className="px-4 py-6 text-center text-sm text-zinc-500">
+            <p className="px-4 py-6 text-center text-sm text-muted">
               No notifications yet.
             </p>
           ) : (
@@ -126,7 +126,7 @@ export function NotificationBell() {
                   className={
                     "flex gap-2 px-4 py-3 " +
                     (n.seen
-                      ? "bg-white dark:bg-zinc-950"
+                      ? "bg-surface-raised"
                       : "bg-zinc-100 dark:bg-zinc-800/50")
                   }
                 >
@@ -137,7 +137,7 @@ export function NotificationBell() {
                       (n.seen ? "bg-transparent" : "bg-accent")
                     }
                   />
-                  <p className="text-sm text-zinc-700 dark:text-zinc-300">
+                  <p className="text-sm text-ink-soft">
                     <NotificationMessage n={n} />
                   </p>
                 </li>
@@ -149,7 +149,7 @@ export function NotificationBell() {
             <Link
               href="/notifications"
               onClick={() => setOpen(false)}
-              className="block border-t border-zinc-100 px-4 py-2.5 text-center text-sm font-medium text-accent hover:bg-zinc-50 dark:border-zinc-800 dark:hover:bg-zinc-900"
+              className="block border-t border-ui px-4 py-2.5 text-center text-sm font-medium text-accent hover:bg-surface-soft"
             >
               View all notifications{total > items.length ? ` (${total})` : ""}
             </Link>

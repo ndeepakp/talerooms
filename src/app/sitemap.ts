@@ -5,8 +5,7 @@ const BASE = "https://talerooms.fly.dev";
 
 export const dynamic = "force-dynamic";
 
-// Lists the home page plus every published story so search engines can find and
-// index them. Author profiles could be added here later.
+// Public welcome/about pages, published stories, and their authors.
 export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
   let stories: { slug: string | null; id: string; created_at: string }[] = [];
   let authors: { username: string }[] = [];
@@ -32,6 +31,7 @@ export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
 
   return [
     { url: BASE, changeFrequency: "daily", priority: 1 },
+    { url: `${BASE}/about`, changeFrequency: "monthly", priority: 0.6 },
     ...stories.map((s) => ({
       url: `${BASE}/stories/${s.slug ?? s.id}`,
       lastModified: new Date(s.created_at),

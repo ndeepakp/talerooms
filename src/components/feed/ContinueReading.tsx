@@ -35,10 +35,10 @@ export function ContinueReading({ resume }: { resume: Resume }) {
           <p className="text-xs font-medium uppercase tracking-wide text-accent">
             Continue reading
           </p>
-          <p className="mt-0.5 truncate font-semibold text-zinc-900 dark:text-zinc-50">
+          <p className="mt-0.5 truncate font-semibold text-ink">
             {resume.title}
           </p>
-          <p className="text-sm text-zinc-500">
+          <p className="text-sm text-muted">
             Chapter {resume.chapter_index + 1} · by {resume.author ?? "Unknown"}
           </p>
         </div>
@@ -50,7 +50,7 @@ export function ContinueReading({ resume }: { resume: Resume }) {
         type="button"
         onClick={dismiss}
         aria-label="Dismiss continue reading"
-        className="absolute right-2 top-2 flex h-7 w-7 items-center justify-center rounded-full text-zinc-400 transition-colors hover:bg-zinc-200 hover:text-zinc-700 dark:hover:bg-zinc-800 dark:hover:text-zinc-200"
+        className="absolute right-2 top-2 flex h-7 w-7 items-center justify-center rounded-full text-subtle transition-colors hover:bg-zinc-200 hover:text-ink dark:hover:bg-zinc-800"
       >
         ✕
       </button>

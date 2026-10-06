@@ -75,7 +75,7 @@ export default async function FeedPage() {
   // "New chapters for you": stories with unseen new_chapter notifications — the
   // serial loop's pull-back, surfaced as a strip at the top of the feed.
   const newChapters = await sql<NewChapterStory[]>`
-    SELECT s.id, s.slug, s.title, u.name AS author,
+    SELECT s.id, s.slug, s.title, s.summary, u.name AS author,
            s.cover_url, s.cover_style,
            COALESCE(rp.chapter_index, 0) AS chapter_index,
            COUNT(*)::int AS new_count

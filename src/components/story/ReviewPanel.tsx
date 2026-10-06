@@ -49,7 +49,7 @@ function StarInput({
           );
         })}
       </div>
-      <span className="text-sm font-medium text-zinc-600 dark:text-zinc-300">
+      <span className="text-sm font-medium text-muted">
         {shown >= 0.5 ? shown.toFixed(1) : "—"}
       </span>
     </div>
@@ -74,7 +74,7 @@ export function ReviewPanel({
 
   if (!canReview) {
     return (
-      <p className="text-sm text-zinc-500">
+      <p className="text-sm text-muted">
         Only readers with access to this story can leave a review.
       </p>
     );
@@ -109,8 +109,8 @@ export function ReviewPanel({
   }
 
   return (
-    <div className="rounded-xl border border-zinc-200 bg-white p-4 dark:border-zinc-800 dark:bg-zinc-950">
-      <p className="text-sm font-medium text-zinc-700 dark:text-zinc-300">
+    <div className="rounded-xl border border-ui bg-surface-raised p-4">
+      <p className="text-sm font-medium text-ink-soft">
         {initial ? "Your review" : "Rate this story"}
       </p>
       <div className="mt-2">
@@ -118,25 +118,25 @@ export function ReviewPanel({
       </div>
       <div className="mt-3 grid gap-3 sm:grid-cols-2">
         <label className="flex flex-col gap-1 text-sm">
-          <span className="text-zinc-600 dark:text-zinc-400">What you liked</span>
+          <span className="text-muted">What you liked</span>
           <textarea
             value={liked}
             onChange={(e) => setLiked(e.target.value)}
             rows={3}
             maxLength={1500}
             placeholder="What worked for you?"
-            className="rounded-lg border border-zinc-300 bg-white px-3 py-2 text-sm text-zinc-900 outline-none focus:border-zinc-900 dark:border-zinc-700 dark:bg-zinc-950 dark:text-zinc-100"
+            className="rounded-lg border border-ui-strong bg-surface-raised px-3 py-2 text-sm text-ink outline-none focus:border-zinc-900"
           />
         </label>
         <label className="flex flex-col gap-1 text-sm">
-          <span className="text-zinc-600 dark:text-zinc-400">What you didn&apos;t</span>
+          <span className="text-muted">What you didn&apos;t</span>
           <textarea
             value={disliked}
             onChange={(e) => setDisliked(e.target.value)}
             rows={3}
             maxLength={1500}
             placeholder="What could be better? (optional)"
-            className="rounded-lg border border-zinc-300 bg-white px-3 py-2 text-sm text-zinc-900 outline-none focus:border-zinc-900 dark:border-zinc-700 dark:bg-zinc-950 dark:text-zinc-100"
+            className="rounded-lg border border-ui-strong bg-surface-raised px-3 py-2 text-sm text-ink outline-none focus:border-zinc-900"
           />
         </label>
       </div>
@@ -155,7 +155,7 @@ export function ReviewPanel({
             type="button"
             onClick={remove}
             disabled={busy}
-            className="text-sm text-zinc-400 hover:text-red-600 dark:hover:text-red-400"
+            className="text-sm text-subtle hover:text-red-600 dark:hover:text-red-400"
           >
             Delete
           </button>

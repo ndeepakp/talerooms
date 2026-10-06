@@ -1,0 +1,74 @@
+.page { background: #faf8f2; color: #202022; }
+.opening { background: #213bb5; color: #fffdf5; --ink: #fffdf5; --surface-raised: #213bb5; --accent: #e3f49a; }
+.navigation, .hero, .manifesto, .shelf, .writers { max-width: 1440px; margin: auto; padding-inline: clamp(24px, 5vw, 80px); }
+.headerSurface { background: #faf8f2; color: #202022; border-bottom: 1px solid #deddd6; --accent: #213bb5; }
+.navigation { display: flex; justify-content: space-between; align-items: center; gap: 24px; padding-block: 22px; }
+.navigation :global(.text-ink) { color: #202022; }
+.navigation :global(.bg-ink) { background: #202022; color: #faf8f2; }
+.navLinks { display: flex; gap: 12px; font-size: 13px; font-weight: 600; align-items: center; }
+.navLinks a { display: inline-flex; justify-content: center; align-items: center; min-height: 44px; padding: 10px 20px; border-radius: 5px; transition: background 180ms; }
+.aboutLink { border: 1px solid #c2c1ba; color: #202022; }
+.aboutLink:hover { background: #eeede7; border-color: #202022; }
+.loginButton { background: #202022; color: #fffdf5; border: 1px solid #202022; }
+.loginButton:hover { background: #3a3a3f; }
+.hero { display: grid; grid-template-columns: 1.2fr 1fr; gap: 64px; padding-block: 44px 64px; align-items: center; }
+.heroCopy { min-width: 0; }
+.eyebrow, .kicker { font-size: 11px; font-weight: 600; letter-spacing: .14em; }
+.eyebrow { display: flex; gap: 10px; align-items: center; text-transform: uppercase; }
+.eyebrow span { background: #e3f49a; width: 7px; height: 7px; border-radius: 50%; }
+.hero h1 { font-size: clamp(64px, 7.8vw, 112px); font-weight: 600; line-height: .94; letter-spacing: -.065em; margin-block: 30px; }
+.hero h1 em { font-family: Georgia, serif; font-weight: 400; color: #e3f49a; letter-spacing: -.055em; }
+.intro { max-width: 405px; font-size: 16px; line-height: 1.75; color: #e4e9ff; }
+.actions { display: flex; align-items: center; flex-wrap: wrap; gap: 24px; margin-top: 30px; font-size: 13px; font-weight: 600; }
+.primary, .writerButton { display: inline-flex; align-items: center; justify-content: space-between; gap: 28px; min-height: 54px; padding: 16px 22px; background: #e3f49a; color: #202022; border-radius: 3px; transition: background 180ms; }
+.primary:hover { background: #f1ffbd; }
+.writeLink { display: inline-flex; align-items: center; gap: 18px; min-height: 44px; }
+.writeLink:hover { text-decoration: underline; text-underline-offset: 6px; }
+.spotlight { min-width: 0; }
+.spotlightLabel { display: flex; justify-content: space-between; gap: 12px; border-top: 1px solid #ffffff55; padding-block: 16px; font-size: 10px; letter-spacing: .12em; }
+.manifesto { display: flex; justify-content: space-between; flex-wrap: wrap; gap: 18px; padding-block: 23px; border-top: 1px solid #ffffff40; font-size: 12px; letter-spacing: .02em; }
+.shelf { padding-block: 72px 80px; scroll-margin-top: 24px; }
+.sectionHeading { display: flex; justify-content: space-between; align-items: flex-end; gap: 24px; margin-bottom: 32px; }
+.kicker { color: #484843; }
+.sectionHeading h2, .writers h2 { font-size: clamp(34px, 4vw, 54px); line-height: 1.05; letter-spacing: -.045em; font-weight: 500; margin-top: 16px; }
+.sectionHeading > p { color: #585851; font-size: 13px; line-height: 1.7; }
+.storyGrid { display: grid; grid-template-columns: repeat(4, minmax(0, 1fr)); gap: 24px; list-style: none; }
+.shelfStage { position: relative; display: flex; justify-content: center; align-items: center; height: 300px; background: #e3e6ec; }
+.story:nth-child(2) .shelfStage { background: #ebe4d8; }
+.story:nth-child(3) .shelfStage { background: #dbe7d2; }
+.story:nth-child(4) .shelfStage { background: #e4dded; }
+.storyNumber { position: absolute; top: 14px; left: 14px; font-size: 10px; color: #55554f; }
+.shelfBook { width: 65%; aspect-ratio: 2/3; transition: transform 220ms; }
+.story a { display: block; }
+
+.story .storyInfo { display: flex; justify-content: space-between; gap: 12px; margin-top: 18px; }
+.storyInfo h3 { font-family: Georgia, serif; font-size: 19px; line-height: 1.3; overflow-wrap: anywhere; display: -webkit-box; -webkit-line-clamp: 2; -webkit-box-orient: vertical; overflow: hidden; }
+.storyInfo span { font-size: 20px; }
+.storyAuthor { font-size: 12px; color: #585851; margin-top: 7px; overflow-wrap: anywhere; }
+.writers { background: #f0bbaa; display: grid; grid-template-columns: 1.2fr 1fr; gap: 64px; padding-block: 56px; margin-bottom: 40px; }
+.writers h2 em { font-family: Georgia, serif; font-weight: 400; }
+.writerCopy { align-self: center; max-width: 400px; }
+.writerCopy p { font-size: 15px; line-height: 1.8; }
+.writerButton { background: #202022; color: #fffdf5; margin-top: 24px; font-size: 13px; }
+.writerButton:hover { background: #3a3a3f; }
+.emptySpotlight { padding: 32px; background: #efb7a5; color: #202022; }
+.emptySpotlight > span { font-family: Georgia, serif; font-size: 100px; }
+.emptySpotlight p { font-size: 28px; line-height: 1.2; }
+.emptySpotlight a, .emptyShelf a { display: inline-flex; min-height: 44px; align-items: center; margin-top: 20px; text-decoration: underline; }
+.emptyShelf { padding: 32px; border: 1px solid #c9c6bf; }
+.emptyShelf h3 { font-size: 24px; }.emptyShelf p { margin-top: 12px; }
+:global(.dark) .page { background: #191b22; color: #f4f3ed; }
+:global(.dark) .shelf .kicker, :global(.dark) .sectionHeading > p, :global(.dark) .storyAuthor { color: #c6c7c9; }
+:global(.dark) .writers { color: #202022; }
+.page a:focus-visible { outline: 3px solid currentColor; outline-offset: 6px; }
+@media (min-width: 1440px) { .writers { max-width: 1280px; } }
+@media (max-width: 1023px) {
+  .hero { gap: 32px; }.hero h1 { font-size: 74px; }.storyGrid { gap: 18px; }.shelfStage { height: 240px; }
+}
+@media (max-width: 767px) {
+  .navigation { padding-block: 16px; gap: 12px; }.navLinks { gap: 8px; font-size: 12px; }.navLinks a { padding-inline: 12px; }
+  .navigation :global(.group) > span:first-child { display: none; }.navigation :global(.group) > span:last-child { font-size: 23px; }
+  .hero { grid-template-columns: 1fr; gap: 40px; padding-block: 28px 36px; }.hero h1 { font-size: clamp(66px, 14vw, 94px); }.intro { font-size: 15px; }.actions { gap: 20px; }.spotlight { max-width: 500px; width: 100%; }
+  .manifesto { font-size: 10px; gap: 10px; padding-block: 20px; }.shelf { padding-block: 44px; }.sectionHeading { align-items: start; flex-direction: column; gap: 16px; }.storyGrid { grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 24px 16px; }.shelfStage { height: clamp(185px, 48vw, 300px); }.shelfBook { width: 70%; }.storyInfo h3 { font-size: 17px; }.writers { grid-template-columns: 1fr; gap: 24px; padding-block: 36px; }
+}
+@media (prefers-reduced-motion: reduce) { .shelfBook, .primary { transition: none; } }

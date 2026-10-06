@@ -4,6 +4,10 @@
    inline script in layout.tsx based on the user's saved theme mode. */
 @custom-variant dark (&:where(.dark, .dark *));
 
+/* The public welcome page has a quiet paper canvas in either color mode. */
+.landing-page { background: #f7f4ee; }
+.dark .landing-page { background: var(--page); }
+
 /* ----------------------------------------------------------------------------
    Appearance variables.
 
@@ -22,7 +26,7 @@
    equal specificity) always win by source order. Reproduces the original look
    before any attribute is applied. */
 :root {
-  --page: #fafafa;
+  --page: #f6f5f2;
   --background: #ffffff;
   --foreground: #171717;
   --accent: #18181b;
@@ -31,27 +35,54 @@
 }
 
 /* Background presets (light + dark pairs). "plain" is the default. */
-.dark { --page: #000000; --foreground: #ededed; }
+.dark { --page: #151519; --foreground: #f2f1f5; }
 
-[data-bg="plain"] { --page: #fafafa; --foreground: #171717; }
-.dark[data-bg="plain"] { --page: #000000; --foreground: #ededed; }
+[data-bg="plain"] { --page: #f6f5f2; --foreground: #222229; }
+.dark[data-bg="plain"] { --page: #151519; --foreground: #f2f1f5; }
 
-[data-bg="paper"] { --page: #f3e8cf; --foreground: #1f1b16; }
-.dark[data-bg="paper"] { --page: #1a160f; --foreground: #ece4d8; }
+[data-bg="paper"] { --page: #f6f0e5; --foreground: #30291f; }
+.dark[data-bg="paper"] { --page: #1c1915; --foreground: #f0e8dc; }
 
-[data-bg="slate"] { --page: #dde6f1; --foreground: #1a1d23; }
-.dark[data-bg="slate"] { --page: #33373d; --foreground: #e6e9ef; }
+[data-bg="slate"] { --page: #eef1f6; --foreground: #232b38; }
+.dark[data-bg="slate"] { --page: #171d27; --foreground: #e9edf5; }
+
+/* Semantic UI colors follow both the background preset and the theme mode.
+   Keep these derived values on each theme scope so nested previews inherit
+   their own colors, and saved paper/slate preferences tint cards as well. */
+:root, [data-bg], .dark {
+  --background: var(--page);
+  --surface: color-mix(in srgb, var(--page) 35%, white);
+  --surface-raised: color-mix(in srgb, var(--page) 12%, white);
+  --surface-soft: color-mix(in srgb, var(--page) 93%, var(--foreground));
+  --border: color-mix(in srgb, var(--foreground) 12%, var(--page));
+  --border-strong: color-mix(in srgb, var(--foreground) 24%, var(--page));
+  --ink-soft: color-mix(in srgb, var(--foreground) 78%, var(--page));
+  --muted: color-mix(in srgb, var(--foreground) 72%, var(--page));
+  --subtle: color-mix(in srgb, var(--foreground) 70%, var(--page));
+  --card-shadow: 0 2px 4px rgb(20 20 30 / 2%), 0 16px 48px -24px rgb(20 20 30 / 16%);
+}
+.dark {
+  color-scheme: dark;
+  --surface: color-mix(in srgb, var(--page) 94%, white);
+  --surface-raised: color-mix(in srgb, var(--page) 89%, white);
+  --card-shadow: 0 2px 4px rgb(0 0 0 / 8%), 0 16px 48px -24px rgb(0 0 0 / 45%);
+}
 
 /* Accent presets. Graphite reproduces the original black/white inverted look. */
 [data-accent="graphite"] { --accent: #18181b; --accent-strong: #3f3f46; --accent-fg: #ffffff; }
 .dark[data-accent="graphite"] { --accent: #fafafa; --accent-strong: #e4e4e7; --accent-fg: #18181b; }
 
-[data-accent="indigo"]  { --accent: #6366f1; --accent-strong: #4f46e5; --accent-fg: #ffffff; }
-[data-accent="violet"]  { --accent: #8b5cf6; --accent-strong: #7c3aed; --accent-fg: #ffffff; }
-[data-accent="sky"]     { --accent: #0ea5e9; --accent-strong: #0284c7; --accent-fg: #ffffff; }
-[data-accent="emerald"] { --accent: #10b981; --accent-strong: #059669; --accent-fg: #ffffff; }
+[data-accent="indigo"]  { --accent: #4f46e5; --accent-strong: #4338ca; --accent-fg: #ffffff; }
+[data-accent="violet"]  { --accent: #7c3aed; --accent-strong: #6d28d9; --accent-fg: #ffffff; }
+[data-accent="sky"]     { --accent: #0369a1; --accent-strong: #075985; --accent-fg: #ffffff; }
+[data-accent="emerald"] { --accent: #047857; --accent-strong: #065f46; --accent-fg: #ffffff; }
 [data-accent="amber"]   { --accent: #f59e0b; --accent-strong: #d97706; --accent-fg: #1a1205; }
-[data-accent="rose"]    { --accent: #f43f5e; --accent-strong: #e11d48; --accent-fg: #ffffff; }
+[data-accent="rose"]    { --accent: #be123c; --accent-strong: #9f1239; --accent-fg: #ffffff; }
+.dark[data-accent="indigo"]  { --accent: #a5b4fc; --accent-strong: #c7d2fe; --accent-fg: #151519; }
+.dark[data-accent="violet"]  { --accent: #c4b5fd; --accent-strong: #ddd6fe; --accent-fg: #151519; }
+.dark[data-accent="sky"]     { --accent: #7dd3fc; --accent-strong: #bae6fd; --accent-fg: #151519; }
+.dark[data-accent="emerald"] { --accent: #6ee7b7; --accent-strong: #a7f3d0; --accent-fg: #151519; }
+.dark[data-accent="rose"]    { --accent: #fda4af; --accent-strong: #fecdd3; --accent-fg: #151519; }
 
 @theme inline {
   --color-background: var(--background);
@@ -59,14 +90,50 @@
   --color-accent: var(--accent);
   --color-accent-strong: var(--accent-strong);
   --color-accent-fg: var(--accent-fg);
-  --font-sans: var(--font-geist-sans);
-  --font-mono: var(--font-geist-mono);
+  --color-surface: var(--surface);
+  --color-surface-raised: var(--surface-raised);
+  --color-surface-soft: var(--surface-soft);
+  --color-ui: var(--border);
+  --color-ui-strong: var(--border-strong);
+  --color-ink: var(--foreground);
+  --color-ink-soft: var(--ink-soft);
+  --color-muted: var(--muted);
+  --color-subtle: var(--subtle);
+  --radius-xl: 1rem;
+  --radius-2xl: 1.5rem;
+  --shadow-card: var(--card-shadow);
+  --font-sans: var(--font-geist-sans), -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+  --font-serif: var(--font-newsreader), Georgia, Cambria, "Times New Roman", serif;
+  --font-mono: var(--font-geist-mono), ui-monospace, monospace;
 }
 
 body {
   background: var(--page);
   color: var(--foreground);
-  font-family: Arial, Helvetica, sans-serif;
+  font-family: var(--font-sans);
+}
+
+/* Visible keyboard focus is shared by links, controls and shelf previews. */
+:where(a, button, input, textarea, select, summary):focus-visible {
+  outline: 2px solid var(--accent);
+  outline-offset: 4px;
+}
+
+.app-header {
+  border-bottom: 1px solid var(--border);
+  background: color-mix(in srgb, var(--page) 88%, transparent);
+  backdrop-filter: blur(20px);
+}
+
+.book-cover { container-type: inline-size; }
+.book-cover-title { font-size: clamp(0.8rem, 12cqw, 2.5rem); }
+.book-cover-kicker { font-size: clamp(0.45rem, 5cqw, 0.7rem); }
+.book-cover-author { font-size: clamp(0.5rem, 6cqw, 0.8rem); }
+.book-lift { transition: transform 220ms ease, box-shadow 220ms ease; }
+.book-lift:hover, .book-lift:focus-visible,
+.group:hover .book-lift, .group:has(:focus-visible) .book-lift {
+  transform: translateY(-4px);
+  box-shadow: 0 14px 28px -12px rgb(0 0 0 / 35%);
 }
 
 @layer components {
@@ -74,9 +141,11 @@ body {
   .btn-primary {
     background-color: var(--accent);
     color: var(--accent-fg);
+    transition: background-color 180ms ease, box-shadow 180ms ease;
   }
   .btn-primary:hover:not(:disabled) {
     background-color: var(--accent-strong);
+    box-shadow: 0 4px 14px color-mix(in srgb, var(--accent) 18%, transparent);
   }
 
   /* Selected genre chip / active tab — accent filled. */
@@ -170,7 +239,7 @@ body {
   padding: 2.5rem clamp(1.25rem, 4vw, 3rem);
   margin: 0 auto;
   max-width: 40rem;
-  font-family: Georgia, "Times New Roman", serif;
+  font-family: var(--font-serif);
   font-size: 1.15rem;
   line-height: 1.9;
 }
@@ -236,176 +305,109 @@ body {
 }
 .richtext-editor .ProseMirror:focus { outline: none; }
 
-/* ---- Library bookshelf ----
-   Books are fixed at 96x144 and laid out in a grid; a wooden shelf "plank" is
-   painted under every row with a repeating background. The tile height MUST
-   equal the cover height (144px) + the grid row-gap (42px) = 186px, and the
-   plank is drawn starting at y=144 (just under each row of books). Keep these
-   numbers in sync with the .h-36/.w-24 covers in the Library page. */
+/* Shared collection surfaces: quiet frames and slim display ledges. */
 .shelf {
   display: grid;
-  grid-template-columns: repeat(auto-fill, 96px);
-  justify-content: center;
-  column-gap: 26px;
-  row-gap: 42px;
-  /* Extend the box one row-gap below the last row so the bottom (or only) row's
-     plank — painted at y=144 of each 186px tile — actually falls inside the box
-     and gets drawn. Without this the last shelf has no plank. */
-  padding-bottom: 42px;
-  background-repeat: repeat;
-  background-size: 100% 186px;
-  background-image: linear-gradient(
-    to bottom,
-    transparent 0,
-    transparent 144px,
-    rgba(40, 25, 5, 0.22) 144px,
-    rgba(40, 25, 5, 0.10) 146px,
-    #cda86e 146px,
-    #c2995a 152px,
-    #a07b3f 152px,
-    #8a6630 162px,
-    rgba(40, 25, 5, 0.30) 162px,
-    rgba(40, 25, 5, 0) 170px,
-    transparent 186px
-  );
+  grid-template-columns: repeat(auto-fill, minmax(112px, 1fr));
+  gap: 2rem 1.25rem;
 }
-.dark .shelf {
-  background-image: linear-gradient(
-    to bottom,
-    transparent 0,
-    transparent 144px,
-    rgba(0, 0, 0, 0.5) 144px,
-    rgba(0, 0, 0, 0.22) 146px,
-    #5c4730 146px,
-    #503d28 152px,
-    #38291a 152px,
-    #2a1e12 162px,
-    rgba(0, 0, 0, 0.55) 162px,
-    rgba(0, 0, 0, 0) 170px,
-    transparent 186px
-  );
-}
-/* The bookcase frame the shelves sit inside. */
 .shelf-case {
-  border-radius: 16px;
-  padding: 1.5rem 1.25rem 0.5rem;
-  border: 1px solid rgba(120, 90, 50, 0.20);
-  background: linear-gradient(to bottom, rgba(180, 140, 90, 0.10), rgba(180, 140, 90, 0.03));
-  box-shadow:
-    inset 0 1px 0 rgba(255, 255, 255, 0.45),
-    inset 0 0 44px rgba(120, 90, 50, 0.07);
+  min-width: 0;
+  border-radius: var(--radius-2xl);
+  padding: clamp(1.25rem, 3vw, 2rem);
+  border: 1px solid var(--border);
+  background: var(--surface);
+  box-shadow: var(--card-shadow);
 }
-.dark .shelf-case {
-  border-color: rgba(120, 90, 50, 0.30);
-  background: linear-gradient(to bottom, rgba(80, 60, 35, 0.28), rgba(40, 30, 18, 0.16));
-  box-shadow: inset 0 0 50px rgba(0, 0, 0, 0.45);
-}
-
-/* A single wooden ledge for one book to stand on (used on the feed shelf, where
-   each cover has metadata below it). Colours come from per-finish CSS variables
-   so it matches the user's chosen shelf without duplicating the gradient. */
-:root,
-[data-shelf="walnut"] { --ledge-top: #c2995a; --ledge-face: #8a6630; }
-.dark,
-.dark[data-shelf="walnut"] { --ledge-top: #503d28; --ledge-face: #2a1e12; }
-[data-shelf="oak"] { --ledge-top: #dcbb72; --ledge-face: #ad8438; }
-.dark[data-shelf="oak"] { --ledge-top: #6b5430; --ledge-face: #41331a; }
-[data-shelf="ebony"] { --ledge-top: #3e3833; --ledge-face: #201c19; }
-.dark[data-shelf="ebony"] { --ledge-top: #322e2a; --ledge-face: #15120f; }
-[data-shelf="minimal"] { --ledge-top: #e2dfd8; --ledge-face: #bdb9b0; }
-.dark[data-shelf="minimal"] { --ledge-top: #313134; --ledge-face: #1c1c1f; }
+:root, [data-shelf="walnut"] { --ledge-accent: #a78b70; }
+[data-shelf="oak"] { --ledge-accent: #c7ad80; }
+[data-shelf="ebony"] { --ledge-accent: #747482; }
+[data-shelf="minimal"] { --ledge-accent: var(--border-strong); }
 .shelf-ledge {
-  height: 9px;
-  border-radius: 0 0 2px 2px;
-  background: linear-gradient(
-    to bottom,
-    var(--ledge-top) 0,
-    var(--ledge-top) 3.5px,
-    var(--ledge-face) 3.5px,
-    var(--ledge-face) 9px
-  );
-  box-shadow: 0 3px 6px rgba(40, 25, 5, 0.25);
+  height: 2px;
+  margin-top: 10px;
+  border-radius: 9999px;
+  background: color-mix(in srgb, var(--ledge-accent) 45%, var(--surface));
 }
-.dark .shelf-ledge {
-  box-shadow: 0 3px 7px rgba(0, 0, 0, 0.5);
+@media (prefers-reduced-motion: reduce) {
+  *, *::before, *::after {
+    animation-duration: 0.01ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 0.01ms !important;
+    scroll-behavior: auto !important;
+  }
+  .book-lift, .book-lift:hover, .book-lift:focus-visible,
+  .group:hover .book-lift, .group:has(:focus-visible) .book-lift {
+    transform: none;
+  }
 }
 
-/* Shelf finishes — selected per user via [data-shelf] on <html>. Walnut is the
-   base above; these override the plank gradient (and frame, where it helps). */
-[data-shelf="oak"] .shelf {
-  background-image: linear-gradient(
-    to bottom,
-    transparent 0, transparent 144px,
-    rgba(70, 45, 10, 0.18) 144px, rgba(70, 45, 10, 0.08) 146px,
-    #e6c98c 146px, #dcbb72 152px,
-    #c39a45 152px, #ad8438 162px,
-    rgba(70, 45, 10, 0.24) 162px, rgba(70, 45, 10, 0) 170px, transparent 186px
-  );
+/* Reading preferences are local to the canvas; the rest of the app keeps its
+   saved appearance. Explicit reader colors also work inside site dark mode. */
+.reading-room {
+  min-width: 0;
+  --reader-paper: #fffcf7;
+  --reader-surface: #f7f4ee;
+  --reader-ink: #292722;
+  --reader-font: var(--font-serif);
+  --reader-size: 18px;
+  --reader-leading: 1.85;
+  --reader-muted: color-mix(in srgb, var(--reader-ink) 72%, var(--reader-paper));
+  --reader-border: color-mix(in srgb, var(--reader-ink) 15%, var(--reader-paper));
+  color: var(--reader-ink);
+  background: var(--reader-surface);
+  border: 1px solid var(--reader-border);
+  border-radius: 24px;
+  padding: clamp(1rem, 3vw, 2rem);
 }
-.dark[data-shelf="oak"] .shelf {
-  background-image: linear-gradient(
-    to bottom,
-    transparent 0, transparent 144px,
-    rgba(0, 0, 0, 0.5) 144px, rgba(0, 0, 0, 0.22) 146px,
-    #7a6038 146px, #6b5430 152px,
-    #50401f 152px, #41331a 162px,
-    rgba(0, 0, 0, 0.55) 162px, rgba(0, 0, 0, 0) 170px, transparent 186px
-  );
+.reading-room[data-reader-theme="sepia"] { --reader-paper: #f5ebd7; --reader-surface: #eee2ca; --reader-ink: #3b3023; }
+.reading-room[data-reader-theme="night"] { --reader-paper: #222329; --reader-surface: #191a20; --reader-ink: #eae5dc; color-scheme: dark; }
+.reading-room[data-reader-theme="oled"] { --reader-paper: #000000; --reader-surface: #000000; --reader-ink: #e1e1e1; color-scheme: dark; }
+.reader-muted { color: var(--reader-muted); }
+.reader-eyebrow { color: var(--reader-muted); font-size: 10px; font-weight: 600; letter-spacing: .16em; text-transform: uppercase; }
+.reader-label { font-size: 13px; font-weight: 500; }
+.reader-toolbar { display: flex; flex-wrap: wrap; align-items: center; justify-content: space-between; gap: 1rem; padding-bottom: 1.25rem; margin-bottom: 1.25rem; border-bottom: 1px solid var(--reader-border); }
+.reader-tool-button, .reader-icon-button, .reader-option {
+  display: inline-flex; align-items: center; justify-content: center; gap: .5rem;
+  min-height: 44px; padding: .5rem 1rem;
+  border: 1px solid var(--reader-border); border-radius: 999px;
+  background: var(--reader-paper); color: var(--reader-ink);
+  font-size: 12px; font-weight: 500; cursor: pointer;
 }
-[data-shelf="ebony"] .shelf {
-  background-image: linear-gradient(
-    to bottom,
-    transparent 0, transparent 144px,
-    rgba(0, 0, 0, 0.30) 144px, rgba(0, 0, 0, 0.12) 146px,
-    #4a443d 146px, #3e3833 152px,
-    #2a2521 152px, #201c19 162px,
-    rgba(0, 0, 0, 0.35) 162px, rgba(0, 0, 0, 0) 170px, transparent 186px
-  );
+.reader-icon-button { width: 44px; padding: 0; flex-shrink: 0; }
+.reader-tool-button:hover, .reader-icon-button:hover:not(:disabled), .reader-option:hover { background: color-mix(in srgb, var(--reader-ink) 6%, var(--reader-paper)); }
+.reader-option[aria-pressed="true"], .reader-chapter-active { background: var(--reader-ink); color: var(--reader-paper); border-color: var(--reader-ink); }
+.reader-chapter-idle { border-color: var(--reader-border); color: var(--reader-muted); background: var(--reader-paper); }
+.reading-room :where(button, input):focus-visible { outline-color: var(--reader-ink); }
+.reading-room input { accent-color: var(--reader-ink); }
+.reading-room .book-page {
+  max-width: none; padding: clamp(1.25rem, 4vw, 3rem); margin: 0;
+  background: var(--reader-paper); color: var(--reader-ink);
+  border: 1px solid var(--reader-border); border-radius: 16px; box-shadow: none;
+  font-family: var(--reader-font); font-size: var(--reader-size); line-height: var(--reader-leading);
 }
-.dark[data-shelf="ebony"] .shelf {
-  background-image: linear-gradient(
-    to bottom,
-    transparent 0, transparent 144px,
-    rgba(0, 0, 0, 0.55) 144px, rgba(0, 0, 0, 0.25) 146px,
-    #3a3531 146px, #322e2a 152px,
-    #1e1b18 152px, #15120f 162px,
-    rgba(0, 0, 0, 0.6) 162px, rgba(0, 0, 0, 0) 170px, transparent 186px
-  );
+.reader-text { line-height: var(--reader-leading); }
+.reader-text :where(p, span, li, blockquote, h1, h2, h3) { font-family: inherit !important; }
+.reader-text span[style] { font-size: inherit !important; }
+.reader-text pre, .reader-text code { font-family: var(--font-mono) !important; }
+.reading-room[data-drop-cap="true"] .reader-text > p:first-child::first-letter { float: left; font-family: var(--font-serif); font-size: 3.4em; line-height: .85; padding: .12em .12em 0 0; }
+.reader-text hr { margin: 2em auto; width: 4rem; border: 0; border-top: 1px solid var(--reader-border); }
+.reader-preferences {
+  position: fixed; inset: 0 0 0 auto; margin: 0; width: min(100%, 420px);
+  max-width: 100%; height: 100dvh; max-height: 100dvh; overflow-y: auto;
+  padding: 1.5rem; border: 0; border-left: 1px solid var(--reader-border);
+  background: var(--reader-paper); color: var(--reader-ink);
+  box-shadow: -12px 0 60px rgb(0 0 0 / 15%);
 }
-[data-shelf="minimal"] .shelf {
-  background-image: linear-gradient(
-    to bottom,
-    transparent 0, transparent 144px,
-    rgba(0, 0, 0, 0.10) 144px, rgba(0, 0, 0, 0.04) 146px,
-    #eceae4 146px, #e2dfd8 152px,
-    #cfccc4 152px, #bdb9b0 162px,
-    rgba(0, 0, 0, 0.12) 162px, rgba(0, 0, 0, 0) 170px, transparent 186px
-  );
+.reader-preferences::backdrop { background: rgb(15 15 20 / 45%); backdrop-filter: blur(4px); }
+.reader-sample { border-color: var(--reader-border); background: var(--reader-surface); }
+.reading-room-focused { position: fixed; inset: 0; z-index: 50; overflow-y: auto; overscroll-behavior: contain; border: 0; border-radius: 0; padding: 0; }
+.reading-room-focused .reader-toolbar { position: sticky; top: 0; z-index: 10; padding: 1rem max(1rem, calc((100vw - 960px) / 2)); background: var(--reader-surface); }
+.reading-room-focused .reader-content { padding: 0 1rem 3rem; }
+@keyframes pageFlipNext { from { opacity: .6; transform: translateX(4px); } to { opacity: 1; transform: translateX(0); } }
+@keyframes pageFlipPrev { from { opacity: .6; transform: translateX(-4px); } to { opacity: 1; transform: translateX(0); } }
+.reading-room .pageflip-next, .reading-room .pageflip-prev { animation-duration: 180ms; }
+@media (prefers-reduced-motion: reduce) {
+  .reading-room .pageflip-next, .reading-room .pageflip-prev { animation: none; }
 }
-.dark[data-shelf="minimal"] .shelf {
-  background-image: linear-gradient(
-    to bottom,
-    transparent 0, transparent 144px,
-    rgba(0, 0, 0, 0.5) 144px, rgba(0, 0, 0, 0.2) 146px,
-    #3a3a3d 146px, #313134 152px,
-    #242427 152px, #1c1c1f 162px,
-    rgba(0, 0, 0, 0.55) 162px, rgba(0, 0, 0, 0) 170px, transparent 186px
-  );
-}
-/* Frame tint for the non-wood finishes (walnut/oak keep the warm default). */
-[data-shelf="minimal"] .shelf-case {
-  border-color: rgba(0, 0, 0, 0.10);
-  background: linear-gradient(to bottom, rgba(0, 0, 0, 0.03), rgba(0, 0, 0, 0.01));
-}
-.dark[data-shelf="minimal"] .shelf-case {
-  border-color: rgba(255, 255, 255, 0.10);
-  background: linear-gradient(to bottom, rgba(255, 255, 255, 0.04), rgba(255, 255, 255, 0.01));
-}
-[data-shelf="ebony"] .shelf-case {
-  border-color: rgba(40, 35, 30, 0.25);
-  background: linear-gradient(to bottom, rgba(40, 35, 30, 0.10), rgba(40, 35, 30, 0.03));
-}
-.dark[data-shelf="ebony"] .shelf-case {
-  border-color: rgba(0, 0, 0, 0.5);
-  background: linear-gradient(to bottom, rgba(0, 0, 0, 0.35), rgba(0, 0, 0, 0.18));
-}
+.reading-room-focused .reader-context { display: none; }

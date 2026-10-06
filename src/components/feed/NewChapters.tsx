@@ -1,5 +1,5 @@
 import Link from "next/link";
-import { BookCover } from "@/components/story/BookCover";
+import { BookPreview } from "@/components/story/BookPreview";
 import { type CoverStyle } from "@/lib/cover-style";
 
 export type NewChapterStory = {
@@ -9,45 +9,36 @@ export type NewChapterStory = {
   author: string | null;
   cover_url: string | null;
   cover_style: CoverStyle | null;
+  summary?: string | null;
   chapter_index: number; // where the reader left off (resume here)
   new_count: number;
 };
 
-// A horizontal "New chapters for you" strip at the top of the feed — stories the
+// A wrapping "New chapters for you" shelf at the top of the feed — stories the
 // reader follows/owns access to that have dropped chapters they haven't seen.
 export function NewChapters({ stories }: { stories: NewChapterStory[] }) {
   if (stories.length === 0) return null;
   return (
     <section className="mt-6">
-      <h2 className="text-sm font-semibold text-zinc-900 dark:text-zinc-50">
+      <h2 className="text-sm font-semibold text-ink">
         ✨ New chapters for you
       </h2>
-      <div className="mt-2 flex gap-3 overflow-x-auto pb-2">
+      <div className="mt-3 grid grid-cols-[repeat(auto-fill,112px)] gap-5 pb-2">
         {stories.map((s) => (
-          <Link
-            key={s.id}
-            href={`/stories/${s.slug ?? s.id}?chapter=${s.chapter_index}`}
-            className="group w-28 shrink-0"
-          >
+          <div key={s.id} className="group min-w-0">
             <div className="relative">
-              <BookCover
-                title={s.title}
-                author={s.author}
-                coverUrl={s.cover_url}
-                coverStyle={s.cover_style}
-                className="aspect-[2/3] w-full rounded-md shadow-sm transition group-hover:-translate-y-1 group-hover:shadow-md"
-              />
-              <span className="absolute right-1 top-1 rounded-full bg-accent px-1.5 py-0.5 text-[10px] font-bold text-accent-fg shadow">
+              <BookPreview story={s} href={`/stories/${s.slug ?? s.id}?chapter=${s.chapter_index}`} readLabel="Continue reading" />
+              <span className="pointer-events-none absolute right-1 top-1 rounded-full bg-accent px-1.5 py-0.5 text-[10px] font-bold text-accent-fg shadow">
                 +{s.new_count}
               </span>
             </div>
-            <p className="mt-1 truncate text-xs font-medium text-zinc-900 dark:text-zinc-100">
+            <Link href={`/stories/${s.slug ?? s.id}?chapter=${s.chapter_index}`} className="mt-1 block truncate text-xs font-medium text-ink">
               {s.title}
-            </p>
-            <p className="truncate text-[11px] text-zinc-500">
+            </Link>
+            <p className="truncate text-[11px] text-muted">
               {s.author ?? "Unknown"}
             </p>
-          </Link>
+          </div>
         ))}
       </div>
     </section>

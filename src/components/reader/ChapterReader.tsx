@@ -1,10 +1,12 @@
 "use client";
 
-import { useCallback, useEffect, useMemo, useRef, useState } from "react";
-import { CHAPTER_PAGE_WORDS, wordCount } from "@/lib/story-validation";
+import { useCallback, useEffect, useMemo, useRef, useState, type CSSProperties } from "react";
+import { CHAPTER_PAGE_WORDS, htmlToText, wordCount } from "@/lib/story-validation";
 import { ChapterQuestions } from "@/components/reader/ChapterQuestions";
 import { ChapterPrompts } from "@/components/reader/ChapterPrompts";
 import { ReaderShield } from "@/components/reader/ReaderShield";
+import { ReaderPreferences } from "@/components/reader/ReaderPreferences";
+import { chapterPosition, DEFAULT_READER_PREFERENCES, normalizeReaderPreferences, READER_STORAGE_KEY, type ReaderPreferences as Preferences } from "@/lib/reader-preferences";
 
 function stripTags(html: string): string {
   return html.replace(/<[^>]+>/g, " ");
@@ -90,6 +92,7 @@ export function ChapterReader({
   watermark,
   authorName,
   lockedNote,
+  canInteract = true,
 }: {
   storyId: string;
   chapters: ReaderChapter[];
@@ -104,6 +107,8 @@ export function ChapterReader({
   authorName?: string | null;
   // Message shown on a locked chapter (defaults to the buy-access wording).
   lockedNote?: string;
+  // Anonymous previews can customize reading, but cannot save account data.
+  canInteract?: boolean;
 }) {
   const clampedInitial = Math.min(
     Math.max(initialChapter, 0),
@@ -131,6 +136,50 @@ export function ChapterReader({
     error?: string;
   } | null>(null);
   const bodyRef = useRef<HTMLDivElement>(null);
+  const roomRef = useRef<HTMLDivElement>(null);
+  const [preferences, setPreferences] = useState(DEFAULT_READER_PREFERENCES);
+  const [preferencesOpen, setPreferencesOpen] = useState(false);
+  const [preferencesStored, setPreferencesStored] = useState(true);
+  const [focused, setFocused] = useState(false);
+
+  useEffect(() => {
+    const raf = requestAnimationFrame(() => {
+      try {
+        const raw = localStorage.getItem(READER_STORAGE_KEY);
+        if (raw) setPreferences(normalizeReaderPreferences(JSON.parse(raw)));
+        else if (document.documentElement.classList.contains("dark")) setPreferences({ ...DEFAULT_READER_PREFERENCES, theme: "night" });
+      } catch { setPreferencesStored(false); }
+    });
+    return () => cancelAnimationFrame(raf);
+  }, []);
+
+  function updatePreferences(value: Preferences) {
+    const clean = normalizeReaderPreferences(value);
+    setPreferences(clean);
+    try { localStorage.setItem(READER_STORAGE_KEY, JSON.stringify(clean)); setPreferencesStored(true); }
+    catch { setPreferencesStored(false); }
+  }
+
+  // Focus mode keeps the same reader mounted, including pagination/bookmarks.
+  useEffect(() => {
+    if (!focused) return;
+    const previousOverflow = document.body.style.overflow;
+    const previousFocus = document.activeElement as HTMLElement | null;
+    document.body.style.overflow = "hidden";
+    const raf = requestAnimationFrame(() => roomRef.current?.querySelector<HTMLButtonElement>("[data-focus-toggle]")?.focus());
+    const onKey = (e: KeyboardEvent) => {
+      if (roomRef.current?.querySelector("dialog[open]")) return; // The native preferences dialog owns focus.
+      if (e.key === "Escape") setFocused(false);
+      if (e.key === "Tab") {
+        const controls = Array.from(roomRef.current?.querySelectorAll<HTMLElement>("a[href], button:not(:disabled), input, select, textarea, [tabindex='0']") ?? []).filter(el => el.getClientRects().length > 0);
+        const first = controls[0], last = controls.at(-1);
+        if (e.shiftKey && document.activeElement === first) { e.preventDefault(); last?.focus(); }
+        else if (!e.shiftKey && document.activeElement === last) { e.preventDefault(); first?.focus(); }
+      }
+    };
+    document.addEventListener("keydown", onKey);
+    return () => { cancelAnimationFrame(raf); document.body.style.overflow = previousOverflow; document.removeEventListener("keydown", onKey); previousFocus?.focus(); };
+  }, [focused]);
 
   const chapter = chapters[current];
   const chapterBookmarks = bookmarks.filter((b) => b.chapter_index === current);
@@ -166,25 +215,27 @@ export function ChapterReader({
   const safePage = Math.min(page, Math.max(pages.length - 1, 0));
   // Direction of the last page turn, so the new page animates like a book flip.
   const [flipDir, setFlipDir] = useState<"next" | "prev" | null>(null);
+  const position = useMemo(() => chapterPosition(pages.map(html => wordCount(htmlToText(html))), safePage), [pages, safePage]);
 
   // Restore the reader to their last page in the starting chapter, once the
   // chapter has been paginated. Runs once; for other chapters we start at page 0.
   const restoredPageRef = useRef(false);
+  const [progressReady, setProgressReady] = useState(false);
   useEffect(() => {
     if (restoredPageRef.current || !mounted) return;
-    restoredPageRef.current = true;
-    if (current === clampedInitial && initialPage > 0) {
-      const target = Math.min(initialPage, pages.length - 1);
-      const raf = requestAnimationFrame(() => setPage(target));
-      return () => cancelAnimationFrame(raf);
-    }
+    const raf = requestAnimationFrame(() => {
+      if (current === clampedInitial && initialPage > 0) setPage(Math.min(initialPage, pages.length - 1));
+      restoredPageRef.current = true;
+      setProgressReady(true);
+    });
+    return () => cancelAnimationFrame(raf);
   }, [mounted, pages.length, current, clampedInitial, initialPage]);
 
   // Auto-save reading progress (chapter + page) — this is the automatic page
   // bookmark. Debounced, and held until the saved page has been restored so we
   // don't overwrite it with page 0 on arrival.
   useEffect(() => {
-    if (!mounted || !restoredPageRef.current) return;
+    if (!mounted || !progressReady || !canInteract) return;
     if (!chapter || chapter.locked) return;
     const t = setTimeout(() => {
       fetch(`/api/stories/${storyId}/progress`, {
@@ -194,7 +245,7 @@ export function ChapterReader({
       }).catch(() => {});
     }, 400);
     return () => clearTimeout(t);
-  }, [mounted, storyId, current, safePage, chapter]);
+  }, [mounted, progressReady, canInteract, storyId, current, safePage, chapter]);
 
   // Unwrap any existing highlight, then highlight + scroll to the `occ`-th (0-based)
   // match of `quote` within the currently-rendered page.
@@ -276,11 +327,11 @@ export function ChapterReader({
   // On arrival via a "continue" link, jump to the newest bookmark in the chapter.
   const resumedRef = useRef(false);
   useEffect(() => {
-    if (resumedRef.current || !autoResume) return;
+    if (resumedRef.current || !autoResume || !mounted || !progressReady) return;
     resumedRef.current = true;
     const latest = bookmarks.filter((b) => b.chapter_index === clampedInitial).at(-1);
     if (latest) setTimeout(() => jumpTo(latest.quote, latest.occurrence), 150);
-  }, [autoResume, bookmarks, clampedInitial, jumpTo]);
+  }, [autoResume, bookmarks, clampedInitial, jumpTo, mounted, progressReady]);
 
   function onMouseUp() {
     const selection = window.getSelection();
@@ -289,6 +340,7 @@ export function ChapterReader({
       return;
     }
     if (!bodyRef.current.contains(selection.anchorNode)) return;
+    if (!canInteract && !/^[a-zA-Z'-]+$/.test(text)) return;
     const range = selection.getRangeAt(0);
     const quote = text.slice(0, 300);
     const needle = norm(quote);
@@ -422,29 +474,47 @@ export function ChapterReader({
 
   return (
     <div
-      className="relative mt-6"
+      ref={roomRef}
+      className={`reading-room ${focused ? "reading-room-focused" : "relative mt-6"}`}
+      data-reader-theme={preferences.theme}
+      data-drop-cap={preferences.dropCap && safePage === 0}
+      role={focused ? "dialog" : undefined}
+      aria-modal={focused || undefined}
+      aria-label={focused ? "Distraction-free reading room" : undefined}
+      style={{ "--reader-font": `var(--font-${preferences.font})`, "--reader-size": `${preferences.fontSize}px`, "--reader-leading": preferences.lineHeight } as CSSProperties}
       onMouseDown={() => {
         setSel(null);
         setDef(null);
       }}
     >
       {watermark && <ReaderShield />}
+      <div className="reader-toolbar">
+        <div><p className="reader-eyebrow">The reading room</p><p className="reader-muted mt-1 text-xs">{chapter.locked ? "Preview the chapter list" : `${position.minutesRemaining} min left in this chapter · estimate`}</p></div>
+        <div className="flex items-center gap-2">
+          <button type="button" className="reader-tool-button" aria-haspopup="dialog" onClick={() => setPreferencesOpen(true)}><span className="font-serif text-lg" aria-hidden="true">Aa</span><span className="hidden sm:inline">Appearance</span><span className="sr-only sm:hidden">Reading preferences</span></button>
+          <button type="button" data-focus-toggle className="reader-tool-button" aria-pressed={focused} onClick={() => setFocused(!focused)}>{focused ? "Exit focus" : "Focus"}<span aria-hidden="true">{focused ? "↙" : "↗"}</span></button>
+        </div>
+      </div>
+      <ReaderPreferences open={preferencesOpen} value={preferences} onChange={updatePreferences} onClose={() => setPreferencesOpen(false)} stored={preferencesStored} />
+      <div className="reader-content mx-auto max-w-3xl">
 
       {/* Chapter pagination buttons — hidden for a single-piece short story. */}
       {!isShort && (
-      <div className="flex flex-wrap gap-2">
+      <div className="reader-context mb-6 flex gap-2 overflow-x-auto pb-2">
         {chapters.map((ch) => {
           const active = ch.index === current;
           return (
             <button
               key={ch.index}
               type="button"
+              aria-pressed={active}
+              aria-label={`${ch.title ?? `Chapter ${ch.index + 1}`}${ch.locked ? " · locked" : ""}`}
               onClick={() => selectChapter(ch.index)}
               className={
-                "flex items-center gap-1.5 rounded-full border px-3 py-1.5 text-sm transition-colors " +
+                "reader-chapter-button flex shrink-0 items-center gap-1.5 rounded-full border px-3 py-2 text-sm transition-colors " +
                 (active
-                  ? "chip-active"
-                  : "border-zinc-300 text-zinc-700 hover:bg-zinc-100 dark:border-zinc-700 dark:text-zinc-300 dark:hover:bg-zinc-900")
+                  ? "reader-chapter-active"
+                  : "reader-chapter-idle")
               }
               title={ch.title ?? `Chapter ${ch.index + 1}`}
             >
@@ -461,21 +531,21 @@ export function ChapterReader({
       {/* Current chapter */}
       <div className={isShort ? "" : "mt-6"}>
         {(chapter.title || !isShort) && (
-          <h3 className="text-xl font-semibold text-zinc-900 dark:text-zinc-50">
+          <h3 className="mb-5 font-serif text-2xl font-medium sm:text-3xl">
             {chapter.title ? chapter.title : `Chapter ${current + 1}`}
           </h3>
         )}
 
         {chapter.locked ? (
-          <div className="mt-4 rounded-xl border border-dashed border-zinc-300 p-6 text-center text-sm text-zinc-500 dark:border-zinc-700">
+          <div className="mt-4 rounded-xl border border-dashed border-[var(--reader-border)] p-6 text-center text-sm text-[var(--reader-muted)]">
             <span aria-hidden="true">🔒</span>{" "}
             {lockedNote ?? "This chapter is locked — buy access below to read it."}
           </div>
         ) : (
           <>
             {chapterBookmarks.length > 0 && (
-              <div className="mt-3 rounded-xl border border-zinc-200 bg-zinc-50 p-3 dark:border-zinc-800 dark:bg-zinc-900/40">
-                <p className="text-xs font-medium text-zinc-600 dark:text-zinc-400">
+              <div className="reader-context mt-3 rounded-xl border border-[var(--reader-border)] bg-[var(--reader-paper)] p-3">
+                <p className="text-xs font-medium text-[var(--reader-muted)]">
                   Your bookmarks in this chapter
                 </p>
                 <ul className="mt-1.5 flex flex-col gap-1.5">
@@ -484,43 +554,42 @@ export function ChapterReader({
                       <button
                         type="button"
                         onClick={() => jumpTo(b.quote, b.occurrence)}
-                        className="min-w-0 flex-1 truncate text-left text-zinc-700 hover:underline dark:text-zinc-300"
+                        className="min-w-0 flex-1 truncate text-left text-[var(--reader-ink)] hover:underline"
                         title="Jump to bookmark"
                       >
                         “{b.quote}”
                       </button>
-                      <button
+                      {canInteract && <button
                         type="button"
                         onClick={() => removeBookmark(b.id)}
-                        className="shrink-0 text-xs text-zinc-400 hover:text-red-600 dark:hover:text-red-400"
+                        className="shrink-0 text-xs text-[var(--reader-muted)] hover:text-red-600 dark:hover:text-red-400"
                       >
                         Remove
-                      </button>
+                      </button>}
                     </li>
                   ))}
                 </ul>
               </div>
             )}
 
-            <p className="mt-3 text-xs text-zinc-400">
-              Tip: select any word or line to bookmark your spot — or highlight a
-              single word to look up its meaning.
+            <p className="reader-context reader-muted mt-3 text-xs">
+              {canInteract ? "Select a word or line to bookmark your spot, or a single word to look up its meaning." : "Select a word to look up its meaning. Sign in to save bookmarks and reading progress."}
             </p>
 
-            <div className="mt-3 flex items-center gap-2 sm:gap-4">
+            <div className="mt-4 flex flex-wrap items-center justify-center gap-3">
               {pages.length > 1 && (
                 <button
                   type="button"
                   aria-label="Previous page"
                   disabled={safePage === 0}
                   onClick={() => goPage(safePage - 1)}
-                  className="flex h-11 w-11 shrink-0 items-center justify-center rounded-full border border-zinc-300 text-2xl leading-none text-zinc-600 hover:bg-zinc-100 disabled:opacity-30 disabled:hover:bg-transparent dark:border-zinc-700 dark:text-zinc-300 dark:hover:bg-zinc-900"
+                  className="reader-icon-button text-2xl disabled:opacity-30"
                 >
                   <span aria-hidden="true">‹</span>
                 </button>
               )}
 
-              <div className="book-stage min-w-0 flex-1">
+              <div className="book-stage order-first w-full min-w-0">
                 <div
                   key={`${current}-${safePage}`}
                   className={
@@ -535,21 +604,22 @@ export function ChapterReader({
                   <div
                     ref={bodyRef}
                     onMouseUp={onMouseUp}
+                    onTouchEnd={() => setTimeout(onMouseUp, 100)}
                     onCopy={(e) => e.preventDefault()}
                     onCut={(e) => e.preventDefault()}
                     onContextMenu={(e) => e.preventDefault()}
                     onDragStart={(e) => e.preventDefault()}
-                    className="richtext"
+                    className="richtext reader-text"
                     dangerouslySetInnerHTML={{ __html: pages[safePage] ?? "" }}
                   />
                   {/* Attribution at the foot of every page. For a published
                       story it also carries the reader's handle + date, so a
                       screenshot stays traceable without an overlay. */}
                   {authorName && (
-                    <footer className="mt-8 select-none border-t border-zinc-200 pt-3 text-center text-xs text-zinc-400 dark:border-zinc-800">
+                    <footer className="reader-muted mt-8 select-none border-t border-[var(--reader-border)] pt-4 text-center text-xs">
                       © {authorName} · Talerooms
                       {watermark && (
-                        <span className="text-zinc-300 dark:text-zinc-600">
+                        <span className="reader-muted">
                           {" "}· {watermark} · {readStamp}
                         </span>
                       )}
@@ -564,7 +634,7 @@ export function ChapterReader({
                   aria-label="Next page"
                   disabled={safePage === pages.length - 1}
                   onClick={() => goPage(safePage + 1)}
-                  className="flex h-11 w-11 shrink-0 items-center justify-center rounded-full border border-zinc-300 text-2xl leading-none text-zinc-600 hover:bg-zinc-100 disabled:opacity-30 disabled:hover:bg-transparent dark:border-zinc-700 dark:text-zinc-300 dark:hover:bg-zinc-900"
+                  className="reader-icon-button text-2xl disabled:opacity-30"
                 >
                   <span aria-hidden="true">›</span>
                 </button>
@@ -572,17 +642,23 @@ export function ChapterReader({
             </div>
 
             {pages.length > 1 && (
-              <p className="mt-3 text-center text-xs text-zinc-400">
+              <p className="reader-muted mt-3 text-center text-xs">
                 Page {safePage + 1} / {pages.length}
               </p>
             )}
 
-            <ChapterQuestions storyId={storyId} chapterIndex={current} />
-            <ChapterPrompts
+            <div className="mt-5" aria-label="Chapter reading position">
+              <div className="reader-muted mb-2 flex justify-between text-xs"><span>Chapter position · {position.percent}%</span><span>Page {safePage + 1} of {pages.length}</span></div>
+              <div role="progressbar" aria-label="Position in chapter" aria-valuemin={0} aria-valuemax={100} aria-valuenow={position.percent} className="h-1 overflow-hidden rounded-full bg-[var(--reader-border)]"><div className="h-full bg-[var(--reader-ink)]" style={{ width: `${position.percent}%` }} /></div>
+            </div>
+            <div className={focused ? "hidden" : ""}>
+            {canInteract && <ChapterQuestions storyId={storyId} chapterIndex={current} />}
+            {canInteract && <ChapterPrompts
               storyId={storyId}
               chapterIndex={current}
               prompts={chapter.prompts}
-            />
+            />}
+            </div>
           </>
         )}
 
@@ -593,18 +669,18 @@ export function ChapterReader({
             type="button"
             disabled={current === 0}
             onClick={() => selectChapter(current - 1)}
-            className="rounded-full border border-zinc-300 px-4 py-1.5 text-sm font-medium text-zinc-700 hover:bg-zinc-100 disabled:opacity-40 dark:border-zinc-700 dark:text-zinc-300 dark:hover:bg-zinc-900"
+            className="rounded-full border border-[var(--reader-border)] px-4 py-1.5 text-sm font-medium text-[var(--reader-ink)] hover:bg-[var(--reader-surface)] disabled:opacity-40"
           >
             ← Previous
           </button>
-          <span className="text-xs text-zinc-400">
+          <span className="text-xs text-[var(--reader-muted)]">
             {current + 1} / {chapters.length}
           </span>
           <button
             type="button"
             disabled={current === chapters.length - 1}
             onClick={() => selectChapter(current + 1)}
-            className="rounded-full border border-zinc-300 px-4 py-1.5 text-sm font-medium text-zinc-700 hover:bg-zinc-100 disabled:opacity-40 dark:border-zinc-700 dark:text-zinc-300 dark:hover:bg-zinc-900"
+            className="rounded-full border border-[var(--reader-border)] px-4 py-1.5 text-sm font-medium text-[var(--reader-ink)] hover:bg-[var(--reader-surface)] disabled:opacity-40"
           >
             Next →
           </button>
@@ -612,6 +688,7 @@ export function ChapterReader({
         )}
       </div>
 
+      </div>
       {/* Floating actions shown over a text selection: bookmark, and — for a
           single word — look up its meaning. */}
       {sel && (
@@ -620,16 +697,16 @@ export function ChapterReader({
             e.preventDefault();
             e.stopPropagation();
           }}
-          style={{ position: "fixed", top: sel.top, left: sel.left, zIndex: 60 }}
+          style={{ position: "fixed", top: Math.max(8, sel.top), left: Math.max(8, Math.min(sel.left, window.innerWidth - 210)), zIndex: 60 }}
           className="flex items-center gap-1 rounded-full bg-accent p-1 shadow-lg"
         >
-          <button
+          {canInteract && <button
             type="button"
             onClick={addBookmark}
             className="rounded-full px-2.5 py-1 text-xs font-medium text-accent-fg hover:bg-black/10"
           >
             ★ Bookmark
-          </button>
+          </button>}
           {/^[a-zA-Z][a-zA-Z'-]*$/.test(sel.text) && (
             <button
               type="button"
@@ -654,31 +731,31 @@ export function ChapterReader({
             ...(def.top !== null ? { top: def.top } : {}),
             ...(def.bottom !== null ? { bottom: def.bottom } : {}),
           }}
-          className="rounded-xl border border-zinc-200 bg-white p-3 shadow-xl dark:border-zinc-700 dark:bg-zinc-900"
+          className="rounded-xl border border-[var(--reader-border)] bg-[var(--reader-paper)] p-3 shadow-xl"
         >
           <div className="flex items-start justify-between gap-2">
             <div className="min-w-0">
-              <p className="truncate font-semibold text-zinc-900 dark:text-zinc-50">
+              <p className="truncate font-semibold text-[var(--reader-ink)]">
                 {def.word}
               </p>
               {def.phonetic && (
-                <p className="text-xs text-zinc-400">{def.phonetic}</p>
+                <p className="text-xs text-[var(--reader-muted)]">{def.phonetic}</p>
               )}
             </div>
             <button
               type="button"
               onClick={() => setDef(null)}
               aria-label="Close"
-              className="shrink-0 text-zinc-400 hover:text-zinc-700 dark:hover:text-zinc-200"
+              className="shrink-0 text-[var(--reader-muted)] hover:text-[var(--reader-ink)]"
             >
               ✕
             </button>
           </div>
 
           {def.loading ? (
-            <p className="mt-2 text-sm text-zinc-400">Looking up…</p>
+            <p className="mt-2 text-sm text-[var(--reader-muted)]">Looking up…</p>
           ) : def.error ? (
-            <p className="mt-2 text-sm text-zinc-500">{def.error}</p>
+            <p className="mt-2 text-sm text-[var(--reader-muted)]">{def.error}</p>
           ) : (
             <div className="mt-2 flex max-h-56 flex-col gap-2 overflow-auto">
               {def.entries?.map((m, i) => (
@@ -688,7 +765,7 @@ export function ChapterReader({
                       {m.partOfSpeech}
                     </p>
                   )}
-                  <ul className="ml-4 list-disc text-sm text-zinc-700 dark:text-zinc-300">
+                  <ul className="ml-4 list-disc text-sm text-[var(--reader-ink)]">
                     {m.definitions.map((d, j) => (
                       <li key={j}>{d}</li>
                     ))}

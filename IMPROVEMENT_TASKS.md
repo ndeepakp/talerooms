@@ -28,8 +28,23 @@ A comprehensive roadmap and tracking ledger for the visual, typographic, archite
 | [`TASK-PAGE-05`](#task-page-05-author-studio-stepped-writing-suite) | Author Studio: Multi-Step Focused Writing Suite | Author Studio | High | `[ ] Pending` |
 | [`TASK-PAGE-06`](#task-page-06-author-portfolio--profile-page) | Author Profile: Literary Portfolio & Memberships | Profiles | Medium | `[ ] Pending` |
 | [`TASK-PAGE-07`](#task-page-07-library-bookshelf-redesign) | Personal Library: Tactile Shelf & Reading Progress | Library | Medium | `[ ] Pending` |
+| [`TASK-AUTH-01`](#task-auth-01-google-signup--email-otp-verification) | Google Signup & Email OTP Verification / Account Activation | Authentication | High | `[ ] Pending` |
 | [`TASK-PAY-01`](#task-pay-01-stripe-payments-integration) | Stripe Platform: Checkout, Subscriptions, Connect & Webhooks | Payments | High | `[ ] Pending` |
 
+
+---
+
+## Pending Task Execution Order
+
+Complete and validate each step before advancing:
+
+1. **Author Studio** — `TASK-PAGE-05`
+2. **Discovery Feed** — `TASK-PAGE-04`
+3. **Personal Library** — `TASK-PAGE-07`
+4. **Author Profiles** — `TASK-PAGE-06`
+5. **Visual Consistency & Theme Audit** — Finish `TASK-SYS-05`, including shared-component colors, surfaces, and light/dark styling.
+6. **Signup, User Verification & Account Testing** — `TASK-AUTH-01`; add Google signup/sign-in and email OTP activation, then complete outstanding end-to-end checks for bookmarks, reviews, community submissions, reading resume, and protected account flows against the activation rules.
+7. **Payments** — `TASK-PAY-01`; remains the final phase.
 
 ---
 
@@ -341,6 +356,38 @@ A comprehensive roadmap and tracking ledger for the visual, typographic, archite
 
 ---
 
+### Signup & Account Verification
+
+#### `TASK-AUTH-01`: Google Signup & Email OTP Verification
+- **Status**: `[ ] Pending`
+- **Priority**: High — Complete before payments; validate both signup paths before advancing.
+- **Files / Areas Affected**:
+  - `src/lib/auth.ts` and authentication client configuration
+  - Signup/login pages and verification UI
+  - Server session/access checks and account persistence
+  - Database migrations, transactional email delivery, and deployment configuration as needed
+- **Objectives**:
+  - Offer **Continue with Google** for signup and subsequent sign-in using the existing Better Auth stack.
+  - Activate Google accounts only after a successful, server-validated provider flow with a verified email. If the provider does not establish email verification, require email OTP verification.
+  - Keep email/password signup available for users who do not use Google. Send a one-time code to their signup email and activate the account only after successful verification. Email OTP is the intended non-Google verification channel.
+  - Treat newly registered, unverified users as **inactive / pending verification**. They may complete verification, resend a code, correct their email, or sign out, but must not gain normal authenticated access or perform protected actions until active. Public browsing remains available.
+  - Enforce activation on the server across sessions, protected pages, and API/mutation handlers; hiding UI alone must not grant access.
+  - Define how existing accounts transition before rollout, avoiding accidental activation of unverified accounts or unexplained lockouts.
+- **Checklist**:
+  - [ ] Configure Google OAuth credentials and approved callback URLs for local and production environments; add signup/login controls and handle cancellation/errors.
+  - [ ] Implement transactional email OTP delivery and an accessible verification screen with resend cooldown and clear pending/expired/error states.
+  - [ ] Use short-lived, single-use codes with secure storage, limited attempts, and request/resend rate limits; invalidate consumed or superseded codes.
+  - [ ] Persist verification/activation state using the auth provider's supported model and enforce it consistently on the server.
+  - [ ] Handle returning inactive users and interrupted signup so verification can resume safely; a changed email must be verified before activation.
+  - [ ] Handle duplicate emails and account linking safely without automatically merging identities solely because email strings match.
+  - [ ] Document and validate the existing-account migration policy and required Google/email environment configuration.
+  - [ ] Validate Google success/cancellation, email OTP success/wrong/expired/reused codes, resend limits, session activation, and direct protected-route/API attempts from inactive users.
+  - [ ] Complete outstanding account-level end-to-end checks for existing bookmarking, reviews, community submissions, saved reading position, and access/subscription flows; repeat protected-flow checks with active and inactive accounts. Real payment validation belongs to the final payments phase.
+  - [ ] Run relevant auth tests, lint, TypeScript, production build, and mobile/keyboard flow checks before moving to the next task.
+- **Acceptance criteria**: A new email/password account remains inactive until its email OTP is verified. A Google signup with a validated verified email becomes active after the provider flow. Unverified users cannot bypass activation through login, stale sessions, or direct API requests. Real payments remain the final phase.
+
+---
+
 ### Monetization & Payments
 
 #### `TASK-PAY-01`: Stripe Payments Integration
@@ -372,6 +419,7 @@ A comprehensive roadmap and tracking ledger for the visual, typographic, archite
 
 | Date | Task ID | Update Description | Author |
 | :--- | :--- | :--- | :--- |
+| 2026-10-06 | `TASK-AUTH-01` | Added Google signup/sign-in and email OTP activation for non-Google signups. Unverified accounts remain inactive with server-enforced restrictions; implementation and validation pending. Payments remain last. | Codex |
 | 2026-10-05 | `TASK-SYS-01` to `04` | Editorial Typography (Newsreader), Brand Identity, 3D Book Spines, Modern Gallery Shelves completed. | Antigravity |
 | 2026-10-05 | `TASK-SYS-05` | First foundation batch validated: semantic surfaces, shared brand/navigation, accessible accent buttons, scalable covers, and touch-friendly library details. Remaining component audit pending; payments last. | Codex |
 | 2026-10-05 | `TASK-PAGE-02` | Reader customization and focus mode locally validated; saved-page restore race fixed. Payments remain last. | Codex |

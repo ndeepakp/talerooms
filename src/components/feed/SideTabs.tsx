@@ -18,7 +18,7 @@ export function SideTabs({ tabs }: { tabs: SideTab[] }) {
 
   return (
     <div className="mt-6 flex flex-col gap-6 md:flex-row">
-      <nav className="flex gap-2 md:w-44 md:shrink-0 md:flex-col md:self-start">
+      <nav className="flex gap-2 md:w-32 md:shrink-0 md:flex-col md:self-start">
         {tabs.map((t) => {
           const on = t.key === current?.key;
           return (
@@ -31,7 +31,7 @@ export function SideTabs({ tabs }: { tabs: SideTab[] }) {
                 "flex flex-1 items-center gap-2 rounded-xl px-4 py-2.5 text-sm font-medium transition-colors md:flex-initial " +
                 (on
                   ? "btn-primary"
-                  : "border border-zinc-200 text-zinc-700 hover:bg-zinc-100 dark:border-zinc-800 dark:text-zinc-300 dark:hover:bg-zinc-900")
+                  : "border border-ui bg-surface-raised text-muted hover:bg-surface-soft")
               }
             >
               {t.icon && <span aria-hidden="true">{t.icon}</span>}

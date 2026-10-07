@@ -24,7 +24,7 @@ function timeAgo(iso: string): string {
   if (hrs < 24) return `${hrs}h`;
   const days = Math.floor(hrs / 24);
   if (days < 30) return `${days}d`;
-  return new Date(iso).toLocaleDateString();
+  return new Date(iso).toLocaleDateString('en-GB', { day: 'numeric', month: 'short', year: 'numeric', timeZone: 'UTC' });
 }
 
 export function PostCard({ post }: { post: PostRow }) {

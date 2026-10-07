@@ -59,6 +59,7 @@ export default async function RootLayout({
   return (
     <html
       lang="en"
+      suppressHydrationWarning
       data-theme-mode={appearance.themeMode}
       data-accent={appearance.accent}
       data-bg={appearance.background}

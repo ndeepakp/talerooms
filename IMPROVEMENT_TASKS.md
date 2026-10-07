@@ -24,7 +24,7 @@ A comprehensive roadmap and tracking ledger for the visual, typographic, archite
 | [`TASK-PAGE-01`](#task-page-01-landing-page-colorful-welcome--original-stories) | Landing Page: Colorful Welcome & Original Stories | Pages & UI | High | `[x] Completed` |
 | [`TASK-PAGE-02`](#task-page-02-reading-room--customization-suite) | Reading Room: Distraction-Free & Customization Drawer | Reader | High | `[x] Completed` |
 | [`TASK-PAGE-03`](#task-page-03-story-overview-page-split-layout) | Story Overview Page: Two-Column Editorial Layout | Story View | High | `[x] Completed` |
-| [`TASK-PAGE-04`](#task-page-04-discovery-feed--curated-shelves) | Discovery Feed & Dynamic Categorized Shelves | Feed | Medium | `[ ] Pending` |
+| [`TASK-PAGE-04`](#task-page-04-discovery-feed--curated-shelves) | Discovery Feed & Dynamic Categorized Shelves | Feed | Medium | `[x] Completed` |
 | [`TASK-PAGE-05`](#task-page-05-author-studio-multi-step-focused-writing-suite) | Author Studio: Multi-Step Focused Writing Suite | Author Studio | High | `[x] Completed` |
 | [`TASK-PAGE-06`](#task-page-06-author-portfolio--profile-page) | Author Profile: Literary Portfolio & Memberships | Profiles | Medium | `[ ] Pending` |
 | [`TASK-PAGE-07`](#task-page-07-library-bookshelf-redesign) | Personal Library: Tactile Shelf & Reading Progress | Library | Medium | `[ ] Pending` |
@@ -38,14 +38,13 @@ A comprehensive roadmap and tracking ledger for the visual, typographic, archite
 
 Complete and validate each step before advancing:
 
-Author Studio (`TASK-PAGE-05`) was completed, validated, and deployed on 2026-10-07.
+Author Studio (`TASK-PAGE-05`) was completed, validated, and deployed on 2026-10-07. Discovery Feed (`TASK-PAGE-04`) was completed and validated locally the same day; production deployment is pending.
 
-1. **Discovery Feed** — `TASK-PAGE-04`
-2. **Personal Library** — `TASK-PAGE-07`
-3. **Author Profiles** — `TASK-PAGE-06`
-4. **Visual Consistency & Theme Audit** — Finish `TASK-SYS-05`, including shared-component colors, surfaces, and light/dark styling.
-5. **Signup, User Verification & Account Testing** — `TASK-AUTH-01`; add Google signup/sign-in and email OTP activation, then complete outstanding end-to-end checks for bookmarks, reviews, community submissions, reading resume, and protected account flows against the activation rules.
-6. **Payments** — `TASK-PAY-01`; remains the final phase.
+1. **Personal Library** — `TASK-PAGE-07`
+2. **Author Profiles** — `TASK-PAGE-06`
+3. **Visual Consistency & Theme Audit** — Finish `TASK-SYS-05`, including shared-component colors, surfaces, and light/dark styling.
+4. **Signup, User Verification & Account Testing** — `TASK-AUTH-01`; add Google signup/sign-in and email OTP activation, then complete outstanding end-to-end checks for bookmarks, reviews, community submissions, reading resume, and protected account flows against the activation rules.
+5. **Payments** — `TASK-PAY-01`; remains the final phase.
 
 ---
 
@@ -272,13 +271,18 @@ Author Studio (`TASK-PAGE-05`) was completed, validated, and deployed on 2026-10
 ---
 
 #### `TASK-PAGE-04`: Discovery Feed & Dynamic Categorized Shelves
-- **Status**: `[ ] Pending`
+- **Status**: `[x] Completed` — Implemented and validated on 2026-10-07. Production deployment is pending.
 - **Priority**: Medium
 - **Files Affected**:
   - `src/app/feed/page.tsx`
   - `src/components/feed/ContinueReading.tsx`
   - `src/components/feed/NewChapters.tsx`
   - `src/components/feed/WeekPanel.tsx`
+  - `src/components/feed/DiscoveryFeed.tsx`, `DiscoveryShelf.tsx`, and `Discovery.module.css`
+  - `src/components/feed/SideTabs.tsx`
+  - `src/components/story/BookPreview.tsx`
+  - `src/lib/discovery.ts` and tests
+  - `src/components/post/PostCard.tsx` and `src/app/layout.tsx` (hydration fixes)
 - **Objectives**:
   - Elevate `/feed` into a lively literary home:
     - **"Continue Reading" Ribbon**: Modernized hero banner for in-progress stories with chapter title, progress bar, and instant "Resume Chapter" button.
@@ -288,11 +292,17 @@ Author Studio (`TASK-PAGE-05`) was completed, validated, and deployed on 2026-10
       - *Quick Bites (Under 15 min reads)*
     - **Redesigned "Your Week"**: Turn the right rail into an engaging personal reading streak & milestones tracker with circular completion gauges.
 - **Checklist**:
-  - [ ] Redesign `ContinueReading` card into a sleek, prominent resume bar.
-  - [ ] Organize feed stories into categorized shelves with horizontal scroll capability.
-  - [ ] Polish `WeekPanel` stats with modern visual metrics and streak tracking.
+  - [x] Redesign `ContinueReading` card into a sleek, prominent resume bar.
+  - [x] Organize feed stories into categorized shelves with horizontal scroll capability.
+  - [x] Polish `WeekPanel` stats with modern visual metrics and streak tracking.
 
-- **Related work completed (2026-10-06)**: Feed Bookshelf and NewChapters now use the shared in-place book preview. The old feed detail drawer was removed; new-chapter books wrap to prevent preview clipping, and their reading links retain the saved chapter. Categorized discovery shelves, ContinueReading redesign, and WeekPanel work remain pending.
+- **Related work completed (2026-10-06)**: Feed Bookshelf and NewChapters now use the shared in-place book preview. The old feed detail drawer was removed; new-chapter books wrap to prevent preview clipping, and their reading links retain the saved chapter. The broader categorized shelves, ContinueReading, and WeekPanel work was completed on 2026-10-07 as documented below.
+
+
+- **Implemented (2026-10-07)**: Editorial reading-room header; prominent Continue Reading ribbon with chapter title/position and a resume link that restores the existing page bookmark. Categorized horizontal shelves show trending stories in preferred genres (last-seven-day views), latest stories from followed authors, short reads with estimates below 15 minutes, and all published stories with genre filters. When genre activity is absent, the personal shelf honestly says “Fresh in your genres.” Existing new-chapter notifications and community posts remain accessible. Weekly activity shows a seven-day circular gauge, daily reading markers, actual reading streak, opened-story/quiz/answer counts, and quiz accuracy. Calendar-day activity is explicitly labeled UTC. Shared book spreads are clamped to the scrolling shelf and close on horizontal scrolling; keyboard/tap/Escape controls remain available. Only public story metadata and SQL-computed word counts are sent to the client; chapter bodies stay on the server.
+- **Validation corrections**: Resume links use the story slug and omit the explicit chapter query, which previously skipped the saved page. Community post dates older than 30 days now use a fixed locale/timezone to avoid hydration mismatch. The root theme element accepts the intentional pre-hydration class change from the existing theme script.
+- **Validation (2026-10-07)**: 60 tests, lint, TypeScript, production build, and diff checks passed. Four discovery/activity regression tests cover genre ranking, followed authors outside preferences, quick-read bounds, fresh fallback, unique reading days, streak resets, and month boundaries. A disposable local reader exercised real follows/preferences/view activity, a two-day streak, fresh/trending shelves, empty followed-author and inactive-week states, carousel controls, genre filtering, community navigation, locked access preservation, and saved page 2 of 4. Production-build checks confirmed persistent resume dismissal and no browser console errors on the feed/community. Responsive checks at 320/390/768/1280px found no page overflow; light/dark themes and the in-place mobile book spread were checked. Test account and all its activity/access rows were removed after verification.
+- **Delivery**: Discovery Feed implementation, regression tests, hydration fixes, and this task update form the Git release. Production deployment is pending; no production data changes, schema migrations, or payment implementation. Personal Library is next.
 
 ---
 
@@ -434,6 +444,7 @@ Author Studio (`TASK-PAGE-05`) was completed, validated, and deployed on 2026-10
 
 | Date | Task ID | Update Description | Author |
 | :--- | :--- | :--- | :--- |
+| 2026-10-07 | `TASK-PAGE-04` | Completed categorized discovery shelves, genre filters, saved-page resume ribbon, and real weekly activity/streaks. Fixed shelf preview clipping and post-date/theme hydration issues found during validation. 60 tests, lint, TypeScript, production build, and local account/browser/responsive checks passed; Git release prepared and production deployment pending. | Codex |
 | 2026-10-07 | `TASK-PAGE-05` | Completed the stepped Author Studio, chapter manager/focus mode, access presets, save integrity fixes, and publication review. Corrected similarity scans to exclude private drafts; local production/account/responsive validation passed. Pushed `0536301` and deployed to Fly (machine v29, health 1/1); live public-page/auth-gate smoke checks passed. | Codex |
 | 2026-10-06 | `TASK-AUTH-01` | Added Google signup/sign-in and email OTP activation for non-Google signups. Unverified accounts remain inactive with server-enforced restrictions; implementation and validation pending. Payments remain last. | Codex |
 | 2026-10-05 | `TASK-SYS-01` to `04` | Editorial Typography (Newsreader), Brand Identity, 3D Book Spines, Modern Gallery Shelves completed. | Antigravity |

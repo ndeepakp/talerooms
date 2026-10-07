@@ -5,9 +5,12 @@ import Link from "next/link";
 
 type Resume = {
   story_id: string;
+  slug: string | null;
   title: string;
   author: string | null;
   chapter_index: number;
+  chapter_title: string | null;
+  chapter_count: number;
 };
 
 // The "Continue reading" card, dismissible via the ✕. Dismissal is stored in a
@@ -25,35 +28,23 @@ export function ContinueReading({ resume }: { resume: Resume }) {
     setHidden(true);
   }
 
+  const position = Math.min(resume.chapter_index, resume.chapter_count - 1);
+  const progress = Math.max(0, Math.round(position / Math.max(1, resume.chapter_count) * 100));
   return (
-    <div className="relative mt-4">
-      <Link
-        href={`/stories/${resume.story_id}?chapter=${resume.chapter_index}`}
-        className="flex items-center justify-between gap-3 rounded-2xl border border-accent bg-accent/5 p-4 pr-12 transition-colors hover:bg-accent/10"
-      >
-        <div className="min-w-0">
-          <p className="text-xs font-medium uppercase tracking-wide text-accent">
-            Continue reading
-          </p>
-          <p className="mt-0.5 truncate font-semibold text-ink">
-            {resume.title}
-          </p>
-          <p className="text-sm text-muted">
-            Chapter {resume.chapter_index + 1} · by {resume.author ?? "Unknown"}
-          </p>
+    <section aria-label="Continue reading" className="relative my-7 rounded-3xl border border-ui bg-surface-raised p-6 sm:p-8">
+      <button type="button" onClick={dismiss} aria-label="Dismiss continue reading" className="absolute right-3 top-3 flex h-9 w-9 items-center justify-center rounded-full text-muted hover:bg-surface-soft">✕</button>
+      <div className="flex flex-col gap-5 sm:flex-row sm:items-center sm:justify-between">
+        <div className="min-w-0 pr-6">
+          <p className="text-[10px] font-bold uppercase tracking-[.18em] text-accent">Right where you left off</p>
+          <h2 className="mt-2 font-serif text-3xl text-ink">{resume.title}</h2>
+          <p className="mt-2 text-sm text-muted">Chapter {position + 1} of {resume.chapter_count}{resume.chapter_title ? ` · ${resume.chapter_title}` : ''} · by {resume.author ?? 'Unknown'}</p>
         </div>
-        <span className="hidden shrink-0 rounded-full btn-primary px-4 py-2 text-sm font-medium sm:inline-block">
-          Continue from there →
-        </span>
-      </Link>
-      <button
-        type="button"
-        onClick={dismiss}
-        aria-label="Dismiss continue reading"
-        className="absolute right-2 top-2 flex h-7 w-7 items-center justify-center rounded-full text-subtle transition-colors hover:bg-zinc-200 hover:text-ink dark:hover:bg-zinc-800"
-      >
-        ✕
-      </button>
-    </div>
+        <Link href={`/stories/${resume.slug ?? resume.story_id}#reading-room`} className="btn-primary shrink-0 rounded-full px-6 py-3 text-center text-sm font-semibold">Resume chapter →</Link>
+      </div>
+      <div className="mt-5 h-1.5 overflow-hidden rounded-full bg-surface-soft" role="progressbar" aria-label="Chapter position in story" aria-valuemin={0} aria-valuemax={resume.chapter_count} aria-valuenow={position} aria-valuetext={`At chapter ${position + 1} of ${resume.chapter_count}`}>
+        <div className="h-full rounded-full bg-accent" style={{width: `${progress}%`}} />
+      </div>
+      <p className="mt-2 text-[11px] text-subtle">Your saved chapter position · page bookmark restored when you resume</p>
+    </section>
   );
 }

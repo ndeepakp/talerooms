@@ -32,9 +32,12 @@ export function BookPreview({ story, variant = "shelf", href: destination, readL
   const measure = useCallback(() => {
     const rect = stageRef.current?.getBoundingClientRect();
     if (!rect) return;
-    const width = Math.min(180, (window.innerWidth - 32) / 2);
+    const rail = stageRef.current?.closest('[data-book-rail]')?.getBoundingClientRect();
+    const left = Math.max(16, (rail?.left ?? 0) + 16);
+    const right = Math.min(window.innerWidth - 16, (rail?.right ?? window.innerWidth) - 16);
+    const width = Math.min(180, (right - left) / 2);
     const center = rect.left + rect.width / 2;
-    const safeCenter = Math.max(width + 16, Math.min(center, window.innerWidth - width - 16));
+    const safeCenter = Math.max(left + width, Math.min(center, right - width));
     setPlacement({ width, shift: safeCenter - center });
   }, []);
   const show = () => { measure(); setOpen(true); };
@@ -42,7 +45,11 @@ export function BookPreview({ story, variant = "shelf", href: destination, readL
   useEffect(() => {
     if (!open) return;
     window.addEventListener("resize", measure);
-    return () => window.removeEventListener("resize", measure);
+    const rail = stageRef.current?.closest('[data-book-rail]');
+    const initialScroll = rail?.scrollLeft;
+    const close = () => { if (rail?.scrollLeft !== initialScroll) setOpen(false); };
+    rail?.addEventListener('scroll', close);
+    return () => { window.removeEventListener("resize", measure); rail?.removeEventListener('scroll', close); };
   }, [open, measure]);
   return (
     <div

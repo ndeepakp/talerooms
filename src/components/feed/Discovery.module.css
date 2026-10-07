@@ -20,14 +20,13 @@
 .card h3 { margin-top:22px; font-family:var(--font-newsreader),Georgia,serif; font-size:20px; line-height:1.2; }
 .author { display:block; color:var(--muted); font-size:12px; margin-top:10px; }
 .meta { display:flex; flex-wrap:wrap; gap:10px; color:var(--muted); font-size:11px; margin-top:12px; }
-.filters { display:flex; flex-wrap:wrap; align-items:center; justify-content:flex-start; gap:8px; margin:0; }
+.genrePicker { display:grid; grid-template-columns:minmax(0,1fr) 38px; gap:8px; align-items:start; }
+.filters { display:grid; grid-template-columns:repeat(4,minmax(0,1fr)); gap:8px; margin:0; }
 .withFilters { display:grid; grid-template-columns:auto minmax(0,1fr); align-items:center; gap:18px; }
 .filterGroup { width:100%; max-width:370px; justify-self:end; min-width:0; }
 .withFilters:has([aria-expanded=true]) { align-items:start; }
-.filters .expandGenres { width:38px; min-height:38px; padding:0; flex-shrink:0; font-size:22px; line-height:1; }
-.moreFilters { justify-content:flex-start; margin-top:8px; }
-.moreFilters[hidden] { display:none; }
-.filters button { border:1px solid var(--border); background:var(--surface-raised); padding:9px 12px; min-height:38px; border-radius:999px; font-size:11px; cursor:pointer; }
+.expandGenres { width:38px; height:48px; padding:0; border:1px solid var(--border); background:var(--surface-raised); border-radius:999px; font-size:22px; line-height:1; cursor:pointer; }
+.filters button { border:1px solid var(--border); background:var(--surface-raised); padding:8px; min-height:48px; height:48px; border-radius:999px; font-size:11px; line-height:1.3; cursor:pointer; overflow-wrap:anywhere; }
 .filters button[aria-pressed=true] { background:var(--accent); color:var(--accent-fg); border-color:var(--accent); }
 .empty { border:1px dashed var(--border); border-radius:18px; padding:24px; margin:20px 0; color:var(--muted); font-size:14px; line-height:1.7; }
 .empty a { color:var(--foreground); text-decoration:underline; text-underline-offset:4px; }
@@ -41,7 +40,7 @@
 .tabs button:hover { text-decoration:underline; text-underline-offset:4px; }
 .resume, .week { border:1px solid var(--border); background:var(--surface-raised); border-radius:18px; padding:20px; min-width:0; }
 .resume { position:relative; display:flex; align-items:center; gap:16px; }
-.resumeCover { width:76px; height:114px; flex-shrink:0; }
+.resumeCover { width:96px; height:144px; flex-shrink:0; }
 .resumeDetails { min-width:0; flex:1; }
 .resumeDetails h2 { font-family:var(--font-newsreader),Georgia,serif; font-size:24px; line-height:1.2; margin:8px 0; overflow-wrap:anywhere; }
 .resume .kicker { font-size:9px; }
@@ -71,5 +70,5 @@
 .accuracy { font-size:11px; margin-top:12px; color:var(--muted); }
 .community { margin-top:28px; }
 @media(max-width:1050px) { .layout { grid-template-columns:minmax(0,1fr); grid-template-areas:"hero" "sidebar" "feed"; }.rail { position:static; width:auto; max-height:none; overflow:visible; display:grid; grid-template-columns:repeat(2,minmax(0,1fr)); margin-bottom:28px; }.rail > :only-child { grid-column:1/-1; }.header { padding-top:0; }.header h1 { font-size:clamp(38px,6vw,64px); } }
-@media(max-width:600px) { .page { padding:24px 16px 44px; }.header { padding-bottom:28px; }.header p { font-size:22px; }.rail { grid-template-columns:1fr; gap:14px; }.bookRail { gap:28px; padding-inline:8px; }.withFilters { grid-template-columns:minmax(0,1fr); gap:16px; }.withFilters > .filterGroup { grid-column:1/-1; grid-row:2; max-width:none; }.filters { gap:8px; }.card { width:140px; }.sectionHeader h2 { font-size:25px; }.wallpaper { padding:16px; }.resume,.week { padding:18px; }.resumeDetails h2 { font-size:22px; }.tabs button { padding:10px 20px; } }
+@media(max-width:600px) { .page { padding:24px 16px 44px; }.header { padding-bottom:28px; }.header p { font-size:22px; }.rail { grid-template-columns:1fr; gap:14px; }.bookRail { gap:28px; padding-inline:8px; }.withFilters { grid-template-columns:minmax(0,1fr); gap:16px; }.withFilters > .filterGroup { grid-column:1/-1; grid-row:2; max-width:none; }.filters { grid-template-columns:repeat(2,minmax(0,1fr)); gap:8px; }.card { width:140px; }.sectionHeader h2 { font-size:25px; }.wallpaper { padding:16px; }.resume,.week { padding:18px; }.resumeCover { width:84px; height:126px; }.resumeDetails h2 { font-size:22px; }.tabs button { padding:10px 20px; } }
 @media(prefers-reduced-motion:reduce) { .bookRail { scroll-behavior:auto; } }

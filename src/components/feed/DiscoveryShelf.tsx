@@ -4,10 +4,10 @@ import { BookPreview } from '@/components/story/BookPreview';
 import { estimatedRead, type DiscoveryStory } from '@/lib/discovery';
 import styles from './Discovery.module.css';
 
-export function DiscoveryShelf({ title, description, stories, empty, genreLabel, filters, moreFilters }: { title: string; description: string; stories: DiscoveryStory[]; empty: React.ReactNode; genreLabel?: string; filters?: React.ReactNode; moreFilters?: React.ReactNode }) {
+export function DiscoveryShelf({ title, description, stories, empty, genreLabel, filters }: { title: string; description: string; stories: DiscoveryStory[]; empty: React.ReactNode; genreLabel?: string; filters?: React.ReactNode }) {
   return <section className={styles.section} aria-label={title}>
     <div className={`${styles.sectionHeader} ${filters ? styles.withFilters : ''}`}><div><h2>{title}</h2><p>{description}</p></div>
-      {filters && <div className={styles.filterGroup}>{filters}{moreFilters}</div>}
+      {filters && <div className={styles.filterGroup}>{filters}</div>}
     </div>
     {stories.length ? <div data-book-rail className={styles.bookRail} tabIndex={0} aria-label={`${title} books, scroll horizontally`}>
       {stories.map(s => <article className={styles.card} key={s.id}>

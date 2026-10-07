@@ -5,7 +5,7 @@ import { BookPreview } from '@/components/story/BookPreview';
 import { estimatedRead, type DiscoveryStory } from '@/lib/discovery';
 import styles from './Discovery.module.css';
 
-export function DiscoveryShelf({ title, description, stories, empty, genreLabel }: { title: string; description: string; stories: DiscoveryStory[]; empty: React.ReactNode; genreLabel?: string }) {
+export function DiscoveryShelf({ title, description, stories, empty, genreLabel, filters }: { title: string; description: string; stories: DiscoveryStory[]; empty: React.ReactNode; genreLabel?: string; filters?: React.ReactNode }) {
   const rail = useRef<HTMLDivElement>(null);
   const [edges, setEdges] = useState({ start: true, end: true });
   useEffect(() => {
@@ -25,6 +25,7 @@ export function DiscoveryShelf({ title, description, stories, empty, genreLabel 
     <div className={styles.sectionHeader}><div><h2>{title}</h2><p>{description}</p></div>
       {stories.length > 0 && <div className={styles.controls}><button onClick={() => scroll(-1)} disabled={edges.start} aria-label={`Previous books in ${title}`}>←</button><button onClick={() => scroll(1)} disabled={edges.end} aria-label={`Next books in ${title}`}>→</button></div>}
     </div>
+    {filters}
     {stories.length ? <div ref={rail} data-book-rail className={styles.bookRail} tabIndex={0} aria-label={`${title} books, scroll horizontally`}>
       {stories.map(s => <article className={styles.card} key={s.id}>
         <BookPreview story={s}/>

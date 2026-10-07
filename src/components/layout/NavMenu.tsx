@@ -5,7 +5,7 @@ import { useRouter } from "next/navigation";
 import Link from "next/link";
 import { signOut } from "@/lib/auth-client";
 
-export function NavMenu() {
+export function NavMenu({ profileHref }: { profileHref: string }) {
   const router = useRouter();
   const [open, setOpen] = useState(false);
   const ref = useRef<HTMLDivElement>(null);
@@ -34,11 +34,12 @@ export function NavMenu() {
         aria-expanded={open}
         className="flex h-11 w-11 items-center justify-center rounded-full border border-ui-strong text-ink transition-colors hover:bg-surface-soft"
       >
-        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.6" strokeLinecap="round" aria-hidden="true" className="h-5 w-5"><path d="M5 8h14M5 16h14" /></svg>
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.6" strokeLinecap="round" aria-hidden="true" className="h-5 w-5"><path d="M5 6h14M5 12h14M5 18h14" /></svg>
       </button>
 
       {open && (
         <div className="absolute right-0 z-50 mt-2 w-44 overflow-hidden rounded-xl border border-ui bg-surface-raised py-1 shadow-lg">
+          <Link href={profileHref} onClick={() => setOpen(false)} className="block px-4 py-2.5 text-sm text-ink-soft hover:bg-surface-soft">Profile</Link>
           <Link
             href="/library"
             onClick={() => setOpen(false)}

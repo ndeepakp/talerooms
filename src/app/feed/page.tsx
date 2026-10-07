@@ -1,4 +1,3 @@
-import Link from "next/link";
 import { redirect } from "next/navigation";
 import { headers, cookies } from "next/headers";
 import { auth } from "@/lib/auth";
@@ -11,7 +10,7 @@ import { WeekPanel, type WeekStats } from "@/components/feed/WeekPanel";
 import { NewChapters, type NewChapterStory } from "@/components/feed/NewChapters";
 import { ContinueReading } from "@/components/feed/ContinueReading";
 import { PostsFeed } from "@/components/post/PostsFeed";
-import { SideTabs } from "@/components/feed/SideTabs";
+import { GalleryTabs } from "@/components/feed/GalleryTabs";
 import { getPosts } from "@/lib/posts";
 
 export const dynamic = "force-dynamic";
@@ -27,9 +26,9 @@ export default async function FeedPage() {
   // "Continue reading": the reader's most recently opened chapter, in a story
   // they don't own that's still published. New readers get nothing.
   const [resume] = await sql<
-    { story_id: string; slug: string | null; title: string; author: string | null; chapter_index: number; chapter_title: string | null; chapter_count: number }[]
+    { story_id: string; slug: string | null; title: string; author: string | null; cover_url: string | null; cover_style: import("@/lib/cover-style").CoverStyle | null; chapter_index: number; chapter_title: string | null; chapter_count: number }[]
   >`
-    SELECT rp.story_id, s.slug, s.title, u.name AS author,
+    SELECT rp.story_id, s.slug, s.title, u.name AS author, s.cover_url, s.cover_style,
            LEAST(rp.chapter_index, jsonb_array_length(s.chapters) - 1) AS chapter_index,
            s.chapters -> LEAST(rp.chapter_index, jsonb_array_length(s.chapters) - 1) ->> 'title' AS chapter_title,
            jsonb_array_length(s.chapters) AS chapter_count
@@ -47,7 +46,7 @@ export default async function FeedPage() {
   // Community posts (newest first, all authors).
   const posts = await getPosts({ viewerId: session.user.id });
 
-  // "Your week" — the reader's last-7-days activity for the feed right-rail panel.
+  // "Your week" — the reader's last-7-days activity for the compact reading summary.
   const me = session.user.id;
   const [reads] = await sql<{ n: number }[]>`
     SELECT COUNT(DISTINCT story_id)::int AS n FROM story_views
@@ -128,17 +127,21 @@ export default async function FeedPage() {
 
   return (
     <div className={styles.page} style={wallpaper ? { backgroundImage: `url(${wallpaper})` } : undefined}>
-      <div className={`${styles.container} ${wallpaper ? styles.wallpaper : ''}`}>
+      <div className={`${styles.container} ${styles.layout} ${wallpaper ? styles.wallpaper : ''}`}>
         <header className={styles.header}>
-          <div><span className={styles.kicker}>Your reading room</span><h1>A story for every mood.</h1><p>Catch up with your favourite voices. Find a new world.<br />Stay a little longer.</p></div>
-          <div className={styles.actions}><Link href="/library" className="border border-ui bg-surface-raised">Your library</Link><Link href="/write" className="btn-primary">Write a story</Link></div>
+          <div><h1>A story for every mood.</h1><p>Catch up with your favourite voices. Find a new world.<br />Stay a little longer.</p></div>
         </header>
-        {resume && (await cookies()).get('resume_dismissed')?.value !== `${resume.story_id}:${resume.chapter_index}` && <ContinueReading resume={resume}/>}
-        <NewChapters stories={newChapters}/>
-        <SideTabs tabs={[
-          {key:'stories',label:'Stories',icon:'📚',content:<div className={styles.layout}><div className={styles.content}><DiscoveryFeed stories={stories} preferredGenres={prefs.map(p => p.name)}/></div><div className={styles.rail}><WeekPanel stats={weekStats}/></div></div>},
-          {key:'posts',label:'Community',icon:'💬',content:<div className="max-w-2xl"><PostsFeed posts={posts}/></div>}
-        ]}/>
+        <div className={styles.content}><GalleryTabs
+          stories={<>
+            <NewChapters stories={newChapters}/>
+            <DiscoveryFeed stories={stories} preferredGenres={prefs.map(p => p.name)}/>
+          </>}
+          community={<div className="mx-auto max-w-2xl"><PostsFeed posts={posts}/></div>}
+        /></div>
+        <div className={styles.rail} aria-label="Reading activity and saved story">
+          <WeekPanel stats={weekStats}/>
+          {resume && (await cookies()).get('resume_dismissed')?.value !== `${resume.story_id}:${resume.chapter_index}` && <ContinueReading resume={resume}/>}
+        </div>
       </div>
     </div>
   );

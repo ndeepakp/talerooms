@@ -130,7 +130,7 @@ export default async function FeedPage() {
     <div className={styles.page} style={wallpaper ? { backgroundImage: `url(${wallpaper})` } : undefined}>
       <div className={`${styles.container} ${wallpaper ? styles.wallpaper : ''}`}>
         <header className={styles.header}>
-          <div><span className={styles.kicker}>Your reading room</span><h1>A story for every mood.</h1><p>Catch up with your favourite voices. Find a new world. Stay a little longer.</p></div>
+          <div><span className={styles.kicker}>Your reading room</span><h1>A story for every mood.</h1><p>Catch up with your favourite voices. Find a new world.<br />Stay a little longer.</p></div>
           <div className={styles.actions}><Link href="/library" className="border border-ui bg-surface-raised">Your library</Link><Link href="/write" className="btn-primary">Write a story</Link></div>
         </header>
         {resume && (await cookies()).get('resume_dismissed')?.value !== `${resume.story_id}:${resume.chapter_index}` && <ContinueReading resume={resume}/>}

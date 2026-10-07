@@ -38,7 +38,7 @@ A comprehensive roadmap and tracking ledger for the visual, typographic, archite
 
 Complete and validate each step before advancing:
 
-Author Studio (`TASK-PAGE-05`) was completed, validated, and deployed on 2026-10-07. Discovery Feed (`TASK-PAGE-04`) was completed and validated locally the same day; production deployment is pending.
+Author Studio (`TASK-PAGE-05`) was completed, validated, and deployed on 2026-10-07. Discovery Feed (`TASK-PAGE-04`) was completed, validated, pushed, and deployed the same day.
 
 1. **Personal Library** — `TASK-PAGE-07`
 2. **Author Profiles** — `TASK-PAGE-06`
@@ -271,7 +271,7 @@ Author Studio (`TASK-PAGE-05`) was completed, validated, and deployed on 2026-10
 ---
 
 #### `TASK-PAGE-04`: Discovery Feed & Dynamic Categorized Shelves
-- **Status**: `[x] Completed` — Implemented and validated on 2026-10-07. Production deployment is pending.
+- **Status**: `[x] Completed` — Implemented, validated, pushed, and deployed on 2026-10-07.
 - **Priority**: Medium
 - **Files Affected**:
   - `src/app/feed/page.tsx`
@@ -302,7 +302,7 @@ Author Studio (`TASK-PAGE-05`) was completed, validated, and deployed on 2026-10
 - **Implemented (2026-10-07)**: Editorial reading-room header; prominent Continue Reading ribbon with chapter title/position and a resume link that restores the existing page bookmark. Categorized horizontal shelves show trending stories in preferred genres (last-seven-day views), latest stories from followed authors, short reads with estimates below 15 minutes, and all published stories with genre filters. When genre activity is absent, the personal shelf honestly says “Fresh in your genres.” Existing new-chapter notifications and community posts remain accessible. Weekly activity shows a seven-day circular gauge, daily reading markers, actual reading streak, opened-story/quiz/answer counts, and quiz accuracy. Calendar-day activity is explicitly labeled UTC. Shared book spreads are clamped to the scrolling shelf and close on horizontal scrolling; keyboard/tap/Escape controls remain available. Only public story metadata and SQL-computed word counts are sent to the client; chapter bodies stay on the server.
 - **Validation corrections**: Resume links use the story slug and omit the explicit chapter query, which previously skipped the saved page. Community post dates older than 30 days now use a fixed locale/timezone to avoid hydration mismatch. The root theme element accepts the intentional pre-hydration class change from the existing theme script.
 - **Validation (2026-10-07)**: 60 tests, lint, TypeScript, production build, and diff checks passed. Four discovery/activity regression tests cover genre ranking, followed authors outside preferences, quick-read bounds, fresh fallback, unique reading days, streak resets, and month boundaries. A disposable local reader exercised real follows/preferences/view activity, a two-day streak, fresh/trending shelves, empty followed-author and inactive-week states, carousel controls, genre filtering, community navigation, locked access preservation, and saved page 2 of 4. Production-build checks confirmed persistent resume dismissal and no browser console errors on the feed/community. Responsive checks at 320/390/768/1280px found no page overflow; light/dark themes and the in-place mobile book spread were checked. Test account and all its activity/access rows were removed after verification.
-- **Delivery**: Discovery Feed implementation, regression tests, hydration fixes, and this task update form the Git release. Production deployment is pending; no production data changes, schema migrations, or payment implementation. Personal Library is next.
+- **Delivery (2026-10-07)**: Discovery Feed release `bb332e8`, invitation line break `84a791b`, roomier shelves/filters `e6d9bf3`, and heading-before-filters ordering `72e7380` were pushed to `origin/main` and deployed to https://talerooms.fly.dev. Final Fly image `deployment-01M4B0G4N2P772T5GGM4AQ4Y9R`, machine version 33, health 1/1 passing. Live health confirms PostgreSQL/pgvector; landing and signed-out feed redirect to login checked with no browser errors. Authenticated feed behavior was verified locally rather than repeated on production. Follow-up spacing and ordering were checked at 1280/390px, including an explicit invitation line break, larger card gaps, and genre filters grouped beneath the Explore heading. Disposable local preview readers were removed. No production data changes, schema migrations, or payment implementation. Personal Library is next.
 
 ---
 
@@ -444,7 +444,7 @@ Author Studio (`TASK-PAGE-05`) was completed, validated, and deployed on 2026-10
 
 | Date | Task ID | Update Description | Author |
 | :--- | :--- | :--- | :--- |
-| 2026-10-07 | `TASK-PAGE-04` | Completed categorized discovery shelves, genre filters, saved-page resume ribbon, and real weekly activity/streaks. Fixed shelf preview clipping and post-date/theme hydration issues found during validation. 60 tests, lint, TypeScript, production build, and local account/browser/responsive checks passed; Git release prepared and production deployment pending. | Codex |
+| 2026-10-07 | `TASK-PAGE-04` | Completed categorized discovery shelves, genre filters, saved-page resume ribbon, and real weekly activity/streaks. Fixed shelf preview clipping and post-date/theme hydration issues found during validation. 60 tests, lint, TypeScript, production build, and local account/browser/responsive checks passed. Pushed and deployed through `72e7380` (Fly v33, health 1/1), including the approved line break, spacing, and heading/filter order. | Codex |
 | 2026-10-07 | `TASK-PAGE-05` | Completed the stepped Author Studio, chapter manager/focus mode, access presets, save integrity fixes, and publication review. Corrected similarity scans to exclude private drafts; local production/account/responsive validation passed. Pushed `0536301` and deployed to Fly (machine v29, health 1/1); live public-page/auth-gate smoke checks passed. | Codex |
 | 2026-10-06 | `TASK-AUTH-01` | Added Google signup/sign-in and email OTP activation for non-Google signups. Unverified accounts remain inactive with server-enforced restrictions; implementation and validation pending. Payments remain last. | Codex |
 | 2026-10-05 | `TASK-SYS-01` to `04` | Editorial Typography (Newsreader), Brand Identity, 3D Book Spines, Modern Gallery Shelves completed. | Antigravity |

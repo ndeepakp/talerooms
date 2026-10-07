@@ -7,7 +7,7 @@ function qid(): string {
 }
 
 const inputCls =
-  "rounded-lg border border-zinc-300 bg-white px-2 text-sm text-zinc-900 outline-none focus:border-zinc-900 dark:border-zinc-700 dark:bg-zinc-950 dark:text-zinc-100";
+  "rounded-lg border border-ui-strong bg-surface-raised px-2 text-sm text-ink outline-none focus:border-accent";
 
 // Author editor for a chapter's graded quiz: multiple-choice questions, each
 // with 2–8 options and one marked correct.
@@ -44,11 +44,11 @@ export function ChapterQuestionsEditor({
   }
 
   return (
-    <div className="mt-3 border-t border-zinc-100 pt-3 dark:border-zinc-800">
-      <span className="text-xs font-medium text-zinc-600 dark:text-zinc-400">
-        Quiz <span className="font-normal text-zinc-400">(optional)</span>
+    <div className="mt-3 border-t border-ui pt-3">
+      <span className="text-xs font-medium text-muted">
+        Quiz <span className="font-normal text-subtle">(optional)</span>
       </span>
-      <p className="text-xs text-zinc-400">
+      <p className="text-xs text-subtle">
         Multiple-choice questions for after this chapter — tap the circle to mark
         the correct answer.
       </p>
@@ -57,10 +57,11 @@ export function ChapterQuestionsEditor({
         {questions.map((q, i) => (
           <div
             key={q.id}
-            className="rounded-lg border border-zinc-200 p-3 dark:border-zinc-800"
+            className="rounded-lg border border-ui p-3"
           >
             <div className="flex items-center gap-2">
               <input
+                aria-label={`Quiz question ${i + 1}`}
                 value={q.prompt}
                 onChange={(e) => update(i, { prompt: e.target.value })}
                 placeholder="Your question…"
@@ -69,7 +70,7 @@ export function ChapterQuestionsEditor({
               <button
                 type="button"
                 onClick={() => remove(i)}
-                className="ml-auto text-xs text-zinc-400 hover:text-red-600 dark:hover:text-red-400"
+                className="ml-auto text-xs text-subtle hover:text-red-600 dark:hover:text-red-400"
               >
                 Remove
               </button>
@@ -87,13 +88,14 @@ export function ChapterQuestionsEditor({
                     className={
                       "flex h-5 w-5 shrink-0 items-center justify-center rounded-full border text-[10px] font-bold transition-colors " +
                       (q.answer === oi
-                        ? "border-emerald-500 bg-emerald-500 text-white"
-                        : "border-zinc-300 text-transparent hover:border-emerald-400 dark:border-zinc-600")
+                        ? "border-accent bg-accent text-accent-fg"
+                        : "border-ui-strong text-transparent hover:border-accent")
                     }
                   >
                     ✓
                   </button>
                   <input
+                    aria-label={`Question ${i + 1} option ${oi + 1}`}
                     value={o}
                     onChange={(e) => setOption(i, oi, e.target.value)}
                     placeholder={`Option ${oi + 1}`}
@@ -103,7 +105,7 @@ export function ChapterQuestionsEditor({
                     <button
                       type="button"
                       onClick={() => removeOption(i, oi)}
-                      className="text-xs text-zinc-400 hover:text-red-600"
+                      className="text-xs text-subtle hover:text-red-600"
                       aria-label="Remove option"
                     >
                       ✕

@@ -115,6 +115,7 @@ export function htmlToText(html: string): string {
 export function normalizeChapters(
   input: unknown,
   offered: Tier[] = TIERS,
+  opts: { draft?: boolean } = {},
 ): Chapter[] {
   if (!Array.isArray(input)) return [];
   const out: Chapter[] = [];
@@ -128,14 +129,16 @@ export function normalizeChapters(
       prompts?: unknown;
     };
     const bodyHtml = typeof r.body === "string" ? r.body : "";
-    if (!htmlToText(bodyHtml)) continue; // skip empty chapters
+    if (!opts.draft && !htmlToText(bodyHtml)) continue; // published stories omit empty chapters
     const titleStr = typeof r.title === "string" ? r.title.trim() : "";
     out.push({
       title: titleStr ? titleStr : null,
       body: bodyHtml.trim(),
       prices: normalizePrices(r.prices, offered),
-      questions: normalizeQuestions(r.questions),
-      prompts: normalizePrompts(r.prompts),
+      questions: opts.draft ? normalizeDraftQuestions(r.questions) : normalizeQuestions(r.questions),
+      prompts: opts.draft && Array.isArray(r.prompts)
+        ? r.prompts.filter((p): p is string => typeof p === "string").map(p => p.slice(0, 280)).slice(0, MAX_PROMPTS)
+        : normalizePrompts(r.prompts),
     });
   }
   return out;
@@ -211,4 +214,19 @@ export function validateStory(
   }
 
   return null;
+}
+
+// Drafts must retain unfinished quizzes rather than drop an author’s work.
+// Publishing still uses the stricter normalizer above.
+function normalizeDraftQuestions(input: unknown): Question[] {
+  if (!Array.isArray(input)) return [];
+  return input.filter((q): q is Record<string, unknown> => !!q && typeof q === "object").map(q => {
+    const options = Array.isArray(q.options) ? q.options.filter((o): o is string => typeof o === "string").map(o => o.slice(0, 500)).slice(0, 8) : ["", ""];
+    return {
+      id: typeof q.id === "string" && q.id ? q.id : newQuestionId(),
+      prompt: typeof q.prompt === "string" ? q.prompt.slice(0, 500) : "",
+      options,
+      answer: Number.isInteger(q.answer) && Number(q.answer) >= 0 && Number(q.answer) < options.length ? Number(q.answer) : 0,
+    };
+  });
 }

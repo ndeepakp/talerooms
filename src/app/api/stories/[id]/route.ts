@@ -80,7 +80,7 @@ export const PUT = withErrors(async (
 
   const cleanTitle = title.trim();
   const cleanSummary = (summary ?? "").trim();
-  const cleanChapters = normalizeChapters(chapters, offered);
+  const cleanChapters = normalizeChapters(chapters, offered, { draft: isDraft });
 
   // Internal, server-only plain text for the originality checks (never exposed
   // to non-authors). Falls back to the summary when there are no chapters yet.

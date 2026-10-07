@@ -71,7 +71,7 @@ export const POST = withErrors(async (req: Request) => {
 
   const cleanTitle = title.trim();
   const cleanSummary = (summary ?? "").trim();
-  const cleanChapters = normalizeChapters(chapters, offered);
+  const cleanChapters = normalizeChapters(chapters, offered, { draft: isDraft });
 
   // The internal, server-only full text for the originality checks: the plain
   // text of every chapter (HTML stripped). Never shown to non-authors. Falls

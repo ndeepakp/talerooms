@@ -25,7 +25,7 @@ A comprehensive roadmap and tracking ledger for the visual, typographic, archite
 | [`TASK-PAGE-02`](#task-page-02-reading-room--customization-suite) | Reading Room: Distraction-Free & Customization Drawer | Reader | High | `[x] Completed` |
 | [`TASK-PAGE-03`](#task-page-03-story-overview-page-split-layout) | Story Overview Page: Two-Column Editorial Layout | Story View | High | `[x] Completed` |
 | [`TASK-PAGE-04`](#task-page-04-discovery-feed--curated-shelves) | Discovery Feed & Dynamic Categorized Shelves | Feed | Medium | `[ ] Pending` |
-| [`TASK-PAGE-05`](#task-page-05-author-studio-stepped-writing-suite) | Author Studio: Multi-Step Focused Writing Suite | Author Studio | High | `[ ] Pending` |
+| [`TASK-PAGE-05`](#task-page-05-author-studio-multi-step-focused-writing-suite) | Author Studio: Multi-Step Focused Writing Suite | Author Studio | High | `[x] Completed` |
 | [`TASK-PAGE-06`](#task-page-06-author-portfolio--profile-page) | Author Profile: Literary Portfolio & Memberships | Profiles | Medium | `[ ] Pending` |
 | [`TASK-PAGE-07`](#task-page-07-library-bookshelf-redesign) | Personal Library: Tactile Shelf & Reading Progress | Library | Medium | `[ ] Pending` |
 | [`TASK-AUTH-01`](#task-auth-01-google-signup--email-otp-verification) | Google Signup & Email OTP Verification / Account Activation | Authentication | High | `[ ] Pending` |
@@ -38,13 +38,14 @@ A comprehensive roadmap and tracking ledger for the visual, typographic, archite
 
 Complete and validate each step before advancing:
 
-1. **Author Studio** — `TASK-PAGE-05`
-2. **Discovery Feed** — `TASK-PAGE-04`
-3. **Personal Library** — `TASK-PAGE-07`
-4. **Author Profiles** — `TASK-PAGE-06`
-5. **Visual Consistency & Theme Audit** — Finish `TASK-SYS-05`, including shared-component colors, surfaces, and light/dark styling.
-6. **Signup, User Verification & Account Testing** — `TASK-AUTH-01`; add Google signup/sign-in and email OTP activation, then complete outstanding end-to-end checks for bookmarks, reviews, community submissions, reading resume, and protected account flows against the activation rules.
-7. **Payments** — `TASK-PAY-01`; remains the final phase.
+Author Studio (`TASK-PAGE-05`) was completed and validated locally on 2026-10-07.
+
+1. **Discovery Feed** — `TASK-PAGE-04`
+2. **Personal Library** — `TASK-PAGE-07`
+3. **Author Profiles** — `TASK-PAGE-06`
+4. **Visual Consistency & Theme Audit** — Finish `TASK-SYS-05`, including shared-component colors, surfaces, and light/dark styling.
+5. **Signup, User Verification & Account Testing** — `TASK-AUTH-01`; add Google signup/sign-in and email OTP activation, then complete outstanding end-to-end checks for bookmarks, reviews, community submissions, reading resume, and protected account flows against the activation rules.
+6. **Payments** — `TASK-PAY-01`; remains the final phase.
 
 ---
 
@@ -296,12 +297,19 @@ Complete and validate each step before advancing:
 ---
 
 #### `TASK-PAGE-05`: Author Studio: Multi-Step Focused Writing Suite
-- **Status**: `[ ] Pending`
+- **Status**: `[x] Completed` — Implemented and validated locally; not yet pushed or deployed.
 - **Priority**: High
 - **Files Affected**:
-  - `src/app/write/page.tsx`
   - `src/app/write/StoryForm.tsx`
+  - `src/components/write/studio/` (four steps, state/save controller, confirmation dialog, and scoped styling)
   - `src/components/write/RichTextEditor.tsx`
+  - `src/components/write/ChapterQuestionsEditor.tsx`
+  - `src/components/write/ChapterPromptsEditor.tsx`
+  - `src/app/api/stories/route.ts`
+  - `src/app/api/stories/[id]/route.ts`
+  - `src/lib/story-validation.ts` and tests
+  - `src/lib/studio-save-queue.ts` and tests
+  - `src/lib/similarity.ts`
 - **Objectives**:
   - Break down the 1,300-line monolithic form into an intuitive, multi-step authoring workflow:
     1. **Step 1: Story Identity & Cover**: Title, summary, genres, Word doc import, and interactive cover designer.
@@ -310,10 +318,17 @@ Complete and validate each step before advancing:
     4. **Step 4: Originality & Publish**: Clean pledge confirmation and similarity scan report before going live.
   - Add auto-save draft indicator and word count targets.
 - **Checklist**:
-  - [ ] Split `StoryForm` into modular step components.
-  - [ ] Implement split-view manuscript editor (chapter drawer + editor canvas).
-  - [ ] Streamline pricing configuration with one-click presets.
-  - [ ] Integrate clean originality pledge checklist.
+  - [x] Split `StoryForm` into modular step components.
+  - [x] Implement split-view manuscript editor (chapter drawer + editor canvas).
+  - [x] Streamline pricing configuration with one-click presets.
+  - [x] Integrate clean originality pledge checklist.
+
+
+- **Implemented (2026-10-07)**: Four navigable steps — Story, Manuscript, Access, and Publish. Live cover designer and Word import retained. The chapter manager supports selection, add/remove, and keyboard-accessible reordering without switching the selected manuscript. One rich-text editor is displayed at a time; focus mode hides app/studio navigation and exits with Escape. Chapter/total word counts and an adjustable writing target are shown. Quizzes and discussion prompts sit in optional reader extras. Access presets separate public reading, first-chapter preview, and restricted access; duration, currency, bundle, and individual chapter settings remain available. Publish review shows readiness, originality pledge, and similarity decisions. Real payments remain deferred.
+- **Save integrity**: Draft status and explicit Save/Retry controls are visible. Dirty tracking includes cover and currency. Serialized requests prevent draft creation/publish races; edits made during an in-flight save trigger another autosave. Newly created drafts update the editor URL without remounting, so reload resumes the saved draft. Draft normalization retains empty chapter outlines and unfinished quizzes/prompts; publishing still drops empty/incomplete content. Accessible confirmation dialogs protect removal, chapter merging, and unsaved navigation (including shared-header links). Published edits stay in a private working copy until publication succeeds.
+- **Originality correction**: Production-flow testing found private working copies in similarity results. Both semantic and lexical scans now include published stories only, avoiding false matches against the author's own working draft and disclosure of private draft titles.
+- **Validation (2026-10-07)**: 56 tests, lint, TypeScript, diff checks, and production build passed. A local QA author exercised signup, draft creation/reload, empty outlines, stable chapter reordering, unfinished quiz persistence, short-story conversion preserving both chapter bodies, currency-only and cover-only autosave, cover upload, access presets, bundle/chapter pricing, focus/Escape, navigation warning/cancellation, failed-save recovery, initial publication, and working-copy publication. Local PostgreSQL checks confirmed one draft rather than duplicates, an unchanged live story during draft editing, and working-copy removal after successful publication. Production API checks confirmed formatted Word import, anonymous creation rejection, and unauthorized edit rejection. A regression scenario detected a real published original while excluding two identical private drafts. All four steps were checked at 320/390/768/1280px without horizontal overflow; six background/mode combinations and narrow editor extras were checked. No browser errors were observed. Disposable local QA account, stories, sessions, and test cover were cleaned up after verification.
+- **Delivery**: Local changes only. No schema migrations, production account changes, or real-payment implementation. Discovery Feed is next in the agreed order.
 
 ---
 
@@ -419,6 +434,7 @@ Complete and validate each step before advancing:
 
 | Date | Task ID | Update Description | Author |
 | :--- | :--- | :--- | :--- |
+| 2026-10-07 | `TASK-PAGE-05` | Completed the stepped Author Studio, chapter manager/focus mode, access presets, save integrity fixes, and publication review. Corrected similarity scans to exclude private drafts; local production/account/responsive validation passed. Not yet pushed or deployed. | Codex |
 | 2026-10-06 | `TASK-AUTH-01` | Added Google signup/sign-in and email OTP activation for non-Google signups. Unverified accounts remain inactive with server-enforced restrictions; implementation and validation pending. Payments remain last. | Codex |
 | 2026-10-05 | `TASK-SYS-01` to `04` | Editorial Typography (Newsreader), Brand Identity, 3D Book Spines, Modern Gallery Shelves completed. | Antigravity |
 | 2026-10-05 | `TASK-SYS-05` | First foundation batch validated: semantic surfaces, shared brand/navigation, accessible accent buttons, scalable covers, and touch-friendly library details. Remaining component audit pending; payments last. | Codex |

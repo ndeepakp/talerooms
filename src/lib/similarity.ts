@@ -22,9 +22,9 @@ const OVERLAP_THRESHOLD = 0.5;
 const NO_EXCLUDE = "00000000-0000-0000-0000-000000000000";
 
 /**
- * Embed `combined` (title + body) and find existing stories that are too similar,
+ * Embed `combined` (title + body) and find published stories that are too similar,
  * by either AI meaning or literal wording. Pass `excludeId` when editing a story
- * so it doesn't match itself. Returns the embedding (for saving) and the matches.
+ * so it doesn't match itself. Private drafts and working copies are never results. Returns the embedding (for saving) and the matches.
  */
 export async function findSimilar(
   combined: string,
@@ -38,7 +38,8 @@ export async function findSimilar(
            1 - (s.embedding <=> ${vec}::vector) AS score
     FROM stories s
     JOIN "user" u ON u.id = s.author_id
-    WHERE s.embedding IS NOT NULL
+    WHERE s.status = 'published'
+      AND s.embedding IS NOT NULL
       AND s.id <> ${exclude}
       AND 1 - (s.embedding <=> ${vec}::vector) >= ${SIMILARITY_THRESHOLD}
     ORDER BY s.embedding <=> ${vec}::vector
@@ -53,7 +54,8 @@ export async function findSimilar(
            ) AS score
     FROM stories s
     JOIN "user" u ON u.id = s.author_id
-    WHERE s.id <> ${exclude}
+    WHERE s.status = 'published'
+      AND s.id <> ${exclude}
       AND GREATEST(
             word_similarity(${combined}, s.title || ' ' || s.body),
             word_similarity(s.title || ' ' || s.body, ${combined})

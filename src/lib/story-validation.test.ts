@@ -111,3 +111,30 @@ describe("validateStory", () => {
     expect(validateStory(ok.title, ok.summary, ok.chapters, ok.genres, true)).toBeNull();
   });
 });
+
+describe("draft manuscript preservation", () => {
+  it("retains empty chapter outlines and incomplete reader extras across draft saves", () => {
+    const chapters = [{ title: "A chapter to write", body: "<p></p>", prices: { always: 3 }, questions: [{ id: "q1", prompt: "Who arrived?", options: ["", ""], answer: 1 }], prompts: [""] }];
+    const draft = normalizeChapters(chapters, ["always"], { draft: true });
+    expect(draft).toHaveLength(1);
+    expect(draft[0].title).toBe("A chapter to write");
+    expect(draft[0].questions[0]).toEqual(chapters[0].questions[0]);
+    expect(draft[0].prompts).toEqual([""]);
+    expect(normalizeChapters(draft, ["always"])).toEqual([]);
+  });
+  it("still removes incomplete quizzes and blank prompts when publishing readable chapters", () => {
+    const draft = normalizeChapters([{ body: "<p>My opening.</p>", questions: [{ prompt: "", options: ["", ""], answer: 0 }], prompts: ["", "Talk about the opening"] }], [], { draft: true });
+    expect(draft[0].questions).toHaveLength(1);
+    const published = normalizeChapters(draft, []);
+    expect(published[0].questions).toEqual([]);
+    expect(published[0].prompts).toEqual(["Talk about the opening"]);
+  });
+  it("rejects malformed chapter and extra values without discarding a valid draft outline", () => {
+    const draft = normalizeChapters([null, "invalid", { title: "Outline", body: 2, questions: [null, { options: [1,"valid"], answer: 10 }], prompts: [null,"",2] }], [], { draft:true });
+    expect(draft).toHaveLength(1);
+    expect(draft[0].body).toBe("");
+    expect(draft[0].questions[0].options).toEqual(["valid"]);
+    expect(draft[0].questions[0].answer).toBe(0);
+    expect(draft[0].prompts).toEqual([""]);
+  });
+});

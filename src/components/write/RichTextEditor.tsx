@@ -1,6 +1,6 @@
 "use client";
 
-import { useReducer } from "react";
+import { useEffect, useReducer } from "react";
 import { useEditor, EditorContent, type Editor } from "@tiptap/react";
 import StarterKit from "@tiptap/starter-kit";
 import { TextStyle, FontFamily } from "@tiptap/extension-text-style";
@@ -51,7 +51,7 @@ function ToolbarButton({
         "flex h-8 min-w-8 items-center justify-center rounded px-2 text-sm transition-colors " +
         (active
           ? "bg-accent text-accent-fg"
-          : "text-zinc-700 hover:bg-zinc-200 dark:text-zinc-300 dark:hover:bg-zinc-800")
+          : "text-ink-soft hover:bg-surface-soft")
       }
     >
       {label}
@@ -61,7 +61,7 @@ function ToolbarButton({
 
 function Toolbar({ editor }: { editor: Editor }) {
   return (
-    <div className="flex flex-wrap items-center gap-1 border-b border-zinc-300 bg-zinc-100 px-2 py-1.5 dark:border-zinc-700 dark:bg-zinc-900">
+    <div className="flex flex-wrap items-center gap-1 border-b border-ui bg-surface-soft px-2 py-1.5">
       <ToolbarButton
         label="B"
         title="Bold"
@@ -87,7 +87,7 @@ function Toolbar({ editor }: { editor: Editor }) {
         onClick={() => editor.chain().focus().toggleStrike().run()}
       />
 
-      <span className="mx-1 h-5 w-px bg-zinc-300 dark:bg-zinc-700" />
+      <span className="mx-1 h-5 w-px bg-ui-strong" />
 
       <ToolbarButton
         label="“ ”"
@@ -108,7 +108,7 @@ function Toolbar({ editor }: { editor: Editor }) {
         onClick={() => editor.chain().focus().toggleOrderedList().run()}
       />
 
-      <span className="mx-1 h-5 w-px bg-zinc-300 dark:bg-zinc-700" />
+      <span className="mx-1 h-5 w-px bg-ui-strong" />
 
       <ToolbarButton
         label="⇤"
@@ -135,7 +135,7 @@ function Toolbar({ editor }: { editor: Editor }) {
         onClick={() => editor.chain().focus().setTextAlign("justify").run()}
       />
 
-      <span className="mx-1 h-5 w-px bg-zinc-300 dark:bg-zinc-700" />
+      <span className="mx-1 h-5 w-px bg-ui-strong" />
 
       <select
         title="Font"
@@ -152,7 +152,7 @@ function Toolbar({ editor }: { editor: Editor }) {
             editor.chain().focus().unsetFontFamily().run();
           }
         }}
-        className="h-8 rounded border border-zinc-300 bg-white px-2 text-sm text-zinc-700 dark:border-zinc-700 dark:bg-zinc-950 dark:text-zinc-300"
+        className="h-8 rounded border border-ui-strong bg-surface-raised px-2 text-sm text-ink-soft"
       >
         {FONTS.map((f) => (
           <option key={f.label} value={f.value}>
@@ -191,7 +191,7 @@ export function RichTextEditor({
     content: value || "",
     editorProps: {
       attributes: {
-        class: "richtext px-3 py-3 text-zinc-900 dark:text-zinc-100",
+        class: "richtext px-3 py-3 text-ink",
         "aria-label": placeholder ?? "Chapter text",
       },
     },
@@ -199,8 +199,14 @@ export function RichTextEditor({
     onTransaction: () => forceUpdate(),
   });
 
+  useEffect(() => {
+    if (editor && editor.getHTML() !== value) {
+      editor.commands.setContent(value || "", { emitUpdate: false });
+    }
+  }, [editor, value]);
+
   return (
-    <div className="richtext-editor overflow-hidden rounded-lg border border-zinc-300 bg-white focus-within:border-zinc-900 dark:border-zinc-700 dark:bg-zinc-950">
+    <div className="richtext-editor overflow-hidden rounded-lg border border-ui-strong bg-surface-raised focus-within:border-accent">
       {editor && <Toolbar editor={editor} />}
       <EditorContent editor={editor} />
     </div>

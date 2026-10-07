@@ -38,7 +38,7 @@ A comprehensive roadmap and tracking ledger for the visual, typographic, archite
 
 Complete and validate each step before advancing:
 
-Author Studio (`TASK-PAGE-05`) was completed and validated locally on 2026-10-07.
+Author Studio (`TASK-PAGE-05`) was completed, validated, and deployed on 2026-10-07.
 
 1. **Discovery Feed** — `TASK-PAGE-04`
 2. **Personal Library** — `TASK-PAGE-07`
@@ -297,7 +297,7 @@ Author Studio (`TASK-PAGE-05`) was completed and validated locally on 2026-10-07
 ---
 
 #### `TASK-PAGE-05`: Author Studio: Multi-Step Focused Writing Suite
-- **Status**: `[x] Completed` — Implemented and validated locally; not yet pushed or deployed.
+- **Status**: `[x] Completed` — Implemented, validated, pushed, and deployed on 2026-10-07.
 - **Priority**: High
 - **Files Affected**:
   - `src/app/write/StoryForm.tsx`
@@ -328,7 +328,7 @@ Author Studio (`TASK-PAGE-05`) was completed and validated locally on 2026-10-07
 - **Save integrity**: Draft status and explicit Save/Retry controls are visible. Dirty tracking includes cover and currency. Serialized requests prevent draft creation/publish races; edits made during an in-flight save trigger another autosave. Newly created drafts update the editor URL without remounting, so reload resumes the saved draft. Draft normalization retains empty chapter outlines and unfinished quizzes/prompts; publishing still drops empty/incomplete content. Accessible confirmation dialogs protect removal, chapter merging, and unsaved navigation (including shared-header links). Published edits stay in a private working copy until publication succeeds.
 - **Originality correction**: Production-flow testing found private working copies in similarity results. Both semantic and lexical scans now include published stories only, avoiding false matches against the author's own working draft and disclosure of private draft titles.
 - **Validation (2026-10-07)**: 56 tests, lint, TypeScript, diff checks, and production build passed. A local QA author exercised signup, draft creation/reload, empty outlines, stable chapter reordering, unfinished quiz persistence, short-story conversion preserving both chapter bodies, currency-only and cover-only autosave, cover upload, access presets, bundle/chapter pricing, focus/Escape, navigation warning/cancellation, failed-save recovery, initial publication, and working-copy publication. Local PostgreSQL checks confirmed one draft rather than duplicates, an unchanged live story during draft editing, and working-copy removal after successful publication. Production API checks confirmed formatted Word import, anonymous creation rejection, and unauthorized edit rejection. A regression scenario detected a real published original while excluding two identical private drafts. All four steps were checked at 320/390/768/1280px without horizontal overflow; six background/mode combinations and narrow editor extras were checked. No browser errors were observed. Disposable local QA account, stories, sessions, and test cover were cleaned up after verification.
-- **Delivery**: Local changes only. No schema migrations, production account changes, or real-payment implementation. Discovery Feed is next in the agreed order.
+- **Delivery (2026-10-07)**: App release `0536301` pushed to `origin/main` and deployed to https://talerooms.fly.dev. Fly image `deployment-01M4AYCEGGAD2JK0KNN43BXA2W`, machine version 29, health 1/1 passing. Live health confirms PostgreSQL/pgvector; landing page, book preview, and signed-out Author Studio redirect to login checked without browser errors. Authenticated author write flows were validated locally, not repeated on production. No schema migrations, production account changes, or real-payment implementation. Discovery Feed is next in the agreed order.
 
 ---
 
@@ -434,7 +434,7 @@ Author Studio (`TASK-PAGE-05`) was completed and validated locally on 2026-10-07
 
 | Date | Task ID | Update Description | Author |
 | :--- | :--- | :--- | :--- |
-| 2026-10-07 | `TASK-PAGE-05` | Completed the stepped Author Studio, chapter manager/focus mode, access presets, save integrity fixes, and publication review. Corrected similarity scans to exclude private drafts; local production/account/responsive validation passed. Not yet pushed or deployed. | Codex |
+| 2026-10-07 | `TASK-PAGE-05` | Completed the stepped Author Studio, chapter manager/focus mode, access presets, save integrity fixes, and publication review. Corrected similarity scans to exclude private drafts; local production/account/responsive validation passed. Pushed `0536301` and deployed to Fly (machine v29, health 1/1); live public-page/auth-gate smoke checks passed. | Codex |
 | 2026-10-06 | `TASK-AUTH-01` | Added Google signup/sign-in and email OTP activation for non-Google signups. Unverified accounts remain inactive with server-enforced restrictions; implementation and validation pending. Payments remain last. | Codex |
 | 2026-10-05 | `TASK-SYS-01` to `04` | Editorial Typography (Newsreader), Brand Identity, 3D Book Spines, Modern Gallery Shelves completed. | Antigravity |
 | 2026-10-05 | `TASK-SYS-05` | First foundation batch validated: semantic surfaces, shared brand/navigation, accessible accent buttons, scalable covers, and touch-friendly library details. Remaining component audit pending; payments last. | Codex |

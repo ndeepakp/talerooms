@@ -15,9 +15,7 @@ A comprehensive roadmap and tracking ledger for the visual, typographic, archite
 ## Quick Status Overview
 
 | Task ID | Feature / Module | Category | Priority | Status |
-| :--- | :--- | :--- | :--- |
-| 2026-10-08 | Mobile sanity follow-up | Rechecked public and signed-in page templates at 320px and 390px. Fixed unbroken draft-title/review text overflow and wrapping of featured-review author controls. Mobile menu and screenshots checked; scoped lint passed. Local changes pending push/deployment. | Codex |
-| 2026-10-07 | `TASK-ADMIN-01` | Added a pending admin console and observability dashboard for user/content management, signup/click/activity/payment analytics, operational health, server-enforced permissions, and audit logs. Scheduled strictly after payment implementation and validation; no implementation started. | Codex | :--- |
+| :--- | :--- | :--- | :--- | :--- |
 | [`TASK-SYS-01`](#task-sys-01-editorial-typography-stack) | Editorial Typography Stack (Serif + Sans pairing) | Design System | High | `[x] Completed` |
 | [`TASK-SYS-02`](#task-sys-02-brand-identity--logo-refinement) | Brand Identity & Header Overhaul | Design System | High | `[x] Completed` |
 | [`TASK-SYS-03`](#task-sys-03-modern-bookshelf-elevation--spine-shadows) | Modern Bookshelf Elevation & 3D Spine Depth | Design System | High | `[x] Completed` |
@@ -28,8 +26,8 @@ A comprehensive roadmap and tracking ledger for the visual, typographic, archite
 | [`TASK-PAGE-03`](#task-page-03-story-overview-page-split-layout) | Story Overview Page: Two-Column Editorial Layout | Story View | High | `[x] Completed` |
 | [`TASK-PAGE-04`](#task-page-04-discovery-feed--curated-shelves) | Discovery Feed & Dynamic Categorized Shelves | Feed | Medium | `[x] Completed` |
 | [`TASK-PAGE-05`](#task-page-05-author-studio-multi-step-focused-writing-suite) | Author Studio: Multi-Step Focused Writing Suite | Author Studio | High | `[x] Completed` |
-| [`TASK-PAGE-06`](#task-page-06-author-portfolio--profile-page) | Author Profile: Literary Portfolio & Memberships | Profiles | Medium | `[x] Completed locally` |
-| [`TASK-PAGE-07`](#task-page-07-library-bookshelf-redesign) | Personal Library: Gallery & Reading Progress | Library | Medium | `[x] Completed locally` |
+| [`TASK-PAGE-06`](#task-page-06-author-portfolio--profile-page) | Author Profile: Literary Portfolio & Memberships | Profiles | Medium | `[x] Completed and deployed` |
+| [`TASK-PAGE-07`](#task-page-07-library-bookshelf-redesign) | Personal Library: Gallery & Reading Progress | Library | Medium | `[x] Completed and deployed` |
 | [`TASK-AUTH-01`](#task-auth-01-google-signup--email-otp-verification) | Google Signup & Email OTP Verification / Account Activation | Authentication | High | `[ ] Pending` |
 | [`TASK-PAY-01`](#task-pay-01-stripe-payments-integration) | Stripe Platform: Checkout, Subscriptions, Connect & Webhooks | Payments | High | `[ ] Pending` |
 | [`TASK-ADMIN-01`](#task-admin-01-admin-console--observability-dashboard) | Admin Console & Observability Dashboard | Administration & Analytics | High | `[ ] Pending` |
@@ -47,7 +45,7 @@ Personal Library (`TASK-PAGE-07`) was implemented, validated, pushed and deploye
 
 The requested application-wide mobile layout audit was validated and deployed on 2026-10-08 in the same release. It covers all 27 page templates, including the reported profile overflow, navigation popovers, collections, resume/library cards, settings, studio extras and comment forms. See [mobile audit coverage and validation](docs/MOBILE_LAYOUT_AUDIT.md). This does not complete the broader author portfolio redesign or theme audit.
 
-Author Profiles (`TASK-PAGE-06`) were implemented and validated locally on 2026-10-08; review, push and deployment remain outstanding.
+Author Profiles (`TASK-PAGE-06`) and mobile sanity fixes were validated, pushed and deployed on 2026-10-08 in `6cbbf59` (Fly machine v37, health 1/1).
 
 1. **Visual Consistency & Theme Audit** — Finish `TASK-SYS-05`, including shared-component colors, surfaces, and light/dark styling.
 2. **Signup, User Verification & Account Testing** — `TASK-AUTH-01`; add Google signup/sign-in and email OTP activation, then complete outstanding end-to-end checks for bookmarks, reviews, community submissions, reading resume, and protected account flows against the activation rules.
@@ -362,7 +360,7 @@ Author Profiles (`TASK-PAGE-06`) were implemented and validated locally on 2026-
 ---
 
 #### `TASK-PAGE-06`: Author Portfolio & Profile Page
-- **Status**: `[x] Completed locally (2026-10-08)` — pending review, push and deployment.
+- **Status**: `[x] Completed and deployed (2026-10-08)` — `6cbbf59`, Fly machine v37, health 1/1.
 - **Priority**: Medium
 - **Files / Areas Affected**:
   - `src/app/[handle]/page.tsx` and the author works archive
@@ -383,7 +381,7 @@ Author Profiles (`TASK-PAGE-06`) were implemented and validated locally on 2026-
   - [x] Validate desktop/tablet/mobile, light/dark, keyboard tabs, filters, book previews and account privacy.
 - **Content integrity**: Biography/credentials/rights statements remain author-supplied through the existing About field; no credentials or adaptation availability are inferred. The banner uses the saved accent, not a private feed wallpaper. Membership checkout remains a demo, clearly labeled; no payment implementation added. Work cards with no published chapters say "Chapters coming soon".
 - **Validation (2026-10-08)**: Lint, TypeScript, 64 tests and the production build passed. Disposable local author/reader accounts verified All works/Serials/Short stories counts, keyboard tabs and repeated story-count navigation, anonymous membership login, Follow/unfollow count refresh, active/cancelled membership states without checkout, owner-only drafts/analytics and empty profile/setup states. Pin/unpin actions added/removed the published reader quote; private-story and self-authored notes remained excluded. Public profile HTML excluded private draft titles, private reviews and manuscript bodies. Profiles, archive, aliases and shared feed/library shelves fit 320/390/430/768/1280px; dark mode and safe narrow book opening were checked with no production-browser errors. Existing local author Maya Chen supplied the final design preview. No schema migration or production data changes.
-- **Preview / delivery**: Screenshots and QA notes are in `/private/tmp/talerooms-profile-qa/`. Work remains local for review; no commit, push or deployment performed.
+- **Preview / delivery**: App release `6cbbf59` pushed to `origin/main` and deployed to https://talerooms.fly.dev. Image `deployment-01M4DDFDHVTZFYJBFTHSJYV805`, machine `9080d707a932e8` v37, health 1/1 passing. Live database health, public author portfolio, opening book preview, public mobile pages and protected redirects passed without browser errors. No migrations or production account mutations. Local QA fixtures remain pending explicit cleanup approval. Screenshots: `/private/tmp/talerooms-profile-qa/` and `/private/tmp/talerooms-sanity/`.
 
 ---
 
@@ -507,7 +505,8 @@ Author Profiles (`TASK-PAGE-06`) were implemented and validated locally on 2026-
 
 | Date | Task ID | Update Description | Author |
 | :--- | :--- | :--- | :--- |
-| 2026-10-08 | `TASK-PAGE-06` | Implemented author portfolio banner, book gallery/format filters, membership card, selected reader quotes and owner-only drafts/dashboard. Narrow preview animation positioning fixed. Local lint, TypeScript, 64 tests, production build and account/viewport checks passed. Pending review, push and deployment. | Codex |
+| 2026-10-08 | Mobile sanity follow-up | Rechecked public and signed-in page templates at 320px and 390px. Fixed unbroken draft-title/review text overflow and wrapping of featured-review author controls. Mobile menu and screenshots checked; scoped lint and production build passed. Included in `6cbbf59`, deployed to Fly v37, health 1/1. | Codex |
+| 2026-10-08 | `TASK-PAGE-06` | Implemented author portfolio banner, book gallery/format filters, membership card, selected reader quotes and owner-only drafts/dashboard. Narrow preview animation positioning fixed. Local lint, TypeScript, 64 tests, production build and account/viewport checks passed. Pushed `6cbbf59`, deployed to Fly v37 with health 1/1; live profile/public mobile/redirect smoke checks passed. | Codex |
 | 2026-10-08 | `TASK-PAGE-07`, mobile layout audit | Pushed `5fe087d` and deployed to Fly (machine v36, health 1/1). Applied and verified production migration 0048 before rollout. Live DB health, public pages, protected-page redirects and mobile profile/story layouts passed. No production account mutations or purchases used for smoke testing. | Codex |
 | 2026-10-08 | Mobile layout audit | Fixed reported profile overflow and cramped mobile controls across navigation, collections, resume/library cards, settings, studio quiz/discussion inputs and post comments. Corrected reader date hydration. All 27 page templates audited; lint, TypeScript, 64 tests and production build passed. Full coverage in docs/MOBILE_LAYOUT_AUDIT.md. Local only; no push/deployment. | Codex |
 | 2026-10-07 | `TASK-ADMIN-01` | Added a pending admin console and observability dashboard for user/content management, signup/click/activity/payment analytics, operational health, server-enforced permissions, and audit logs. Scheduled strictly after payment implementation and validation; no implementation started. | Codex |

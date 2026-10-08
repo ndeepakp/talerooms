@@ -1,6 +1,7 @@
 import Link from "next/link";
 import { notFound } from "next/navigation";
 import type { Metadata } from "next";
+import type { CSSProperties } from "react";
 import { headers } from "next/headers";
 import { auth } from "@/lib/auth";
 import { sql } from "@/lib/db";
@@ -10,9 +11,14 @@ import { AnalyticsPanel } from "@/components/profile/AnalyticsPanel";
 import { SubscribeButton } from "@/components/profile/SubscribeButton";
 import { ReportButton } from "@/components/profile/ReportButton";
 import { PostsSection } from "@/components/post/PostsSection";
-import { SideTabs } from "@/components/feed/SideTabs";
+import { AuthorWorks } from "@/components/profile/AuthorWorks";
+import { ProfileContent } from "@/components/profile/ProfileContent";
+import { PublicNavigation, PublicFooter } from "@/components/layout/PublicNavigation";
+import { getAuthorWorks } from "@/lib/profile";
+import { ACCENTS } from "@/lib/appearance";
+import styles from "@/components/profile/Profile.module.css";
 import { getPosts } from "@/lib/posts";
-import { CURRENCY } from "@/lib/pricing";
+import { formatPrice } from "@/lib/pricing";
 
 export const dynamic = "force-dynamic";
 
@@ -62,10 +68,11 @@ export default async function ProfilePage({
       bio: string | null;
       about: string | null;
       subscription_price: number | null;
+      accent_color: string | null;
       image: string | null;
     }[]
   >`
-    SELECT id, name, username, bio, about, subscription_price, image
+    SELECT id, name, username, bio, about, subscription_price, accent_color, image
     FROM "user" WHERE lower(username) = lower(${handle})
   `;
   if (!user) notFound();
@@ -104,20 +111,22 @@ export default async function ProfilePage({
     SELECT COUNT(*)::int AS following FROM follows WHERE follower_id = ${id}
   `;
 
-  // Public, published stories — what every visitor sees.
-  const stories = await sql<
-    {
-      id: string;
-      slug: string | null;
-      title: string;
-      summary: string;
-      created_at: string;
-    }[]
-  >`
-    SELECT id, slug, title, summary, created_at
-    FROM stories
-    WHERE author_id = ${id} AND status = 'published'
-    ORDER BY created_at DESC
+  const stories = await getAuthorWorks(id);
+  const restrictedCount = stories.filter(story => !story.chapters_public && story.chapter_count > 0).length;
+  const authorAccent = ACCENTS.find(accent => accent.id === user.accent_color)?.swatch ?? "#047857";
+  const hasSidebar = isSelf || !!user.about?.trim() || (user.subscription_price ?? 0) > 0;
+
+  // Only author-pinned notes from published works become public testimonials.
+  const notes = await sql<{
+    id: string; stars: number; liked: string; reader: string | null;
+    story_title: string; story_id: string; slug: string | null;
+  }[]>`
+    SELECT r.id, r.stars::float AS stars, r.liked, u.name AS reader,
+      s.title AS story_title, s.id AS story_id, s.slug
+    FROM reviews r JOIN stories s ON s.id = r.story_id JOIN "user" u ON u.id = r.user_id
+    WHERE s.author_id = ${id} AND s.status = 'published' AND r.pinned
+      AND length(btrim(COALESCE(r.liked, ''))) > 0 AND r.user_id <> ${id}
+    ORDER BY r.updated_at DESC, r.id LIMIT 3
   `;
 
   // The author's own private drafts — shown only to them.
@@ -143,137 +152,64 @@ export default async function ProfilePage({
   // (liked/mine) false for logged-out visitors.
   const posts = await getPosts({ viewerId: userId ?? "", authorId: id });
 
-  return (
-    <div className="min-h-screen bg-[var(--page)] px-4 py-8 sm:px-6 sm:py-12">
-      <div className="mx-auto w-full max-w-5xl">
-        <div className="flex min-w-0 flex-col gap-5 sm:flex-row sm:items-start sm:justify-between">
-          <div className="min-w-0 flex-1">
-            <div className="flex min-w-0 items-start gap-4">
-              <Avatar src={user.image} name={user.name} size={64} />
-              <div className="min-w-0 flex-1">
-                <h1 className="break-words text-2xl font-bold tracking-tight text-zinc-900 sm:text-3xl dark:text-zinc-50">{user.name ?? "Unknown writer"}</h1>
-                {user.username && <p className="mt-1 break-words text-sm font-medium text-zinc-500">${user.username}</p>}
-              </div>
-            </div>
-            {user.bio && <p className="mt-4 whitespace-pre-wrap break-words text-zinc-700 dark:text-zinc-300">{user.bio}</p>}
-            <div className="mt-5 grid grid-cols-2 gap-x-4 gap-y-3 text-sm text-zinc-600 sm:flex sm:flex-wrap sm:gap-6 dark:text-zinc-400">
-              <Link href={`/${h}/stories`} className="hover:underline"><strong className="block text-zinc-900 sm:inline dark:text-zinc-100">{stories.length}</strong>{" "}stories</Link>
-              <Link href={`/${h}/connections?tab=followers`} className="hover:underline"><strong className="block text-zinc-900 sm:inline dark:text-zinc-100">{followers}</strong>{" "}followers</Link>
-              <Link href={`/${h}/connections?tab=following`} className="hover:underline"><strong className="block text-zinc-900 sm:inline dark:text-zinc-100">{following}</strong>{" "}following</Link>
-              <span><strong className="block text-zinc-900 sm:inline dark:text-zinc-100">{subscriberCount}</strong>{" "}{subscriberCount === 1 ? "subscriber" : "subscribers"}</span>
-            </div>
-            {isSelf && <p className="mt-3 text-sm text-zinc-500">
-              {user.subscription_price ? <>Subscription: <strong className="text-zinc-900 dark:text-zinc-100">{CURRENCY}{user.subscription_price}</strong> / 30 days</> : <>No subscription set — <Link href={`/${h}/edit`} className="underline">add one</Link> so readers can subscribe.</>}
-            </p>}
+  return <>
+    {!session && <PublicNavigation />}
+    <main className={styles.page} style={{ "--author-accent": authorAccent } as CSSProperties}>
+      <div className={styles.inner}>
+        <header className={styles.hero}>
+          <div className={styles.banner}>
+            <p>{stories.length > 0 ? "Original stories. A singular voice." : "Every voice has a place."}</p>
+            <svg viewBox="0 0 80 56" fill="none" stroke="currentColor" strokeWidth="1.4" aria-hidden="true"><path d="M40 12C28 4 14 6 4 10v36c12-4 26-4 36 4 10-8 24-8 36-4V10C64 6 52 4 40 12Z"/><path d="M40 12v38M13 18c6-2 13-1 20 2M13 25c6-2 13-1 20 2M47 20c7-3 14-4 20-2M47 27c7-3 14-4 20-2"/></svg>
           </div>
-          {isSelf ? <Link href={`/${h}/edit`} className="inline-flex min-h-11 shrink-0 self-start items-center rounded-full btn-primary px-5 text-sm font-medium transition-colors">Edit profile</Link> : <div className="flex min-w-0 flex-wrap items-start gap-2 sm:shrink-0 sm:flex-col sm:items-end">
-            <FollowButton userId={user.id} initialFollowing={isFollowing} isLoggedIn={!!session} />
-            {session && user.subscription_price ? <SubscribeButton authorId={user.id} price={user.subscription_price} initialDaysLeft={subDaysLeft} initialCancelled={subCancelled} /> : null}
-          </div>}
-        </div>
-
-        {isSelf && <AnalyticsPanel />}
-
-        {user.about && (
-          <section className="mt-10">
-            <h2 className="text-lg font-semibold text-zinc-900 dark:text-zinc-50">
-              About
-            </h2>
-            <p className="mt-3 whitespace-pre-wrap break-words leading-relaxed text-zinc-700 dark:text-zinc-300">
-              {user.about}
-            </p>
-          </section>
-        )}
-
-        <div className="mt-8">
-          <SideTabs
-            tabs={[
-              {
-                key: "stories",
-                label: "Stories",
-                icon: "📚",
-                content: (
-                  <>
-                    {stories.length === 0 ? (
-                      <p className="text-zinc-500">No stories yet.</p>
-                    ) : (
-                      <ul className="flex flex-col gap-4">
-                        {stories.map((story) => (
-                          <li key={story.id}>
-                            <Link
-                              href={`/stories/${story.slug ?? story.id}`}
-                              className="block rounded-2xl border border-zinc-200 bg-white p-5 transition-colors hover:border-zinc-400 dark:border-zinc-800 dark:bg-zinc-950 dark:hover:border-zinc-600"
-                            >
-                              <h3 className="text-lg font-semibold text-zinc-900 dark:text-zinc-50">
-                                {story.title}
-                              </h3>
-                              <p className="mt-2 line-clamp-4 text-zinc-700 dark:text-zinc-300">
-                                {story.summary}
-                              </p>
-                            </Link>
-                          </li>
-                        ))}
-                      </ul>
-                    )}
-
-                    {isSelf && drafts.length > 0 && (
-                      <>
-                        <h3 className="mt-8 text-base font-semibold text-zinc-900 dark:text-zinc-50">
-                          Drafts{" "}
-                          <span className="text-sm font-normal text-zinc-500">
-                            (only you can see these)
-                          </span>
-                        </h3>
-                        <ul className="mt-4 flex flex-col gap-4">
-                          {drafts.map((draft) => (
-                            <li key={draft.id}>
-                              <Link
-                                href={`/stories/${draft.id}/edit`}
-                                className="block rounded-2xl border border-dashed border-amber-300 bg-amber-50/50 p-5 transition-colors hover:border-amber-400 dark:border-amber-900 dark:bg-amber-950/20"
-                              >
-                                <div className="flex items-center gap-2">
-                                  <span className="rounded-full bg-amber-100 px-2 py-0.5 text-xs font-semibold text-amber-800 dark:bg-amber-950/50 dark:text-amber-300">
-                                    Draft
-                                  </span>
-                                  <h4 className="text-lg font-semibold text-zinc-900 dark:text-zinc-50">
-                                    {draft.title || "Untitled"}
-                                  </h4>
-                                </div>
-                                {draft.summary && (
-                                  <p className="mt-2 line-clamp-3 text-zinc-700 dark:text-zinc-300">
-                                    {draft.summary}
-                                  </p>
-                                )}
-                              </Link>
-                            </li>
-                          ))}
-                        </ul>
-                      </>
-                    )}
-                  </>
-                ),
-              },
-              {
-                key: "posts",
-                label: "Posts",
-                icon: "💬",
-                content: (
-                  <PostsSection
-                    posts={posts}
-                    emptyText={isSelf ? "You haven't posted yet." : "No posts yet."}
-                  />
-                ),
-              },
-            ]}
-          />
-        </div>
-
-        {session && !isSelf && (
-          <div className="mt-12 flex flex-col items-start gap-2 border-t border-zinc-200 pt-6 dark:border-zinc-800">
-            <ReportButton userId={user.id} />
+          <div className={styles.identity}>
+            <div className={styles.nameRow}>
+              <Avatar src={user.image} name={user.name} size={80} />
+              <div className={styles.name}><h1>{user.name ?? "A voice on Talerooms"}</h1>{user.username && <p className={styles.handle}>${user.username}</p>}</div>
+              <div className={styles.actions}>{isSelf ? <Link href={`/${h}/edit`} className={styles.edit}>Edit profile</Link> : <><FollowButton userId={id} initialFollowing={isFollowing} isLoggedIn={!!session} />{!!user.subscription_price && user.subscription_price > 0 && <a href="#membership" className={styles.edit}>Membership</a>}</>}</div>
+            </div>
+            {user.bio && <p className={styles.bio}>{user.bio}</p>}
+            <div className={styles.stats} aria-label="Profile statistics">
+              <a href="#works"><strong>{stories.length}</strong> {stories.length === 1 ? "story" : "stories"}</a>
+              <Link href={`/${h}/connections?tab=followers`}><strong>{followers}</strong> {followers === 1 ? "follower" : "followers"}</Link>
+              <Link href={`/${h}/connections?tab=following`}><strong>{following}</strong> following</Link>
+              <span><strong>{subscriberCount}</strong> {subscriberCount === 1 ? "subscriber" : "subscribers"}</span>
+            </div>
           </div>
-        )}
+        </header>
+
+        <div className={`${styles.layout} ${hasSidebar ? "" : styles.wide}`}>
+          <div>
+            <ProfileContent works={<AuthorWorks stories={stories} isSelf={isSelf} />} posts={<PostsSection posts={posts} emptyText={isSelf ? "You haven't posted yet." : "No posts yet."} />} />
+            {notes.length > 0 && <section className={styles.notes} aria-labelledby="reader-notes-heading">
+              <p className={styles.eyebrow}>Selected by the author</p><h2 id="reader-notes-heading">In the readers’ words.</h2>
+              <div className={styles.notesGrid}>{notes.map(note => <figure key={note.id} className={styles.quote}>
+                <p aria-label={`${note.stars} out of 5 stars`}>★ {note.stars.toFixed(1)}</p><blockquote>“{note.liked}”</blockquote>
+                <figcaption><p>{note.reader ?? "A reader"} · on <Link href={`/stories/${note.slug ?? note.story_id}`}>{note.story_title}</Link></p></figcaption>
+              </figure>)}</div>
+            </section>}
+            {isSelf && drafts.length > 0 && <section className={styles.drafts} aria-labelledby="private-drafts-heading">
+              <p className={styles.eyebrow}>Only you can see these</p><h2 id="private-drafts-heading">Still taking shape.</h2>
+              <ul>{drafts.map(draft => <li key={draft.id}><Link href={`/stories/${draft.id}/edit`}>{draft.title || "Untitled"}<span>Continue writing ↗</span></Link></li>)}</ul>
+            </section>}
+          </div>
+          {hasSidebar && <aside className={styles.sidebar} aria-label="About and membership">
+            {user.subscription_price && user.subscription_price > 0 ? <section id="membership" className={styles.membership} aria-labelledby="membership-heading">
+              <p className={styles.eyebrow}>The reader’s circle</p><h2 id="membership-heading">Stay close to the story.</h2>
+              <p className={styles.price}>{formatPrice(user.subscription_price)} <small>/ 30 days</small></p>
+              <ul className={styles.perks}>
+                <li>{restrictedCount > 0 ? `${restrictedCount} ${restrictedCount === 1 ? "story with" : "stories with"} members-only chapters` : "Members-only stories will appear here when published"}</li>
+                <li>Access to this author’s restricted chapters during your membership</li>
+              </ul>
+              <div className={styles.memberAction}>{isSelf ? <Link href={`/${h}/edit`} className="btn-primary">Manage membership</Link> : session ? <SubscribeButton authorId={id} price={user.subscription_price} initialDaysLeft={subDaysLeft} initialCancelled={subCancelled} /> : <Link href="/login" className="btn-primary">Log in to subscribe</Link>}</div>
+              <p className={styles.finePrint}>Membership checkout is currently a demo. No real payment is taken.</p>
+            </section> : isSelf ? <section className={styles.membership}><p className={styles.eyebrow}>Your reader’s circle</p><h2>Make room for your readers.</h2><p className={styles.finePrint}>Add a membership price in your profile when you’re ready to offer members-only chapters.</p><div className={`${styles.memberAction} mt-5`}><Link href={`/${h}/edit`} className="btn-primary">Set up membership</Link></div></section> : null}
+            {user.about && <section className={styles.about}><p className={styles.eyebrow}>Behind the words</p><h2>Meet this voice.</h2><p>{user.about}</p></section>}
+          </aside>}
+        </div>
+        {isSelf && <div className={styles.owner}><p className={styles.eyebrow}>Your author dashboard · only you</p><AnalyticsPanel /></div>}
+        {session && !isSelf && <div className={styles.report}><ReportButton userId={id} /></div>}
       </div>
-    </div>
-  );
+    </main>
+    {!session && <PublicFooter />}
+  </>;
 }

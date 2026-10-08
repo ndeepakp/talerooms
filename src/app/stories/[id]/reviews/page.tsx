@@ -54,14 +54,14 @@ export default async function ReviewsPage({
       <div className="mx-auto w-full max-w-2xl">
         <Link
           href={`/stories/${id}`}
-          className="text-sm font-medium text-zinc-500 hover:underline"
+          className="text-sm font-medium text-zinc-500 [overflow-wrap:anywhere] hover:underline"
         >
           {story.title}
         </Link>
         <h1 className="mt-1 text-2xl font-bold text-zinc-900 dark:text-zinc-50">
           Ratings &amp; reviews
         </h1>
-        <div className="mt-2 flex items-center gap-2 text-zinc-600 dark:text-zinc-300">
+        <div className="mt-2 flex flex-wrap items-center gap-2 text-zinc-600 dark:text-zinc-300">
           <StarRating value={agg.avg ?? 0} size={22} />
           <span className="text-lg font-semibold">{(agg.avg ?? 0).toFixed(1)}</span>
           <span className="text-zinc-400">
@@ -76,10 +76,10 @@ export default async function ReviewsPage({
             {reviews.map((r) => (
               <li
                 key={r.id}
-                className="rounded-xl border border-zinc-200 bg-white p-4 dark:border-zinc-800 dark:bg-zinc-950"
+                className="rounded-xl border border-zinc-200 bg-white p-4 [overflow-wrap:anywhere] dark:border-zinc-800 dark:bg-zinc-950"
               >
-                <div className="flex items-center justify-between gap-3">
-                  <div className="flex items-center gap-3">
+                <div className="flex flex-wrap items-center justify-between gap-3">
+                  <div className="flex min-w-0 items-center gap-3">
                     <Avatar src={r.image} name={r.author} size={36} />
                     <div className="min-w-0">
                       <Link

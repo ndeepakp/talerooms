@@ -519,10 +519,10 @@ export default async function StoryPage({
               {reviews.map((r) => (
                 <li
                   key={r.id}
-                  className="rounded-xl border border-ui bg-surface-raised p-4  "
+                  className="rounded-xl border border-ui bg-surface-raised p-4 [overflow-wrap:anywhere]"
                 >
-                  <div className="flex items-center justify-between gap-3">
-                    <div className="flex items-center gap-3">
+                  <div className="flex flex-wrap items-center justify-between gap-3">
+                    <div className="flex min-w-0 items-center gap-3">
                       <Avatar src={r.image} name={r.author} size={36} />
                       <div className="min-w-0">
                         <p className="text-sm font-medium text-ink">
@@ -536,7 +536,7 @@ export default async function StoryPage({
                         <StarRating value={r.stars} size={14} />
                       </div>
                     </div>
-                    <div className="flex shrink-0 items-center gap-2">
+                    <div className="flex max-w-full flex-wrap items-center gap-2">
                       {r.pinned && (
                         <span className="rounded-full bg-amber-100 px-2 py-0.5 text-xs font-medium text-amber-700 dark:bg-amber-950/40 dark:text-amber-300">
                           📌 Featured by author

@@ -16,6 +16,7 @@ A comprehensive roadmap and tracking ledger for the visual, typographic, archite
 
 | Task ID | Feature / Module | Category | Priority | Status |
 | :--- | :--- | :--- | :--- |
+| 2026-10-08 | Mobile sanity follow-up | Rechecked public and signed-in page templates at 320px and 390px. Fixed unbroken draft-title/review text overflow and wrapping of featured-review author controls. Mobile menu and screenshots checked; scoped lint passed. Local changes pending push/deployment. | Codex |
 | 2026-10-07 | `TASK-ADMIN-01` | Added a pending admin console and observability dashboard for user/content management, signup/click/activity/payment analytics, operational health, server-enforced permissions, and audit logs. Scheduled strictly after payment implementation and validation; no implementation started. | Codex | :--- |
 | [`TASK-SYS-01`](#task-sys-01-editorial-typography-stack) | Editorial Typography Stack (Serif + Sans pairing) | Design System | High | `[x] Completed` |
 | [`TASK-SYS-02`](#task-sys-02-brand-identity--logo-refinement) | Brand Identity & Header Overhaul | Design System | High | `[x] Completed` |
@@ -27,7 +28,7 @@ A comprehensive roadmap and tracking ledger for the visual, typographic, archite
 | [`TASK-PAGE-03`](#task-page-03-story-overview-page-split-layout) | Story Overview Page: Two-Column Editorial Layout | Story View | High | `[x] Completed` |
 | [`TASK-PAGE-04`](#task-page-04-discovery-feed--curated-shelves) | Discovery Feed & Dynamic Categorized Shelves | Feed | Medium | `[x] Completed` |
 | [`TASK-PAGE-05`](#task-page-05-author-studio-multi-step-focused-writing-suite) | Author Studio: Multi-Step Focused Writing Suite | Author Studio | High | `[x] Completed` |
-| [`TASK-PAGE-06`](#task-page-06-author-portfolio--profile-page) | Author Profile: Literary Portfolio & Memberships | Profiles | Medium | `[ ] Pending` |
+| [`TASK-PAGE-06`](#task-page-06-author-portfolio--profile-page) | Author Profile: Literary Portfolio & Memberships | Profiles | Medium | `[x] Completed locally` |
 | [`TASK-PAGE-07`](#task-page-07-library-bookshelf-redesign) | Personal Library: Gallery & Reading Progress | Library | Medium | `[x] Completed locally` |
 | [`TASK-AUTH-01`](#task-auth-01-google-signup--email-otp-verification) | Google Signup & Email OTP Verification / Account Activation | Authentication | High | `[ ] Pending` |
 | [`TASK-PAY-01`](#task-pay-01-stripe-payments-integration) | Stripe Platform: Checkout, Subscriptions, Connect & Webhooks | Payments | High | `[ ] Pending` |
@@ -46,11 +47,12 @@ Personal Library (`TASK-PAGE-07`) was implemented, validated, pushed and deploye
 
 The requested application-wide mobile layout audit was validated and deployed on 2026-10-08 in the same release. It covers all 27 page templates, including the reported profile overflow, navigation popovers, collections, resume/library cards, settings, studio extras and comment forms. See [mobile audit coverage and validation](docs/MOBILE_LAYOUT_AUDIT.md). This does not complete the broader author portfolio redesign or theme audit.
 
-1. **Author Profiles** — `TASK-PAGE-06`
-2. **Visual Consistency & Theme Audit** — Finish `TASK-SYS-05`, including shared-component colors, surfaces, and light/dark styling.
-3. **Signup, User Verification & Account Testing** — `TASK-AUTH-01`; add Google signup/sign-in and email OTP activation, then complete outstanding end-to-end checks for bookmarks, reviews, community submissions, reading resume, and protected account flows against the activation rules.
-4. **Payments** — `TASK-PAY-01`; complete and validate before starting administration.
-5. **Admin Console & Observability Dashboard** — `TASK-ADMIN-01`; user management, content moderation, product analytics, and operational visibility. Start only after the payments task is completed and validated.
+Author Profiles (`TASK-PAGE-06`) were implemented and validated locally on 2026-10-08; review, push and deployment remain outstanding.
+
+1. **Visual Consistency & Theme Audit** — Finish `TASK-SYS-05`, including shared-component colors, surfaces, and light/dark styling.
+2. **Signup, User Verification & Account Testing** — `TASK-AUTH-01`; add Google signup/sign-in and email OTP activation, then complete outstanding end-to-end checks for bookmarks, reviews, community submissions, reading resume, and protected account flows against the activation rules.
+3. **Payments** — `TASK-PAY-01`; complete and validate before starting administration.
+4. **Admin Console & Observability Dashboard** — `TASK-ADMIN-01`; user management, content moderation, product analytics, and operational visibility. Start only after the payments task is completed and validated.
 
 ---
 
@@ -360,22 +362,28 @@ The requested application-wide mobile layout audit was validated and deployed on
 ---
 
 #### `TASK-PAGE-06`: Author Portfolio & Profile Page
-- **Status**: `[ ] Pending`
+- **Status**: `[x] Completed locally (2026-10-08)` — pending review, push and deployment.
 - **Priority**: Medium
-- **Files Affected**:
-  - `src/app/[handle]/page.tsx`
-  - `src/app/users/[id]/page.tsx`
-  - `src/components/profile/AnalyticsPanel.tsx`
+- **Files / Areas Affected**:
+  - `src/app/[handle]/page.tsx` and the author works archive
+  - `AuthorWorks`, `ProfileContent`, `Profile.module.css`, shared book previews
+  - Public bibliography query in `src/lib/profile.ts`; membership action touch targets
 - **Objectives**:
-  - Transform author profiles into an author portfolio:
-    - Elegant profile banner and bio section with author credentials and IP status (e.g., *"Available for adaptation"*).
-    - Clear Author Subscription Card with subscriber perks and instant join action.
-    - Filterable bibliography (All Works, Serials, Short Stories).
-    - Reader testimonials and pinned top reviews.
+  - Give every profile a distinctive editorial banner, author identity, biography and clear Follow/Membership actions.
+  - Present published works as a book gallery with shared in-place book opening and All works / Serials / Short stories filters.
+  - Show a membership card with the actual price, restricted-story count and existing active/cancelled subscription states.
+  - Feature author-pinned reader notes from published stories; preserve private drafts and owner-only analytics.
 - **Checklist**:
-  - [ ] Design header banner with custom accent or wallpaper integration.
-  - [ ] Modernize the author subscription box with clear tier benefits.
-  - [ ] Group author works into a clean portfolio grid.
+  - [x] Integrate the author's saved accent into the banner while surfaces follow the viewer's appearance settings.
+  - [x] Separate membership information from the profile identity, including anonymous login and author management actions.
+  - [x] Build a responsive bibliography with existing cover art, format filters, genres, rating summaries and access labels.
+  - [x] Reuse the gallery in the author works archive; preserve legacy profile redirects and protected archive access.
+  - [x] Show selected reader notes only when the author has pinned a nonempty review on a published work.
+  - [x] Keep private drafts and analytics visible only to the owner, with writing/setup actions for empty profiles.
+  - [x] Validate desktop/tablet/mobile, light/dark, keyboard tabs, filters, book previews and account privacy.
+- **Content integrity**: Biography/credentials/rights statements remain author-supplied through the existing About field; no credentials or adaptation availability are inferred. The banner uses the saved accent, not a private feed wallpaper. Membership checkout remains a demo, clearly labeled; no payment implementation added. Work cards with no published chapters say "Chapters coming soon".
+- **Validation (2026-10-08)**: Lint, TypeScript, 64 tests and the production build passed. Disposable local author/reader accounts verified All works/Serials/Short stories counts, keyboard tabs and repeated story-count navigation, anonymous membership login, Follow/unfollow count refresh, active/cancelled membership states without checkout, owner-only drafts/analytics and empty profile/setup states. Pin/unpin actions added/removed the published reader quote; private-story and self-authored notes remained excluded. Public profile HTML excluded private draft titles, private reviews and manuscript bodies. Profiles, archive, aliases and shared feed/library shelves fit 320/390/430/768/1280px; dark mode and safe narrow book opening were checked with no production-browser errors. Existing local author Maya Chen supplied the final design preview. No schema migration or production data changes.
+- **Preview / delivery**: Screenshots and QA notes are in `/private/tmp/talerooms-profile-qa/`. Work remains local for review; no commit, push or deployment performed.
 
 ---
 
@@ -499,6 +507,7 @@ The requested application-wide mobile layout audit was validated and deployed on
 
 | Date | Task ID | Update Description | Author |
 | :--- | :--- | :--- | :--- |
+| 2026-10-08 | `TASK-PAGE-06` | Implemented author portfolio banner, book gallery/format filters, membership card, selected reader quotes and owner-only drafts/dashboard. Narrow preview animation positioning fixed. Local lint, TypeScript, 64 tests, production build and account/viewport checks passed. Pending review, push and deployment. | Codex |
 | 2026-10-08 | `TASK-PAGE-07`, mobile layout audit | Pushed `5fe087d` and deployed to Fly (machine v36, health 1/1). Applied and verified production migration 0048 before rollout. Live DB health, public pages, protected-page redirects and mobile profile/story layouts passed. No production account mutations or purchases used for smoke testing. | Codex |
 | 2026-10-08 | Mobile layout audit | Fixed reported profile overflow and cramped mobile controls across navigation, collections, resume/library cards, settings, studio quiz/discussion inputs and post comments. Corrected reader date hydration. All 27 page templates audited; lint, TypeScript, 64 tests and production build passed. Full coverage in docs/MOBILE_LAYOUT_AUDIT.md. Local only; no push/deployment. | Codex |
 | 2026-10-07 | `TASK-ADMIN-01` | Added a pending admin console and observability dashboard for user/content management, signup/click/activity/payment analytics, operational health, server-enforced permissions, and audit logs. Scheduled strictly after payment implementation and validation; no implementation started. | Codex |

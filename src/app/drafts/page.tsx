@@ -68,9 +68,9 @@ export default async function DraftsPage() {
                 key={d.id}
                 className="rounded-2xl border border-dashed border-amber-300 bg-amber-50/50 p-5 dark:border-amber-900 dark:bg-amber-950/20"
               >
-                <div className="flex items-start justify-between gap-3">
+                <div className="flex flex-col items-start justify-between gap-3 sm:flex-row">
                   <Link href={`/stories/${d.id}/edit`} className="min-w-0">
-                    <h2 className="text-lg font-semibold text-zinc-900 hover:underline dark:text-zinc-50">
+                    <h2 className="text-lg font-semibold text-zinc-900 [overflow-wrap:anywhere] hover:underline dark:text-zinc-50">
                       {d.title || "Untitled"}
                     </h2>
                   </Link>
@@ -84,7 +84,7 @@ export default async function DraftsPage() {
                   </p>
                 )}
                 {d.summary && (
-                  <Link href={`/stories/${d.id}/edit`} className="block">
+                  <Link href={`/stories/${d.id}/edit`} className="block [overflow-wrap:anywhere]">
                     <p className="mt-2 line-clamp-3 text-zinc-700 dark:text-zinc-300">
                       {d.summary}
                     </p>

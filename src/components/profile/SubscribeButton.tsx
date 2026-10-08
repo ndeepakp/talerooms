@@ -73,7 +73,7 @@ export function SubscribeButton({
               type="button"
               onClick={subscribe}
               disabled={loading}
-              className="text-xs text-zinc-500 underline hover:text-zinc-700 disabled:opacity-50 dark:hover:text-zinc-300"
+              className="min-h-11 px-1 text-xs text-zinc-500 underline hover:text-zinc-700 disabled:opacity-50 dark:hover:text-zinc-300"
             >
               Resume subscription
             </button>
@@ -87,7 +87,7 @@ export function SubscribeButton({
               type="button"
               onClick={unsubscribe}
               disabled={loading}
-              className="text-xs text-zinc-500 underline hover:text-red-600 disabled:opacity-50 dark:hover:text-red-400"
+              className="min-h-11 px-1 text-xs text-zinc-500 underline hover:text-red-600 disabled:opacity-50 dark:hover:text-red-400"
             >
               Unsubscribe
             </button>

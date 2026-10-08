@@ -42,9 +42,9 @@ Complete and validate each step before advancing:
 
 Author Studio (`TASK-PAGE-05`) was completed, validated, and deployed on 2026-10-07. Discovery Feed (`TASK-PAGE-04`) was completed, validated, pushed, and deployed the same day.
 
-Personal Library (`TASK-PAGE-07`) was implemented and validated locally on 2026-10-08; review/push/deployment remain outstanding. Apply `db/0048_library_progress.sql` before deploying its app changes.
+Personal Library (`TASK-PAGE-07`) was implemented, validated, pushed and deployed on 2026-10-08 in `5fe087d` (Fly machine v36, health 1/1). Migration `db/0048_library_progress.sql` was applied and verified on production before rollout.
 
-The requested application-wide mobile layout audit was implemented locally on 2026-10-08 before push/deployment. It covers all 27 page templates, including the reported profile overflow, navigation popovers, collections, resume/library cards, settings, studio extras and comment forms. See [mobile audit coverage and validation](docs/MOBILE_LAYOUT_AUDIT.md). This does not complete the broader author portfolio redesign or theme audit.
+The requested application-wide mobile layout audit was validated and deployed on 2026-10-08 in the same release. It covers all 27 page templates, including the reported profile overflow, navigation popovers, collections, resume/library cards, settings, studio extras and comment forms. See [mobile audit coverage and validation](docs/MOBILE_LAYOUT_AUDIT.md). This does not complete the broader author portfolio redesign or theme audit.
 
 1. **Author Profiles** — `TASK-PAGE-06`
 2. **Visual Consistency & Theme Audit** — Finish `TASK-SYS-05`, including shared-component colors, surfaces, and light/dark styling.
@@ -380,7 +380,7 @@ The requested application-wide mobile layout audit was implemented locally on 20
 ---
 
 #### `TASK-PAGE-07`: Personal Library Bookshelf Redesign
-- **Status**: `[x] Completed locally (2026-10-08)` — pending review, push and deployment.
+- **Status**: `[x] Completed and deployed (2026-10-08)` — `5fe087d`, Fly machine v36, health 1/1.
 - **Priority**: Medium
 - **Files / Areas Affected**:
   - `src/app/library/page.tsx`, `src/components/story/LibraryShelf.tsx` and its CSS module
@@ -403,7 +403,7 @@ The requested application-wide mobile layout audit was implemented locally on 20
 - **Progress definition**: Percentages describe the saved position, with chapters weighted equally and page position within the bookmarked chapter. They do not claim words consumed or infer completion from opening the last page. Old bookmarks fall back to chapter position until resumed; 100% requires explicit completion.
 - **Purchase scope**: Uses existing positive-amount access grants (payments are still mocked). Includes expired access with a clear label; free grants are not purchases. Library metadata never grants reading access, and chapter bodies are excluded from its server/client payload.
 - **Validation (2026-10-08)**: Lint, TypeScript, 64 tests and the production build passed. Disposable local readers verified completion persistence/reversal, reader ownership, draft/unopened/own-story rejection, new-chapter handling, collection isolation, active/expired access, search/no-match recovery, empty states, anonymous redirect, saved chapter 2/page 2 restoration, keyboard book opening/Escape, and light/dark responsiveness at 320/390/768/1280px without horizontal overflow or production-browser errors.
-- **Delivery requirement**: Additive migration `0048` was applied to the local database only. Apply it to production before releasing the code. Existing bookmarks remain intact. Disposable local fixture accounts and their test-owned records were removed after validation. No live payments or admin functionality implemented.
+- **Delivery**: Additive migration `0048` was applied and its two integer columns verified on production before release. Existing bookmarks remain intact. Disposable local fixture accounts and their test-owned records were removed after validation. GitHub push and Fly deployment completed; live database health, public pages, protected-page redirects and mobile profile/story layout checks passed with no browser console errors. No live payments or admin functionality implemented.
 
 ---
 
@@ -499,6 +499,7 @@ The requested application-wide mobile layout audit was implemented locally on 20
 
 | Date | Task ID | Update Description | Author |
 | :--- | :--- | :--- | :--- |
+| 2026-10-08 | `TASK-PAGE-07`, mobile layout audit | Pushed `5fe087d` and deployed to Fly (machine v36, health 1/1). Applied and verified production migration 0048 before rollout. Live DB health, public pages, protected-page redirects and mobile profile/story layouts passed. No production account mutations or purchases used for smoke testing. | Codex |
 | 2026-10-08 | Mobile layout audit | Fixed reported profile overflow and cramped mobile controls across navigation, collections, resume/library cards, settings, studio quiz/discussion inputs and post comments. Corrected reader date hydration. All 27 page templates audited; lint, TypeScript, 64 tests and production build passed. Full coverage in docs/MOBILE_LAYOUT_AUDIT.md. Local only; no push/deployment. | Codex |
 | 2026-10-07 | `TASK-ADMIN-01` | Added a pending admin console and observability dashboard for user/content management, signup/click/activity/payment analytics, operational health, server-enforced permissions, and audit logs. Scheduled strictly after payment implementation and validation; no implementation started. | Codex |
 | 2026-10-07 | `TASK-PAGE-04` | Completed categorized discovery shelves, genre filters, saved-page resume ribbon, and real weekly activity/streaks. Fixed shelf preview clipping and post-date/theme hydration issues found during validation. 60 tests, lint, TypeScript, production build, and local account/browser/responsive checks passed. Pushed and deployed through `72e7380` (Fly v33, health 1/1), including the approved line break, spacing, and heading/filter order. | Codex |

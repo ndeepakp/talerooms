@@ -1,6 +1,6 @@
 # Mobile layout audit — 2026-10-08
 
-Status: implemented and validated locally. Not pushed or deployed.
+Status: validated, pushed and deployed on 2026-10-08. App commit `5fe087d`; Fly machine v36, health 1/1.
 
 ## Scope and method
 
@@ -51,4 +51,6 @@ Local proof images and route measurements are in `/private/tmp/talerooms-mobile-
 
 These are browser viewport checks, not physical iPhone/Android tests. Native virtual-keyboard behavior, Safari-specific rendering and device safe-area behavior still need a real-device smoke check. Payments and external notification delivery were outside this audit.
 
-Keep the broader author portfolio redesign and theme audit pending. The earlier Personal Library change also requires `db/0048_library_progress.sql` on production before its future app deployment.
+Keep the broader author portfolio redesign and theme audit pending. Personal Library migration `db/0048_library_progress.sql` was applied and verified on production before this rollout.
+
+Live smoke checks on `https://talerooms.fly.dev/` passed: PostgreSQL/pgvector health, public landing/About/login/signup, anonymous redirects for library/feed/settings, and 390px landing/story/profile layouts with no horizontal page overflow or browser console errors. Signed-in library behavior was validated locally; no production account records were changed for live smoke testing. The custom domain `talerooms.com` still serves its existing holding page and was not changed by this Fly deployment.

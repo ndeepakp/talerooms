@@ -18,9 +18,19 @@ export function SaveToCollection({ storyId }: { storyId: string }) {
     function onClick(e: MouseEvent) {
       if (ref.current && !ref.current.contains(e.target as Node)) setOpen(false);
     }
+    function onKey(e: KeyboardEvent) {
+      if (open && e.key === "Escape") {
+        setOpen(false);
+        ref.current?.querySelector("button")?.focus();
+      }
+    }
     document.addEventListener("mousedown", onClick);
-    return () => document.removeEventListener("mousedown", onClick);
-  }, []);
+    document.addEventListener("keydown", onKey);
+    return () => {
+      document.removeEventListener("mousedown", onClick);
+      document.removeEventListener("keydown", onKey);
+    };
+  }, [open]);
 
   async function load() {
     const res = await fetch(`/api/collections?storyId=${storyId}`, { cache: "no-store" });
@@ -79,14 +89,15 @@ export function SaveToCollection({ storyId }: { storyId: string }) {
       <button
         type="button"
         onClick={toggleOpen}
-        className="flex h-10 items-center gap-2 rounded-full border border-zinc-300 px-4 text-sm font-medium text-zinc-700 transition-colors hover:bg-zinc-100 dark:border-zinc-700 dark:text-zinc-300 dark:hover:bg-zinc-900"
+        aria-expanded={open}
+        className="flex h-11 items-center gap-2 rounded-full border border-zinc-300 px-4 text-sm font-medium text-zinc-700 transition-colors hover:bg-zinc-100 dark:border-zinc-700 dark:text-zinc-300 dark:hover:bg-zinc-900"
       >
         <span aria-hidden="true">＋</span>
         {loaded && savedCount > 0 ? `Saved (${savedCount})` : "Save to collection"}
       </button>
 
       {open && (
-        <div className="absolute right-0 z-50 mt-2 w-72 overflow-hidden rounded-xl border border-zinc-200 bg-white shadow-lg dark:border-zinc-800 dark:bg-zinc-950">
+        <div role="region" aria-label="Collection picker" className="fixed inset-x-4 bottom-4 z-50 max-h-[calc(100dvh-2rem)] overflow-y-auto rounded-xl border border-zinc-200 bg-white shadow-lg sm:absolute sm:inset-x-auto sm:bottom-auto sm:right-0 sm:mt-2 sm:w-72 dark:border-zinc-800 dark:bg-zinc-950">
           <div className="border-b border-zinc-100 px-4 py-2.5 text-sm font-semibold text-zinc-900 dark:border-zinc-800 dark:text-zinc-100">
             Save to collection
           </div>
@@ -104,7 +115,7 @@ export function SaveToCollection({ storyId }: { storyId: string }) {
                   <button
                     type="button"
                     onClick={() => toggle(c)}
-                    className="flex w-full items-center justify-between gap-2 px-4 py-2 text-left text-sm hover:bg-zinc-50 dark:hover:bg-zinc-900"
+                    className="flex min-h-11 w-full items-center justify-between gap-2 px-4 py-2 text-left text-sm hover:bg-zinc-50 dark:hover:bg-zinc-900"
                   >
                     <span className="min-w-0 flex-1 truncate text-zinc-800 dark:text-zinc-200">
                       {c.name}{" "}
@@ -126,13 +137,13 @@ export function SaveToCollection({ storyId }: { storyId: string }) {
               onKeyDown={(e) => e.key === "Enter" && createAndAdd()}
               placeholder="New collection…"
               maxLength={80}
-              className="h-9 flex-1 rounded-lg border border-zinc-300 bg-white px-2 text-sm text-zinc-900 outline-none focus:border-zinc-900 dark:border-zinc-700 dark:bg-zinc-950 dark:text-zinc-100"
+              className="h-11 min-w-0 flex-1 rounded-lg border border-zinc-300 bg-white px-2 text-sm text-zinc-900 outline-none focus:border-zinc-900 dark:border-zinc-700 dark:bg-zinc-950 dark:text-zinc-100"
             />
             <button
               type="button"
               onClick={createAndAdd}
               disabled={busy || !newName.trim()}
-              className="h-9 rounded-lg btn-primary px-3 text-sm font-medium disabled:opacity-50"
+              className="h-11 shrink-0 rounded-lg btn-primary px-3 text-sm font-medium disabled:opacity-50"
             >
               Add
             </button>

@@ -41,7 +41,7 @@ export function ContinueReading({ resume }: { resume: Resume }) {
       <div className={styles.resumeCover} aria-hidden="true"><BookCover title={resume.title} author={resume.author} coverUrl={resume.cover_url} coverStyle={resume.cover_style} className="h-full w-full"/></div>
       <div className={styles.resumeDetails}>
         <p className={styles.kicker}>Continue reading</p>
-        <h2>{resume.title}</h2>
+        <h2 title={resume.title}>{resume.title}</h2>
         <p className={styles.resumeMeta}>by {resume.author ?? 'Unknown'} · Chapter {position + 1} of {resume.chapter_count}</p>
         <div className={styles.progress} role="progressbar" aria-label="Chapter position in story" aria-valuemin={0} aria-valuemax={resume.chapter_count} aria-valuenow={position} aria-valuetext={`At chapter ${position + 1} of ${resume.chapter_count}`}>
           <div style={{width: `${progress}%`}} />

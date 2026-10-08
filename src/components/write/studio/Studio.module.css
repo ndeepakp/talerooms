@@ -83,7 +83,7 @@
 @media(max-width:640px) {
  .studio { padding-top:20px; } .top { align-items:start; flex-direction:column; gap:16px; } .actions { width:100%; justify-content:space-between; }
  .steps { gap:5px; margin-bottom:24px; } .step { flex-direction:column; gap:6px; padding:10px 4px; text-align:center; font-size:11px; border-radius:10px; }
- .manuscript { grid-template-columns:1fr; } .chapterRail { position:static; } .chapterList { display:grid; grid-template-columns:repeat(2,minmax(0,1fr)); max-height:260px; overflow:auto; }
+ .manuscript { grid-template-columns:1fr; } .chapterRail { position:static; } .chapterList { display:grid; grid-template-columns:minmax(0,1fr); max-height:320px; overflow:auto; }
  .editorPanel :global(.ProseMirror) { padding:18px 14px; font-size:18px; }
  .footer { align-items:start; flex-wrap:wrap; } .footer .actions { width:auto; } .panel { padding:20px; }
 }
@@ -91,3 +91,5 @@
 
 .dialog { position:fixed; inset:0; margin:auto; max-width:460px; width:calc(100% - 32px); border:1px solid var(--border); border-radius:20px; padding:28px; background:var(--surface-raised); color:var(--foreground); box-shadow:var(--card-shadow); }
 .dialog::backdrop { background:rgb(0 0 0 / 45%); backdrop-filter:blur(3px); }
+
+@media(max-width:640px) { .icon { min-height:44px; min-width:44px; }.dialog { max-height:calc(100dvh - 32px); overflow-y:auto; } }

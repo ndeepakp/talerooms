@@ -221,13 +221,13 @@ export function PostCard({ post }: { post: PostRow }) {
               }}
               maxLength={1000}
               placeholder="Write a comment…"
-              className="flex-1 rounded-full border border-zinc-300 bg-white px-3 py-1.5 text-sm text-zinc-900 outline-none focus:border-zinc-900 dark:border-zinc-700 dark:bg-zinc-950 dark:text-zinc-100"
+              className="min-h-11 min-w-0 flex-1 rounded-full border border-zinc-300 bg-white px-3 py-1.5 text-sm text-zinc-900 outline-none focus:border-zinc-900 dark:border-zinc-700 dark:bg-zinc-950 dark:text-zinc-100"
             />
             <button
               type="button"
               onClick={addComment}
               disabled={busy || !draft.trim()}
-              className="rounded-full btn-primary px-3 py-1.5 text-sm font-medium disabled:opacity-50"
+              className="min-h-11 shrink-0 rounded-full btn-primary px-3 py-1.5 text-sm font-medium disabled:opacity-50"
             >
               Send
             </button>

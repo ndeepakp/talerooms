@@ -15,7 +15,8 @@ A comprehensive roadmap and tracking ledger for the visual, typographic, archite
 ## Quick Status Overview
 
 | Task ID | Feature / Module | Category | Priority | Status |
-| :--- | :--- | :--- | :--- | :--- |
+| :--- | :--- | :--- | :--- |
+| 2026-10-07 | `TASK-ADMIN-01` | Added a pending admin console and observability dashboard for user/content management, signup/click/activity/payment analytics, operational health, server-enforced permissions, and audit logs. Scheduled strictly after payment implementation and validation; no implementation started. | Codex | :--- |
 | [`TASK-SYS-01`](#task-sys-01-editorial-typography-stack) | Editorial Typography Stack (Serif + Sans pairing) | Design System | High | `[x] Completed` |
 | [`TASK-SYS-02`](#task-sys-02-brand-identity--logo-refinement) | Brand Identity & Header Overhaul | Design System | High | `[x] Completed` |
 | [`TASK-SYS-03`](#task-sys-03-modern-bookshelf-elevation--spine-shadows) | Modern Bookshelf Elevation & 3D Spine Depth | Design System | High | `[x] Completed` |
@@ -27,9 +28,10 @@ A comprehensive roadmap and tracking ledger for the visual, typographic, archite
 | [`TASK-PAGE-04`](#task-page-04-discovery-feed--curated-shelves) | Discovery Feed & Dynamic Categorized Shelves | Feed | Medium | `[x] Completed` |
 | [`TASK-PAGE-05`](#task-page-05-author-studio-multi-step-focused-writing-suite) | Author Studio: Multi-Step Focused Writing Suite | Author Studio | High | `[x] Completed` |
 | [`TASK-PAGE-06`](#task-page-06-author-portfolio--profile-page) | Author Profile: Literary Portfolio & Memberships | Profiles | Medium | `[ ] Pending` |
-| [`TASK-PAGE-07`](#task-page-07-library-bookshelf-redesign) | Personal Library: Tactile Shelf & Reading Progress | Library | Medium | `[ ] Pending` |
+| [`TASK-PAGE-07`](#task-page-07-library-bookshelf-redesign) | Personal Library: Gallery & Reading Progress | Library | Medium | `[x] Completed locally` |
 | [`TASK-AUTH-01`](#task-auth-01-google-signup--email-otp-verification) | Google Signup & Email OTP Verification / Account Activation | Authentication | High | `[ ] Pending` |
 | [`TASK-PAY-01`](#task-pay-01-stripe-payments-integration) | Stripe Platform: Checkout, Subscriptions, Connect & Webhooks | Payments | High | `[ ] Pending` |
+| [`TASK-ADMIN-01`](#task-admin-01-admin-console--observability-dashboard) | Admin Console & Observability Dashboard | Administration & Analytics | High | `[ ] Pending` |
 
 
 ---
@@ -40,11 +42,15 @@ Complete and validate each step before advancing:
 
 Author Studio (`TASK-PAGE-05`) was completed, validated, and deployed on 2026-10-07. Discovery Feed (`TASK-PAGE-04`) was completed, validated, pushed, and deployed the same day.
 
-1. **Personal Library** — `TASK-PAGE-07`
-2. **Author Profiles** — `TASK-PAGE-06`
-3. **Visual Consistency & Theme Audit** — Finish `TASK-SYS-05`, including shared-component colors, surfaces, and light/dark styling.
-4. **Signup, User Verification & Account Testing** — `TASK-AUTH-01`; add Google signup/sign-in and email OTP activation, then complete outstanding end-to-end checks for bookmarks, reviews, community submissions, reading resume, and protected account flows against the activation rules.
-5. **Payments** — `TASK-PAY-01`; remains the final phase.
+Personal Library (`TASK-PAGE-07`) was implemented and validated locally on 2026-10-08; review/push/deployment remain outstanding. Apply `db/0048_library_progress.sql` before deploying its app changes.
+
+The requested application-wide mobile layout audit was implemented locally on 2026-10-08 before push/deployment. It covers all 27 page templates, including the reported profile overflow, navigation popovers, collections, resume/library cards, settings, studio extras and comment forms. See [mobile audit coverage and validation](docs/MOBILE_LAYOUT_AUDIT.md). This does not complete the broader author portfolio redesign or theme audit.
+
+1. **Author Profiles** — `TASK-PAGE-06`
+2. **Visual Consistency & Theme Audit** — Finish `TASK-SYS-05`, including shared-component colors, surfaces, and light/dark styling.
+3. **Signup, User Verification & Account Testing** — `TASK-AUTH-01`; add Google signup/sign-in and email OTP activation, then complete outstanding end-to-end checks for bookmarks, reviews, community submissions, reading resume, and protected account flows against the activation rules.
+4. **Payments** — `TASK-PAY-01`; complete and validate before starting administration.
+5. **Admin Console & Observability Dashboard** — `TASK-ADMIN-01`; user management, content moderation, product analytics, and operational visibility. Start only after the payments task is completed and validated.
 
 ---
 
@@ -183,7 +189,7 @@ Author Studio (`TASK-PAGE-05`) was completed, validated, and deployed on 2026-10
   - Keep **Start writing** and **Log in** easy to find; preserve the signed-in feed redirect.
   - Use a saturated blue opening, oversized mixed typography, lime actions, a peach book-jacket spotlight, and a structured shelf of real published stories. Support dark styling in the shelf and footer.
   - Keep the layout simple and responsive, with gentle hover movement that respects reduced-motion preferences.
-  - Keep monetization and future IP licensing out of the main promise until those experiences are available. Payments remain the final implementation phase.
+  - Keep monetization and future IP licensing out of the main promise until those experiences are available. Payments remain the final reader/author implementation phase, followed by the admin console.
 - **Checklist**:
   - [x] Rebuild the hero with the editorial headline, featured-story spotlight, and a distinct creator-ownership section.
   - [x] Connect browsing, signup, login, and About to existing routes.
@@ -374,21 +380,30 @@ Author Studio (`TASK-PAGE-05`) was completed, validated, and deployed on 2026-10
 ---
 
 #### `TASK-PAGE-07`: Personal Library Bookshelf Redesign
-- **Status**: `[ ] Pending`
+- **Status**: `[x] Completed locally (2026-10-08)` — pending review, push and deployment.
 - **Priority**: Medium
-- **Files Affected**:
-  - `src/app/library/page.tsx`
+- **Files / Areas Affected**:
+  - `src/app/library/page.tsx`, `src/components/story/LibraryShelf.tsx` and its CSS module
+  - `src/lib/library.ts`, library tests, shared `BookPreview`
+  - ChapterReader progress saving, progress/completion API handlers, feed resume query
+  - `db/0048_library_progress.sql`
 - **Objectives**:
-  - Redesign `/library` so users' saved and in-progress books feel like a personal digital collection:
-    - Display books with realistic dimensions and spine artwork.
-    - Hover card showing last read chapter, exact reading percentage, and new chapter notifications.
-    - Filter by *Currently Reading*, *Completed*, *Purchased*, and *Custom Collections*.
+  - Bring opened stories, saved collection books and existing paid-access stories into one personal gallery.
+  - Retain realistic cover proportions, spine styling and the shared in-place book-opening preview.
+  - Show saved chapter/page position, new-chapter badges, and reader-declared completion.
+  - Filter by All books, Reading, Finished, Purchased and Collections; search books/authors and select an owned collection.
 - **Checklist**:
-  - [ ] Remove legacy wood background and replace with modern gallery view.
-  - [ ] Add progress indicators and collection category tabs.
-  - [ ] Enhance empty-state graphics and call-to-action to discover stories.
-
-- **Related work completed (2026-10-06)**: LibraryShelf now uses the shared in-place book preview with public synopses, copy controls, and saved-chapter continuation links. Existing last-opened chapter labels and new-chapter badges are retained. Collection filters and broader progress/category work remain pending.
+  - [x] Replace the legacy shelf/wood wrapper with a responsive gallery using semantic appearance tokens.
+  - [x] Add reading-position indicators, filter counts, collection selection and search.
+  - [x] Add contextual empty states, clear-filter recovery and a discover-story call to action.
+  - [x] Continue from the saved page, without an explicit chapter query resetting pagination.
+  - [x] Add Mark as finished / Move to reading, with authenticated ownership checks and persistent status.
+  - [x] Return finished books to Reading when the author adds chapters; exclude finished books from feed resume.
+  - [x] Validate local desktop/tablet/mobile, light/dark, keyboard preview, status changes, filters and API isolation.
+- **Progress definition**: Percentages describe the saved position, with chapters weighted equally and page position within the bookmarked chapter. They do not claim words consumed or infer completion from opening the last page. Old bookmarks fall back to chapter position until resumed; 100% requires explicit completion.
+- **Purchase scope**: Uses existing positive-amount access grants (payments are still mocked). Includes expired access with a clear label; free grants are not purchases. Library metadata never grants reading access, and chapter bodies are excluded from its server/client payload.
+- **Validation (2026-10-08)**: Lint, TypeScript, 64 tests and the production build passed. Disposable local readers verified completion persistence/reversal, reader ownership, draft/unopened/own-story rejection, new-chapter handling, collection isolation, active/expired access, search/no-match recovery, empty states, anonymous redirect, saved chapter 2/page 2 restoration, keyboard book opening/Escape, and light/dark responsiveness at 320/390/768/1280px without horizontal overflow or production-browser errors.
+- **Delivery requirement**: Additive migration `0048` was applied to the local database only. Apply it to production before releasing the code. Existing bookmarks remain intact. Disposable local fixture accounts and their test-owned records were removed after validation. No live payments or admin functionality implemented.
 
 ---
 
@@ -428,7 +443,7 @@ Author Studio (`TASK-PAGE-05`) was completed, validated, and deployed on 2026-10
 
 #### `TASK-PAY-01`: Stripe Payments Integration
 - **Status**: `[ ] Pending`
-- **Priority**: High (Scheduled for final phase)
+- **Priority**: High (After signup/verification; before the admin console)
 - **Files Affected**:
   - `src/lib/pricing.ts`
   - `src/app/api/stories/[id]/purchase/route.ts`
@@ -451,10 +466,41 @@ Author Studio (`TASK-PAGE-05`) was completed, validated, and deployed on 2026-10
 
 ---
 
+### Administration & Observability
+
+#### `TASK-ADMIN-01`: Admin Console & Observability Dashboard
+- **Status**: `[ ] Pending` — Planning only; no implementation started.
+- **Priority**: High
+- **Execution dependency**: Start after `TASK-PAY-01` is completed and validated. Preserve the existing Library → Profiles → Visual Audit → Signup/Verification → Payments order.
+- **Planned Areas**:
+  - Protected `/admin` dashboard and user/content management screens.
+  - Server-authorized admin APIs and shared role/permission checks.
+  - Database migrations for admin roles, action audit records, and analytics events/aggregates.
+  - Existing `src/app/api/admin/reindex/route.ts` (currently a development-only helper); review administrative utilities before exposing any in production.
+- **Objectives**:
+  - **User management**: Search and paginate users; inspect signup date, verification/activation state, reader/author activity, and account status. Suspend/reactivate accounts with a reason and revoke sessions when appropriate. Keep account activation consistent with Google/OTP verification rules. Protect role changes from self-service escalation; use explicit authorized admin provisioning.
+  - **Content and platform control**: Review reported users, stories, reviews, and community posts; hide/restore inappropriate content and record moderation reasons. Define which platform settings admins may change, with validated values and reversible changes. Use confirmations for consequential actions and prefer suspension/hiding over permanent deletion.
+  - **Product analytics**: Show total users, new signups by day/week/month, verified versus inactive accounts, active readers/authors, story opens, and a defined inventory of clicks (e.g. story/author links, Read story, Resume chapter, genre selection, and Write a story). Include date filters, trends, and popular stories/genres. Distinguish total clicks, unique users/sessions, and story views; label definitions and timezones clearly.
+  - **Conversion and payment visibility**: Once payments exist, show signup → verification → reading/purchase conversion and aggregate purchases, subscriptions, revenue/refunds, and webhook failures. Use verified payment records rather than estimating revenue from click events; keep financial dashboards read-only initially.
+  - **Operational observability**: Surface app/database health, request errors/latency, failed background work and payment webhooks, plus relevant deployment/log links. Reuse existing health and hosting telemetry where available. Include actionable failure states rather than only cumulative counters.
+  - **Trustworthy data and admin access**: Enforce authorization on every admin page and API, not just navigation visibility. Record who changed what, when, and why in an audit trail. Minimize collected analytics data, avoid story bodies/secrets/payment credentials in events, define retention, and respect applicable consent preferences. Deduplicate retries and filter obvious bot/test traffic; validate aggregates against their underlying records.
+- **Checklist**:
+  - [ ] Define admin permissions, account-status semantics, allowed moderation/settings actions, and the initial admin provisioning process.
+  - [ ] Define the click-event inventory, unique-activity/conversion metrics, reporting timezone, privacy boundaries, and retention policy before collecting new analytics.
+  - [ ] Implement protected admin pages/APIs with server-enforced roles and audit logging.
+  - [ ] Build searchable user management and reversible content/report moderation flows.
+  - [ ] Add first-party event capture and trustworthy aggregation for signups, clicks, reading activity, and verified payment metrics.
+  - [ ] Build a responsive dashboard with date ranges, charts, useful empty/error states, and operational health links.
+  - [ ] Validate unauthorized access/role escalation, suspension and session behavior, moderation reversibility, audit records, event deduplication, metric accuracy, and dashboard desktop/mobile layouts before release.
+
+---
+
 ## Progress Log
 
 | Date | Task ID | Update Description | Author |
 | :--- | :--- | :--- | :--- |
+| 2026-10-08 | Mobile layout audit | Fixed reported profile overflow and cramped mobile controls across navigation, collections, resume/library cards, settings, studio quiz/discussion inputs and post comments. Corrected reader date hydration. All 27 page templates audited; lint, TypeScript, 64 tests and production build passed. Full coverage in docs/MOBILE_LAYOUT_AUDIT.md. Local only; no push/deployment. | Codex |
+| 2026-10-07 | `TASK-ADMIN-01` | Added a pending admin console and observability dashboard for user/content management, signup/click/activity/payment analytics, operational health, server-enforced permissions, and audit logs. Scheduled strictly after payment implementation and validation; no implementation started. | Codex |
 | 2026-10-07 | `TASK-PAGE-04` | Completed categorized discovery shelves, genre filters, saved-page resume ribbon, and real weekly activity/streaks. Fixed shelf preview clipping and post-date/theme hydration issues found during validation. 60 tests, lint, TypeScript, production build, and local account/browser/responsive checks passed. Pushed and deployed through `72e7380` (Fly v33, health 1/1), including the approved line break, spacing, and heading/filter order. | Codex |
 | 2026-10-07 | `TASK-PAGE-05` | Completed the stepped Author Studio, chapter manager/focus mode, access presets, save integrity fixes, and publication review. Corrected similarity scans to exclude private drafts; local production/account/responsive validation passed. Pushed `0536301` and deployed to Fly (machine v29, health 1/1); live public-page/auth-gate smoke checks passed. | Codex |
 | 2026-10-06 | `TASK-AUTH-01` | Added Google signup/sign-in and email OTP activation for non-Google signups. Unverified accounts remain inactive with server-enforced restrictions; implementation and validation pending. Payments remain last. | Codex |

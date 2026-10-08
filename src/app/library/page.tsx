@@ -11,29 +11,35 @@ export default async function LibraryPage() {
   if (!session) redirect("/login");
   const me = session.user.id;
 
-  // Everything the reader has opened (others' published stories), newest first.
-  // `has_new` is an unseen "new chapter" notification for that story — the same
-  // signal the serial loop emits when an author drops a chapter.
-  const stories = await sql<LibraryStory[]>`
-    SELECT
-      s.id, s.slug, s.title, s.summary,
-      u.name AS author, u.username AS author_handle,
-      s.cover_url, s.cover_style,
-      rp.chapter_index,
-      jsonb_array_length(s.chapters)::int AS chapter_count,
-      EXISTS (
-        SELECT 1 FROM notifications n
-        WHERE n.user_id = ${me} AND n.kind = 'new_chapter'
-          AND n.story_id = s.id AND NOT n.seen
-      ) AS has_new
-    FROM reading_progress rp
-    JOIN stories s ON s.id = rp.story_id
-    JOIN "user" u ON u.id = s.author_id
-    WHERE rp.user_id = ${me}
-      AND s.status = 'published'
-      AND s.author_id <> ${me}
-    ORDER BY rp.updated_at DESC
+  const collections = await sql<{ id: string; name: string }[]>`
+    SELECT id, name FROM collections WHERE user_id = ${me} ORDER BY created_at DESC
   `;
-
-  return <LibraryShelf stories={stories} />;
+  // Project public metadata only. Reading, paid access and collections are all
+  // scoped to this session; chapter bodies never cross the client boundary.
+  const stories = await sql<LibraryStory[]>`
+    SELECT s.id, s.slug, s.title, s.summary,
+      u.name AS author, u.username AS author_handle, s.cover_url, s.cover_style,
+      rp.chapter_index, rp.page_index, rp.page_count, rp.completed_chapter_count,
+      jsonb_array_length(s.chapters)::int AS chapter_count,
+      ARRAY(SELECT cs.collection_id::text FROM collection_stories cs
+        JOIN collections c ON c.id = cs.collection_id
+        WHERE cs.story_id = s.id AND c.user_id = ${me}) AS collection_ids,
+      EXISTS(SELECT 1 FROM access_grants g WHERE g.story_id = s.id
+        AND g.user_id = ${me} AND g.amount > 0) AS purchased,
+      EXISTS(SELECT 1 FROM access_grants g WHERE g.story_id = s.id
+        AND g.user_id = ${me} AND g.amount > 0
+        AND (g.expires_at IS NULL OR g.expires_at > now())) AS access_active,
+      (EXISTS(SELECT 1 FROM notifications n WHERE n.user_id = ${me}
+        AND n.kind = 'new_chapter' AND n.story_id = s.id AND NOT n.seen)
+        OR COALESCE(rp.completed_chapter_count < jsonb_array_length(s.chapters), false)) AS has_new
+    FROM stories s JOIN "user" u ON u.id = s.author_id
+    LEFT JOIN reading_progress rp ON rp.story_id = s.id AND rp.user_id = ${me}
+    WHERE s.status = 'published' AND s.author_id <> ${me}
+      AND (rp.user_id IS NOT NULL
+        OR EXISTS(SELECT 1 FROM access_grants g WHERE g.story_id = s.id AND g.user_id = ${me} AND g.amount > 0)
+        OR EXISTS(SELECT 1 FROM collection_stories cs JOIN collections c ON c.id = cs.collection_id
+          WHERE cs.story_id = s.id AND c.user_id = ${me}))
+    ORDER BY rp.updated_at DESC NULLS LAST, s.created_at DESC, s.id
+  `;
+  return <LibraryShelf stories={stories} collections={collections} />;
 }

@@ -62,9 +62,9 @@ export default async function CollectionPage({
   return (
     <div className="min-h-screen bg-[var(--page)] px-6 py-12">
       <div className="mx-auto w-full max-w-5xl">
-        <div className="flex items-start justify-between gap-4">
-          <div>
-            <h1 className="text-2xl font-bold text-zinc-900 dark:text-zinc-50">
+        <div className="flex min-w-0 flex-col items-start gap-3 sm:flex-row sm:justify-between sm:gap-4">
+          <div className="min-w-0">
+            <h1 className="break-words text-2xl font-bold text-zinc-900 dark:text-zinc-50">
               {collection.name}
             </h1>
             {!isOwner && (
@@ -94,10 +94,10 @@ export default async function CollectionPage({
                 <li key={s.id}>
                   <Link
                     href={`/stories/${s.id}`}
-                    className="flex items-center justify-between gap-3 rounded-2xl border border-zinc-200 bg-white p-5 transition-colors hover:border-zinc-400 dark:border-zinc-800 dark:bg-zinc-950 dark:hover:border-zinc-600"
+                    className="flex min-w-0 flex-col items-start gap-3 rounded-2xl sm:flex-row sm:items-center sm:justify-between border border-zinc-200 bg-white p-5 transition-colors hover:border-zinc-400 dark:border-zinc-800 dark:bg-zinc-950 dark:hover:border-zinc-600"
                   >
                     <div className="min-w-0">
-                      <h2 className="truncate text-lg font-semibold text-zinc-900 dark:text-zinc-50">
+                      <h2 className="break-words text-lg font-semibold text-zinc-900 dark:text-zinc-50">
                         {s.title}
                       </h2>
                       <p className="mt-1 text-sm text-zinc-500">

@@ -271,10 +271,10 @@ export function SettingsForm({
               )
             </span>
           </span>
-          <div className="flex items-stretch gap-3">
+          <div className="flex flex-col items-start gap-3 sm:flex-row sm:items-stretch">
             {/* Live preview of the selected finish. */}
             <ShelfPreview shelf={shelf} />
-            <div className="grid flex-1 grid-cols-2 gap-2 self-center">
+            <div className="grid w-full min-w-0 flex-1 grid-cols-2 gap-2 sm:w-auto sm:self-center">
               {SHELF_STYLES.map((s) => {
                 const active = shelf === s.id;
                 return (

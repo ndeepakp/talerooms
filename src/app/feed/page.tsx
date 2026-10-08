@@ -39,6 +39,7 @@ export default async function FeedPage() {
       AND s.status = 'published'
       AND s.author_id <> ${session.user.id}
       AND jsonb_array_length(s.chapters) > 0
+      AND (rp.completed_chapter_count IS NULL OR rp.completed_chapter_count < jsonb_array_length(s.chapters))
     ORDER BY rp.updated_at DESC
     LIMIT 1
   `;

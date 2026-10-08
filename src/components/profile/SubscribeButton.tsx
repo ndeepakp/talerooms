@@ -63,7 +63,7 @@ export function SubscribeButton({
 
   if (active) {
     return (
-      <div className="flex flex-col items-end gap-1">
+      <div className="flex max-w-full flex-col items-start gap-1 sm:items-end">
         {cancelled ? (
           <>
             <span className="rounded-full bg-amber-100 px-3 py-1 text-xs font-medium text-amber-700 dark:bg-amber-950/40 dark:text-amber-300">
@@ -102,7 +102,7 @@ export function SubscribeButton({
       type="button"
       onClick={subscribe}
       disabled={loading}
-      className="h-10 rounded-full btn-primary px-5 text-sm font-medium transition-colors disabled:opacity-50"
+      className="min-h-11 max-w-full rounded-full btn-primary px-5 text-sm font-medium transition-colors disabled:opacity-50"
     >
       Subscribe · {CURRENCY}
       {price}/30d

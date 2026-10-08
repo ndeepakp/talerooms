@@ -68,7 +68,12 @@ export function NotificationBell() {
   const badge = cleared ? 0 : unread;
 
   return (
-    <div className="relative" ref={ref}>
+    <div className="relative" ref={ref} onKeyDown={event => {
+      if (event.key === "Escape") {
+        setOpen(false);
+        ref.current?.querySelector<HTMLButtonElement>("button")?.focus();
+      }
+    }}>
       <button
         type="button"
         onClick={toggleOpen}
@@ -98,7 +103,7 @@ export function NotificationBell() {
       </button>
 
       {open && (
-        <div className="absolute right-0 z-50 mt-2 w-80 overflow-hidden rounded-xl border border-ui bg-surface-raised shadow-lg">
+        <div className="fixed inset-x-4 top-[68px] z-50 max-h-[calc(100dvh-84px)] overflow-y-auto rounded-xl sm:absolute sm:inset-x-auto sm:right-0 sm:top-full sm:mt-2 sm:w-80 border border-ui bg-surface-raised shadow-lg">
           <div className="flex items-center justify-between border-b border-ui px-4 py-2.5">
             <span className="text-sm font-semibold text-ink">
               Notifications
@@ -137,7 +142,7 @@ export function NotificationBell() {
                       (n.seen ? "bg-transparent" : "bg-accent")
                     }
                   />
-                  <p className="text-sm text-ink-soft">
+                  <p className="min-w-0 break-words text-sm text-ink-soft">
                     <NotificationMessage n={n} />
                   </p>
                 </li>

@@ -87,7 +87,7 @@ export function SearchBar({ initial = "" }: { initial?: string }) {
       </form>
 
       {open && q.trim() && (
-        <div className="absolute left-0 right-0 z-50 mt-2 max-h-96 overflow-auto rounded-xl border border-ui bg-surface-raised py-1 shadow-lg">
+        <div className="absolute left-0 right-0 z-50 mt-2 max-h-[min(24rem,calc(100dvh-144px))] overflow-auto rounded-xl border border-ui bg-surface-raised py-1 shadow-lg">
           {!hasResults ? (
             <p className="px-4 py-3 text-sm text-muted">No matches.</p>
           ) : (
@@ -131,7 +131,7 @@ export function SearchBar({ initial = "" }: { initial?: string }) {
             type="button"
             onMouseDown={(e) => e.preventDefault()}
             onClick={() => go(`/search?q=${encodeURIComponent(q.trim())}`)}
-            className="block w-full border-t border-ui px-4 py-2.5 text-left text-sm font-medium text-ink-soft hover:bg-surface-soft"
+            className="block min-h-11 w-full border-t border-ui px-4 py-2.5 text-left text-sm font-medium text-ink-soft hover:bg-surface-soft"
           >
             See all results for “{q.trim()}”
           </button>
@@ -164,7 +164,7 @@ function Row({
       type="button"
       onMouseDown={(e) => e.preventDefault()}
       onClick={onClick}
-      className="block w-full truncate px-4 py-2 text-left text-sm hover:bg-surface-soft"
+      className="block min-h-11 w-full truncate px-4 py-2 text-left text-sm hover:bg-surface-soft"
     >
       {children}
     </button>

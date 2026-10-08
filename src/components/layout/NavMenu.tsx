@@ -38,7 +38,7 @@ export function NavMenu({ profileHref }: { profileHref: string }) {
       </button>
 
       {open && (
-        <div className="absolute right-0 z-50 mt-2 w-44 overflow-hidden rounded-xl border border-ui bg-surface-raised py-1 shadow-lg">
+        <div className="absolute right-0 z-50 mt-2 w-44 max-h-[calc(100dvh-84px)] overflow-y-auto rounded-xl border border-ui bg-surface-raised py-1 shadow-lg">
           <Link href={profileHref} onClick={() => setOpen(false)} className="block px-4 py-2.5 text-sm text-ink-soft hover:bg-surface-soft">Profile</Link>
           <Link
             href="/library"

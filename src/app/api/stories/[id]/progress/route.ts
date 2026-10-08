@@ -14,18 +14,22 @@ export const POST = withErrors(async (
   if (!UUID_RE.test(id)) throw new ApiError(404, "Not found.");
 
   const session = await requireSession();
-  const { chapterIndex, pageIndex } = await req.json().catch(() => ({}));
-  if (!Number.isInteger(chapterIndex) || chapterIndex < 0) {
+  const { chapterIndex, pageIndex, pageCount } = (await req.json().catch(() => null)) ?? {};
+  if (!Number.isSafeInteger(chapterIndex) || chapterIndex < 0) {
     throw new ApiError(400, "Bad chapter.");
   }
   // Page within the chapter (auto page bookmark). Optional; defaults to 0.
   const page = Number.isInteger(pageIndex) && pageIndex >= 0 ? pageIndex : 0;
 
+  if (pageCount !== undefined && (!Number.isSafeInteger(pageCount) || pageCount < 1 || pageCount > 100000 || page >= pageCount)) {
+    throw new ApiError(400, "Bad page count.");
+  }
+  const count = pageCount ?? null;
   await sql`
-    INSERT INTO reading_progress (user_id, story_id, chapter_index, page_index)
-    VALUES (${session.user.id}, ${id}, ${chapterIndex}, ${page})
+    INSERT INTO reading_progress (user_id, story_id, chapter_index, page_index, page_count)
+    VALUES (${session.user.id}, ${id}, ${chapterIndex}, ${page}, ${count})
     ON CONFLICT (user_id, story_id) DO UPDATE
-      SET chapter_index = ${chapterIndex}, page_index = ${page}, updated_at = now()
+      SET chapter_index = ${chapterIndex}, page_index = ${page}, page_count = ${count}, updated_at = now()
   `;
 
   return NextResponse.json({ ok: true });

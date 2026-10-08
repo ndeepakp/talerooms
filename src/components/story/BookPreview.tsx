@@ -17,11 +17,12 @@ export type BookPreviewStory = {
   summary?: string | null;
 };
 
-export function BookPreview({ story, variant = "shelf", href: destination, readLabel = "Read this story" }: {
+export function BookPreview({ story, variant = "shelf", href: destination, readLabel = "Read this story", readingDetails }: {
   story: BookPreviewStory;
   variant?: "featured" | "shelf";
   href?: string;
   readLabel?: string;
+  readingDetails?: string;
 }) {
   const [open, setOpen] = useState(false);
   const pageId = useId();
@@ -94,6 +95,7 @@ export function BookPreview({ story, variant = "shelf", href: destination, readL
           <div id={pageId} className={styles.page} aria-hidden={!open}>
             <p className={styles.kicker}>A GLIMPSE</p>
             <p className={styles.synopsis}>{story.summary?.trim() || "Meet a new voice. Open this story to discover where the first chapter takes you."}</p>
+            {readingDetails && <p className={styles.readingDetails}>{readingDetails}</p>}
             <Link href={href} tabIndex={open ? 0 : -1} className={styles.readLink}>{readLabel}</Link>
             <span className={styles.pageNumber} aria-hidden="true">— 1 —</span>
           </div>

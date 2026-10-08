@@ -51,12 +51,12 @@ export default async function HandleCollectionsPage({
               <li key={c.id}>
                 <Link
                   href={`/${h}/collections/${c.id}`}
-                  className="flex items-center justify-between rounded-2xl border border-zinc-200 bg-white p-5 transition-colors hover:border-zinc-400 dark:border-zinc-800 dark:bg-zinc-950 dark:hover:border-zinc-600"
+                  className="flex items-center justify-between gap-4 rounded-2xl border border-zinc-200 bg-white p-5 transition-colors hover:border-zinc-400 dark:border-zinc-800 dark:bg-zinc-950 dark:hover:border-zinc-600"
                 >
                   <span className="font-semibold text-zinc-900 dark:text-zinc-50">
                     {c.name}
                   </span>
-                  <span className="text-sm text-zinc-500">
+                  <span className="shrink-0 whitespace-nowrap text-sm text-zinc-500">
                     {c.count} {c.count === 1 ? "story" : "stories"}
                   </span>
                 </Link>

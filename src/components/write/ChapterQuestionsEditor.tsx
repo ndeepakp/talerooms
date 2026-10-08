@@ -7,7 +7,7 @@ function qid(): string {
 }
 
 const inputCls =
-  "rounded-lg border border-ui-strong bg-surface-raised px-2 text-sm text-ink outline-none focus:border-accent";
+  "min-w-0 rounded-lg border border-ui-strong bg-surface-raised px-2 text-sm text-ink outline-none focus:border-accent";
 
 // Author editor for a chapter's graded quiz: multiple-choice questions, each
 // with 2–8 options and one marked correct.
@@ -70,7 +70,7 @@ export function ChapterQuestionsEditor({
               <button
                 type="button"
                 onClick={() => remove(i)}
-                className="ml-auto text-xs text-subtle hover:text-red-600 dark:hover:text-red-400"
+                className="ml-auto shrink-0 text-xs text-subtle hover:text-red-600 dark:hover:text-red-400"
               >
                 Remove
               </button>

@@ -187,21 +187,20 @@ export function ChapterReader({
   // content with none of the chapter chrome (no nav, no "Chapter 1" heading).
   const isShort = chapters.length === 1 && !chapters[0]?.title;
 
-  // Date this page was opened, stamped once, for the page footer.
-  const [readStamp] = useState(() =>
-    new Date().toLocaleDateString(undefined, {
-      year: "numeric",
-      month: "short",
-      day: "numeric",
-    }),
-  );
+  // Stamp after mount: the reader's locale/timezone can differ from the server.
+  const [readStamp, setReadStamp] = useState("");
 
   // Paginate long chapters. We only paginate after mount (DOMParser is
   // client-only); the first paint matches the server (one page) to avoid a
   // hydration mismatch.
   const [mounted, setMounted] = useState(false);
   useEffect(() => {
-    const raf = requestAnimationFrame(() => setMounted(true));
+    const raf = requestAnimationFrame(() => {
+      setMounted(true);
+      setReadStamp(new Date().toLocaleDateString(undefined, {
+        year: "numeric", month: "short", day: "numeric",
+      }));
+    });
     return () => cancelAnimationFrame(raf);
   }, []);
   // Only decode (and render) the body client-side after mount, so the chapter
@@ -241,11 +240,11 @@ export function ChapterReader({
       fetch(`/api/stories/${storyId}/progress`, {
         method: "POST",
         headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ chapterIndex: current, pageIndex: safePage }),
+        body: JSON.stringify({ chapterIndex: current, pageIndex: safePage, pageCount: pages.length }),
       }).catch(() => {});
     }, 400);
     return () => clearTimeout(t);
-  }, [mounted, progressReady, canInteract, storyId, current, safePage, chapter]);
+  }, [mounted, progressReady, canInteract, storyId, current, safePage, chapter, pages.length]);
 
   // Unwrap any existing highlight, then highlight + scroll to the `occ`-th (0-based)
   // match of `quote` within the currently-rendered page.
@@ -620,7 +619,7 @@ export function ChapterReader({
                       © {authorName} · Talerooms
                       {watermark && (
                         <span className="reader-muted">
-                          {" "}· {watermark} · {readStamp}
+                          {" "}· {watermark}{readStamp && <> · {readStamp}</>}
                         </span>
                       )}
                     </footer>

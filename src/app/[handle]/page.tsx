@@ -144,86 +144,32 @@ export default async function ProfilePage({
   const posts = await getPosts({ viewerId: userId ?? "", authorId: id });
 
   return (
-    <div className="min-h-screen bg-[var(--page)] px-6 py-12">
+    <div className="min-h-screen bg-[var(--page)] px-4 py-8 sm:px-6 sm:py-12">
       <div className="mx-auto w-full max-w-5xl">
-        <div className="flex items-start justify-between gap-4">
-          <div className="flex items-start gap-4">
-            <Avatar src={user.image} name={user.name} size={64} />
-            <div>
-            <h1 className="text-3xl font-bold tracking-tight text-zinc-900 dark:text-zinc-50">
-              {user.name ?? "Unknown writer"}
-            </h1>
-            {user.username && (
-              <p className="mt-1 text-sm font-medium text-zinc-500">${user.username}</p>
-            )}
-            {user.bio && (
-              <p className="mt-3 whitespace-pre-wrap text-zinc-700 dark:text-zinc-300">
-                {user.bio}
-              </p>
-            )}
-            <div className="mt-3 flex gap-6 text-sm text-zinc-600 dark:text-zinc-400">
-              <Link href={`/${h}/stories`} className="hover:underline">
-                <strong className="text-zinc-900 dark:text-zinc-100">{stories.length}</strong> stories
-              </Link>
-              <Link href={`/${h}/connections?tab=followers`} className="hover:underline">
-                <strong className="text-zinc-900 dark:text-zinc-100">{followers}</strong> followers
-              </Link>
-              <Link href={`/${h}/connections?tab=following`} className="hover:underline">
-                <strong className="text-zinc-900 dark:text-zinc-100">{following}</strong> following
-              </Link>
-              <span>
-                <strong className="text-zinc-900 dark:text-zinc-100">{subscriberCount}</strong>{" "}
-                {subscriberCount === 1 ? "subscriber" : "subscribers"}
-              </span>
+        <div className="flex min-w-0 flex-col gap-5 sm:flex-row sm:items-start sm:justify-between">
+          <div className="min-w-0 flex-1">
+            <div className="flex min-w-0 items-start gap-4">
+              <Avatar src={user.image} name={user.name} size={64} />
+              <div className="min-w-0 flex-1">
+                <h1 className="break-words text-2xl font-bold tracking-tight text-zinc-900 sm:text-3xl dark:text-zinc-50">{user.name ?? "Unknown writer"}</h1>
+                {user.username && <p className="mt-1 break-words text-sm font-medium text-zinc-500">${user.username}</p>}
+              </div>
             </div>
-            {isSelf && (
-              <p className="mt-2 text-sm text-zinc-500">
-                {user.subscription_price ? (
-                  <>
-                    Subscription:{" "}
-                    <strong className="text-zinc-900 dark:text-zinc-100">
-                      {CURRENCY}
-                      {user.subscription_price}
-                    </strong>{" "}
-                    / 30 days
-                  </>
-                ) : (
-                  <>
-                    No subscription set —{" "}
-                    <Link href={`/${h}/edit`} className="underline">
-                      add one
-                    </Link>{" "}
-                    so readers can subscribe.
-                  </>
-                )}
-              </p>
-            )}
+            {user.bio && <p className="mt-4 whitespace-pre-wrap break-words text-zinc-700 dark:text-zinc-300">{user.bio}</p>}
+            <div className="mt-5 grid grid-cols-2 gap-x-4 gap-y-3 text-sm text-zinc-600 sm:flex sm:flex-wrap sm:gap-6 dark:text-zinc-400">
+              <Link href={`/${h}/stories`} className="hover:underline"><strong className="block text-zinc-900 sm:inline dark:text-zinc-100">{stories.length}</strong>{" "}stories</Link>
+              <Link href={`/${h}/connections?tab=followers`} className="hover:underline"><strong className="block text-zinc-900 sm:inline dark:text-zinc-100">{followers}</strong>{" "}followers</Link>
+              <Link href={`/${h}/connections?tab=following`} className="hover:underline"><strong className="block text-zinc-900 sm:inline dark:text-zinc-100">{following}</strong>{" "}following</Link>
+              <span><strong className="block text-zinc-900 sm:inline dark:text-zinc-100">{subscriberCount}</strong>{" "}{subscriberCount === 1 ? "subscriber" : "subscribers"}</span>
             </div>
+            {isSelf && <p className="mt-3 text-sm text-zinc-500">
+              {user.subscription_price ? <>Subscription: <strong className="text-zinc-900 dark:text-zinc-100">{CURRENCY}{user.subscription_price}</strong> / 30 days</> : <>No subscription set — <Link href={`/${h}/edit`} className="underline">add one</Link> so readers can subscribe.</>}
+            </p>}
           </div>
-          {isSelf ? (
-            <Link
-              href={`/${h}/edit`}
-              className="flex h-11 shrink-0 items-center rounded-full btn-primary px-5 text-sm font-medium transition-colors"
-            >
-              Edit profile
-            </Link>
-          ) : (
-            <div className="flex shrink-0 flex-col items-end gap-2">
-              <FollowButton
-                userId={user.id}
-                initialFollowing={isFollowing}
-                isLoggedIn={!!session}
-              />
-              {session && user.subscription_price ? (
-                <SubscribeButton
-                  authorId={user.id}
-                  price={user.subscription_price}
-                  initialDaysLeft={subDaysLeft}
-                  initialCancelled={subCancelled}
-                />
-              ) : null}
-            </div>
-          )}
+          {isSelf ? <Link href={`/${h}/edit`} className="inline-flex min-h-11 shrink-0 self-start items-center rounded-full btn-primary px-5 text-sm font-medium transition-colors">Edit profile</Link> : <div className="flex min-w-0 flex-wrap items-start gap-2 sm:shrink-0 sm:flex-col sm:items-end">
+            <FollowButton userId={user.id} initialFollowing={isFollowing} isLoggedIn={!!session} />
+            {session && user.subscription_price ? <SubscribeButton authorId={user.id} price={user.subscription_price} initialDaysLeft={subDaysLeft} initialCancelled={subCancelled} /> : null}
+          </div>}
         </div>
 
         {isSelf && <AnalyticsPanel />}
@@ -233,7 +179,7 @@ export default async function ProfilePage({
             <h2 className="text-lg font-semibold text-zinc-900 dark:text-zinc-50">
               About
             </h2>
-            <p className="mt-3 whitespace-pre-wrap leading-relaxed text-zinc-700 dark:text-zinc-300">
+            <p className="mt-3 whitespace-pre-wrap break-words leading-relaxed text-zinc-700 dark:text-zinc-300">
               {user.about}
             </p>
           </section>

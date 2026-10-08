@@ -41,7 +41,7 @@ export function FollowButton({
       disabled={loading}
       aria-pressed={following}
       className={
-        "h-10 rounded-full px-5 text-sm font-medium transition-colors disabled:opacity-50 " +
+        "min-h-11 rounded-full px-5 text-sm font-medium transition-colors disabled:opacity-50 " +
         (following
           ? "border border-zinc-300 text-zinc-700 hover:bg-zinc-100 dark:border-zinc-700 dark:text-zinc-300 dark:hover:bg-zinc-900"
           : "btn-primary")

@@ -92,14 +92,14 @@ export function AnalyticsPanel() {
             active {data.subscribers === 1 ? "subscriber" : "subscribers"}
           </p>
         </div>
-        <div className="flex items-center gap-1.5">
+        <div className="flex flex-wrap items-center gap-1.5">
           {RANGES.map((r) => (
             <button
               key={r.days}
               type="button"
               onClick={() => setDays(r.days)}
               className={
-                "rounded-full border px-3 py-1 text-sm transition-colors " +
+                "min-h-11 whitespace-nowrap rounded-full border px-3 py-1 text-sm transition-colors " +
                 (days === r.days
                   ? "chip-active"
                   : "border-zinc-300 text-zinc-700 hover:bg-zinc-100 dark:border-zinc-700 dark:text-zinc-300 dark:hover:bg-zinc-900")
@@ -113,7 +113,7 @@ export function AnalyticsPanel() {
             onClick={() => setReload((r) => r + 1)}
             aria-label="Refresh"
             title="Refresh"
-            className="rounded-full border border-zinc-300 px-3 py-1 text-sm text-zinc-700 hover:bg-zinc-100 dark:border-zinc-700 dark:text-zinc-300 dark:hover:bg-zinc-900"
+            className="min-h-11 min-w-11 rounded-full border border-zinc-300 px-3 py-1 text-sm text-zinc-700 hover:bg-zinc-100 dark:border-zinc-700 dark:text-zinc-300 dark:hover:bg-zinc-900"
           >
             ↻
           </button>
@@ -165,7 +165,7 @@ export function AnalyticsPanel() {
               onClick={() => setExpanded(null)}
             >
               <div
-                className="w-full max-w-4xl rounded-2xl border border-zinc-200 bg-white p-6 shadow-xl dark:border-zinc-800 dark:bg-zinc-950"
+                className="max-h-[calc(100dvh-2rem)] w-full max-w-4xl overflow-y-auto rounded-2xl border border-zinc-200 bg-white p-6 shadow-xl dark:border-zinc-800 dark:bg-zinc-950"
                 onClick={(e) => e.stopPropagation()}
               >
                 <div className="flex items-baseline justify-between gap-4">
@@ -182,7 +182,7 @@ export function AnalyticsPanel() {
                     type="button"
                     onClick={() => setExpanded(null)}
                     aria-label="Close"
-                    className="rounded-full border border-zinc-300 px-3 py-1 text-sm text-zinc-700 hover:bg-zinc-100 dark:border-zinc-700 dark:text-zinc-300 dark:hover:bg-zinc-900"
+                    className="min-h-11 min-w-11 rounded-full border border-zinc-300 px-3 py-1 text-sm text-zinc-700 hover:bg-zinc-100 dark:border-zinc-700 dark:text-zinc-300 dark:hover:bg-zinc-900"
                   >
                     ✕
                   </button>

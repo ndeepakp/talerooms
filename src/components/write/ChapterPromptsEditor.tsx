@@ -3,7 +3,7 @@
 import { MAX_PROMPTS } from "@/lib/story-validation";
 
 const inputCls =
-  "h-9 flex-1 rounded-lg border border-ui-strong bg-surface-raised px-2 text-sm text-ink outline-none focus:border-accent";
+  "h-9 min-w-0 flex-1 rounded-lg border border-ui-strong bg-surface-raised px-2 text-sm text-ink outline-none focus:border-accent";
 
 // Author editor for a chapter's open discussion prompts. A reader's answer to a
 // prompt becomes a public post (handled at read time), so these are free-text.
@@ -47,7 +47,7 @@ export function ChapterPromptsEditor({
             <button
               type="button"
               onClick={() => remove(i)}
-              className="text-xs text-subtle hover:text-red-600"
+              className="shrink-0 text-xs text-subtle hover:text-red-600"
               aria-label="Remove prompt"
             >
               ✕

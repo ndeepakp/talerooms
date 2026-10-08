@@ -19,7 +19,7 @@ export function AppNavigation({ profileHref, user, notifications = <Notification
         <Link
           href={profileHref}
           aria-label="View profile"
-          className="order-3 shrink-0 rounded-full ring-ui-strong transition-shadow hover:ring-2"
+          className="order-3 flex min-h-11 min-w-11 shrink-0 items-center justify-center rounded-full ring-ui-strong transition-shadow hover:ring-2"
         >
           <Avatar src={user.image} name={user.name} size={34} />
         </Link>

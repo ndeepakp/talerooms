@@ -90,22 +90,22 @@ export function SaveToCollection({ storyId }: { storyId: string }) {
         type="button"
         onClick={toggleOpen}
         aria-expanded={open}
-        className="flex h-11 items-center gap-2 rounded-full border border-zinc-300 px-4 text-sm font-medium text-zinc-700 transition-colors hover:bg-zinc-100 dark:border-zinc-700 dark:text-zinc-300 dark:hover:bg-zinc-900"
+        className="flex h-11 items-center gap-2 rounded-full border border-ui-strong px-4 text-sm font-medium text-ink-soft transition-colors hover:bg-surface-soft"
       >
         <span aria-hidden="true">＋</span>
         {loaded && savedCount > 0 ? `Saved (${savedCount})` : "Save to collection"}
       </button>
 
       {open && (
-        <div role="region" aria-label="Collection picker" className="fixed inset-x-4 bottom-4 z-50 max-h-[calc(100dvh-2rem)] overflow-y-auto rounded-xl border border-zinc-200 bg-white shadow-lg sm:absolute sm:inset-x-auto sm:bottom-auto sm:right-0 sm:mt-2 sm:w-72 dark:border-zinc-800 dark:bg-zinc-950">
-          <div className="border-b border-zinc-100 px-4 py-2.5 text-sm font-semibold text-zinc-900 dark:border-zinc-800 dark:text-zinc-100">
+        <div role="region" aria-label="Collection picker" className="fixed inset-x-4 bottom-4 z-50 max-h-[calc(100dvh-2rem)] overflow-y-auto rounded-xl border border-ui bg-surface-raised shadow-lg sm:absolute sm:inset-x-auto sm:bottom-auto sm:right-0 sm:mt-2 sm:w-72">
+          <div className="border-b border-ui px-4 py-2.5 text-sm font-semibold text-ink">
             Save to collection
           </div>
 
           {!loaded ? (
-            <p className="px-4 py-4 text-center text-sm text-zinc-500">Loading…</p>
+            <p className="px-4 py-4 text-center text-sm text-muted">Loading…</p>
           ) : items.length === 0 ? (
-            <p className="px-4 py-4 text-center text-sm text-zinc-500">
+            <p className="px-4 py-4 text-center text-sm text-muted">
               No collections yet — create one below.
             </p>
           ) : (
@@ -115,13 +115,13 @@ export function SaveToCollection({ storyId }: { storyId: string }) {
                   <button
                     type="button"
                     onClick={() => toggle(c)}
-                    className="flex min-h-11 w-full items-center justify-between gap-2 px-4 py-2 text-left text-sm hover:bg-zinc-50 dark:hover:bg-zinc-900"
+                    className="flex min-h-11 w-full items-center justify-between gap-2 px-4 py-2 text-left text-sm hover:bg-surface-soft"
                   >
-                    <span className="min-w-0 flex-1 truncate text-zinc-800 dark:text-zinc-200">
+                    <span className="min-w-0 flex-1 truncate text-ink">
                       {c.name}{" "}
-                      <span className="text-xs text-zinc-400">({c.count})</span>
+                      <span className="text-xs text-subtle">({c.count})</span>
                     </span>
-                    <span className={c.contains ? "text-accent" : "text-zinc-300 dark:text-zinc-600"}>
+                    <span className={c.contains ? "text-accent" : "text-ui-strong"}>
                       {c.contains ? "✓" : "＋"}
                     </span>
                   </button>
@@ -130,14 +130,14 @@ export function SaveToCollection({ storyId }: { storyId: string }) {
             </ul>
           )}
 
-          <div className="flex gap-2 border-t border-zinc-100 p-2 dark:border-zinc-800">
+          <div className="flex gap-2 border-t border-ui p-2">
             <input
               value={newName}
               onChange={(e) => setNewName(e.target.value)}
               onKeyDown={(e) => e.key === "Enter" && createAndAdd()}
               placeholder="New collection…"
               maxLength={80}
-              className="h-11 min-w-0 flex-1 rounded-lg border border-zinc-300 bg-white px-2 text-sm text-zinc-900 outline-none focus:border-zinc-900 dark:border-zinc-700 dark:bg-zinc-950 dark:text-zinc-100"
+              className="h-11 min-w-0 flex-1 rounded-lg border border-ui-strong bg-surface-raised px-2 text-sm text-ink outline-none focus:border-accent"
             />
             <button
               type="button"

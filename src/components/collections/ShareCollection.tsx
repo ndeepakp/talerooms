@@ -44,17 +44,17 @@ export function ShareCollection({ name }: { name: string }) {
       <button
         type="button"
         onClick={share}
-        className="flex h-9 items-center gap-2 rounded-full border border-zinc-300 px-4 text-sm font-medium text-zinc-700 transition-colors hover:bg-zinc-100 dark:border-zinc-700 dark:text-zinc-300 dark:hover:bg-zinc-900"
+        className="flex h-9 items-center gap-2 rounded-full border border-ui-strong px-4 text-sm font-medium text-ink-soft transition-colors hover:bg-surface-soft"
       >
         <span aria-hidden="true">↗</span> Share
       </button>
 
       {open && (
-        <div className="absolute left-0 z-50 mt-2 w-56 overflow-hidden rounded-xl border border-zinc-200 bg-white p-1 shadow-lg dark:border-zinc-800 dark:bg-zinc-950">
+        <div className="absolute left-0 z-50 mt-2 w-56 overflow-hidden rounded-xl border border-ui bg-surface-raised p-1 shadow-lg">
           <button
             type="button"
             onClick={copy}
-            className="block w-full rounded-lg px-3 py-2 text-left text-sm hover:bg-zinc-100 dark:hover:bg-zinc-900"
+            className="block w-full rounded-lg px-3 py-2 text-left text-sm hover:bg-surface-soft"
           >
             {copied ? "Link copied ✓" : "Copy link"}
           </button>
@@ -62,7 +62,7 @@ export function ShareCollection({ name }: { name: string }) {
             href={`https://www.facebook.com/sharer/sharer.php?u=${encoded}`}
             target="_blank"
             rel="noopener noreferrer"
-            className="block rounded-lg px-3 py-2 text-sm hover:bg-zinc-100 dark:hover:bg-zinc-900"
+            className="block rounded-lg px-3 py-2 text-sm hover:bg-surface-soft"
           >
             Share on Facebook
           </a>
@@ -70,7 +70,7 @@ export function ShareCollection({ name }: { name: string }) {
             href={`https://www.linkedin.com/sharing/share-offsite/?url=${encoded}`}
             target="_blank"
             rel="noopener noreferrer"
-            className="block rounded-lg px-3 py-2 text-sm hover:bg-zinc-100 dark:hover:bg-zinc-900"
+            className="block rounded-lg px-3 py-2 text-sm hover:bg-surface-soft"
           >
             Share on LinkedIn
           </a>
@@ -78,7 +78,7 @@ export function ShareCollection({ name }: { name: string }) {
             href={`https://twitter.com/intent/tweet?url=${encoded}&text=${text}`}
             target="_blank"
             rel="noopener noreferrer"
-            className="block rounded-lg px-3 py-2 text-sm hover:bg-zinc-100 dark:hover:bg-zinc-900"
+            className="block rounded-lg px-3 py-2 text-sm hover:bg-surface-soft"
           >
             Share on X
           </a>
@@ -86,7 +86,7 @@ export function ShareCollection({ name }: { name: string }) {
             href={`https://wa.me/?text=${text}%20${encoded}`}
             target="_blank"
             rel="noopener noreferrer"
-            className="block rounded-lg px-3 py-2 text-sm hover:bg-zinc-100 dark:hover:bg-zinc-900"
+            className="block rounded-lg px-3 py-2 text-sm hover:bg-surface-soft"
           >
             Share on WhatsApp
           </a>

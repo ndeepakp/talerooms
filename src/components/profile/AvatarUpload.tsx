@@ -73,16 +73,16 @@ export function AvatarUpload({
               type="button"
               onClick={remove}
               disabled={busy}
-              className="h-9 rounded-full px-3 text-sm font-medium text-zinc-600 hover:bg-zinc-100 disabled:opacity-50 dark:text-zinc-400 dark:hover:bg-zinc-900"
+              className="h-9 rounded-full px-3 text-sm font-medium text-muted hover:bg-surface-soft disabled:opacity-50"
             >
               Remove
             </button>
           )}
         </div>
         {error ? (
-          <p className="text-xs text-red-600">{error}</p>
+          <p className="text-xs text-danger">{error}</p>
         ) : (
-          <p className="text-xs text-zinc-500">JPG, PNG, WEBP or GIF · up to 8 MB.</p>
+          <p className="text-xs text-muted">JPG, PNG, WEBP or GIF · up to 8 MB.</p>
         )}
       </div>
     </div>

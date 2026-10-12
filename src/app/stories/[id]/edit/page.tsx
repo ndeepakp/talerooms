@@ -1,6 +1,5 @@
 import { notFound, redirect } from "next/navigation";
-import { headers } from "next/headers";
-import { auth } from "@/lib/auth";
+import { requirePageSession } from "@/lib/account-session";
 import { sql } from "@/lib/db";
 import { StoryForm } from "@/app/write/StoryForm";
 import { type Chapter } from "@/lib/story-validation";
@@ -16,8 +15,7 @@ export default async function EditStoryPage({
   const { id } = await params;
   if (!UUID_RE.test(id)) notFound();
 
-  const session = await auth.api.getSession({ headers: await headers() });
-  if (!session) redirect("/login");
+  const session = await requirePageSession();
 
   const [story] = await sql<
     {

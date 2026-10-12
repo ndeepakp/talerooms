@@ -81,12 +81,12 @@ export function AnalyticsPanel() {
     <section className="mt-10">
       <div className="flex flex-wrap items-center justify-between gap-3">
         <div>
-          <h2 className="text-lg font-semibold text-zinc-900 dark:text-zinc-50">
+          <h2 className="text-lg font-semibold text-ink">
             Analytics
           </h2>
-          <p className="mt-1 text-sm text-zinc-500">
+          <p className="mt-1 text-sm text-muted">
             Views, purchases and earnings across your stories ·{" "}
-            <strong className="text-zinc-700 dark:text-zinc-300">
+            <strong className="text-ink-soft">
               {data.subscribers}
             </strong>{" "}
             active {data.subscribers === 1 ? "subscriber" : "subscribers"}
@@ -102,7 +102,7 @@ export function AnalyticsPanel() {
                 "min-h-11 whitespace-nowrap rounded-full border px-3 py-1 text-sm transition-colors " +
                 (days === r.days
                   ? "chip-active"
-                  : "border-zinc-300 text-zinc-700 hover:bg-zinc-100 dark:border-zinc-700 dark:text-zinc-300 dark:hover:bg-zinc-900")
+                  : "border-ui-strong text-ink-soft hover:bg-surface-soft")
               }
             >
               {r.label}
@@ -113,7 +113,7 @@ export function AnalyticsPanel() {
             onClick={() => setReload((r) => r + 1)}
             aria-label="Refresh"
             title="Refresh"
-            className="min-h-11 min-w-11 rounded-full border border-zinc-300 px-3 py-1 text-sm text-zinc-700 hover:bg-zinc-100 dark:border-zinc-700 dark:text-zinc-300 dark:hover:bg-zinc-900"
+            className="min-h-11 min-w-11 rounded-full border border-ui-strong px-3 py-1 text-sm text-ink-soft hover:bg-surface-soft"
           >
             ↻
           </button>
@@ -127,30 +127,30 @@ export function AnalyticsPanel() {
             type="button"
             onClick={() => setExpanded(c.title)}
             title="Click to expand"
-            className="rounded-2xl border border-zinc-200 bg-white p-4 text-left transition-colors hover:border-zinc-400 dark:border-zinc-800 dark:bg-zinc-950 dark:hover:border-zinc-600"
+            className="rounded-2xl border border-ui bg-surface-raised p-4 text-left transition-colors hover:border-ui-strong"
           >
             <div className="flex items-baseline justify-between">
-              <span className="text-sm font-medium text-zinc-600 dark:text-zinc-400">
+              <span className="text-sm font-medium text-muted">
                 {c.title}
               </span>
-              <span className="text-lg font-semibold text-zinc-900 dark:text-zinc-50">
+              <span className="text-lg font-semibold text-ink">
                 {c.total}
               </span>
             </div>
             <div className="mt-3">
               {c.pts.length === 0 ? (
-                <div className="flex h-32 items-center justify-center text-sm text-zinc-400">
+                <div className="flex h-32 items-center justify-center text-sm text-subtle">
                   {loading ? "Loading…" : "No data"}
                 </div>
               ) : (
                 <MiniBarChart data={c.pts} format={c.fmt} />
               )}
             </div>
-            <p className="mt-2 text-right text-[10px] text-zinc-400">Click to expand ⤢</p>
+            <p className="mt-2 text-right text-[10px] text-subtle">Click to expand ⤢</p>
           </button>
         ))}
       </div>
-      <p className="mt-2 text-xs text-zinc-500">
+      <p className="mt-2 text-xs text-muted">
         Earnings are mocked for now — they reflect the prices readers would have paid.
       </p>
 
@@ -165,31 +165,31 @@ export function AnalyticsPanel() {
               onClick={() => setExpanded(null)}
             >
               <div
-                className="max-h-[calc(100dvh-2rem)] w-full max-w-4xl overflow-y-auto rounded-2xl border border-zinc-200 bg-white p-6 shadow-xl dark:border-zinc-800 dark:bg-zinc-950"
+                className="max-h-[calc(100dvh-2rem)] w-full max-w-4xl overflow-y-auto rounded-2xl border border-ui bg-surface-raised p-6 shadow-xl"
                 onClick={(e) => e.stopPropagation()}
               >
                 <div className="flex items-baseline justify-between gap-4">
                   <div>
-                    <h3 className="text-xl font-semibold text-zinc-900 dark:text-zinc-50">
+                    <h3 className="text-xl font-semibold text-ink">
                       {c.title}
                     </h3>
-                    <p className="mt-0.5 text-sm text-zinc-500">
+                    <p className="mt-0.5 text-sm text-muted">
                       Last {days} days · total{" "}
-                      <strong className="text-zinc-700 dark:text-zinc-300">{c.total}</strong>
+                      <strong className="text-ink-soft">{c.total}</strong>
                     </p>
                   </div>
                   <button
                     type="button"
                     onClick={() => setExpanded(null)}
                     aria-label="Close"
-                    className="min-h-11 min-w-11 rounded-full border border-zinc-300 px-3 py-1 text-sm text-zinc-700 hover:bg-zinc-100 dark:border-zinc-700 dark:text-zinc-300 dark:hover:bg-zinc-900"
+                    className="min-h-11 min-w-11 rounded-full border border-ui-strong px-3 py-1 text-sm text-ink-soft hover:bg-surface-soft"
                   >
                     ✕
                   </button>
                 </div>
                 <div className="mt-6">
                   {c.pts.length === 0 ? (
-                    <div className="flex h-80 items-center justify-center text-sm text-zinc-400">
+                    <div className="flex h-80 items-center justify-center text-sm text-subtle">
                       No data
                     </div>
                   ) : (

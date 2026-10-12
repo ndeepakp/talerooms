@@ -36,7 +36,7 @@ export function LandingWelcome({ stories }: { stories: LandingStory[] }) {
             <div className={styles.heroCopy}>
               <p className={styles.eyebrow}><span aria-hidden="true" /> A home for original stories</p>
               <h1 id="welcome-title">Get lost.<br />Find your<br /><em>people.</em></h1>
-              <p className={styles.intro}>Stories that pull you in. Voices that stay with you. Discover original fiction and connect with the writers behind it.</p>
+              <p className={styles.intro}>Discover your next favourite author—or publish your own stories, keep your rights, and build a readership.</p>
               <div className={styles.actions}>
                 <Link href="#stories" className={styles.primary}>Find your next story <span aria-hidden="true">↗</span></Link>
                 <Link href="/signup" className={styles.writeLink}>Start writing <span aria-hidden="true">→</span></Link>
@@ -51,7 +51,7 @@ export function LandingWelcome({ stories }: { stories: LandingStory[] }) {
               )}
             </div>
           </section>
-          <div className={styles.manifesto}><span>Original voices.</span><span>Real connections.</span><span>Your stories. Your rights.</span></div>
+          <div className={styles.manifesto}><span>Original stories.</span><span>Independent voices.</span><span>Readers who come back for more.</span></div>
         </div>
       <section id="stories" aria-labelledby="stories-title" className={styles.shelf}>
         <div className={styles.sectionHeading}>

@@ -47,7 +47,7 @@ export function ChapterPromptsEditor({
             <button
               type="button"
               onClick={() => remove(i)}
-              className="shrink-0 text-xs text-subtle hover:text-red-600"
+              className="shrink-0 text-xs text-subtle hover:text-danger"
               aria-label="Remove prompt"
             >
               ✕

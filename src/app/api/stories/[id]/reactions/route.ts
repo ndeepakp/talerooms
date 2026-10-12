@@ -1,6 +1,5 @@
 import { NextResponse } from "next/server";
-import { headers } from "next/headers";
-import { auth } from "@/lib/auth";
+import { requireSession, withErrors } from "@/lib/http";
 import { sql } from "@/lib/db";
 import { notify } from "@/lib/notify";
 
@@ -17,7 +16,7 @@ async function counts(storyId: string) {
   return row as { likes: number; dislikes: number };
 }
 
-export async function POST(
+export const POST = withErrors(async function POST(
   req: Request,
   { params }: { params: Promise<{ id: string }> },
 ) {
@@ -26,7 +25,7 @@ export async function POST(
     return NextResponse.json({ error: "Not found." }, { status: 404 });
   }
 
-  const session = await auth.api.getSession({ headers: await headers() });
+  const session = await requireSession();
   if (!session) {
     return NextResponse.json({ error: "Sign in to react." }, { status: 401 });
   }
@@ -71,4 +70,4 @@ export async function POST(
   }
 
   return NextResponse.json({ ...(await counts(id)), userReaction });
-}
+});

@@ -76,7 +76,7 @@ export function NavMenu({ profileHref }: { profileHref: string }) {
               router.push("/login");
               router.refresh();
             }}
-            className="block w-full px-4 py-2.5 text-left text-sm text-red-600 hover:bg-surface-soft dark:text-red-400"
+            className="block w-full px-4 py-2.5 text-left text-sm text-danger hover:bg-surface-soft"
           >
             Sign out
           </button>

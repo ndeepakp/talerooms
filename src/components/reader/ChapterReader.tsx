@@ -561,7 +561,7 @@ export function ChapterReader({
                       {canInteract && <button
                         type="button"
                         onClick={() => removeBookmark(b.id)}
-                        className="shrink-0 text-xs text-[var(--reader-muted)] hover:text-red-600 dark:hover:text-red-400"
+                        className="shrink-0 text-xs text-[var(--reader-muted)] hover:text-[var(--reader-danger)]"
                       >
                         Remove
                       </button>}

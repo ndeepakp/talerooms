@@ -1,7 +1,6 @@
 import { redirect, notFound } from "next/navigation";
-import { headers } from "next/headers";
 import Link from "next/link";
-import { auth } from "@/lib/auth";
+import { requirePageSession } from "@/lib/account-session";
 import { sql } from "@/lib/db";
 import { Avatar } from "@/components/layout/Avatar";
 import { StarRating } from "@/components/story/StarRating";
@@ -14,8 +13,7 @@ export default async function ReviewsPage({
 }: {
   params: Promise<{ id: string }>;
 }) {
-  const session = await auth.api.getSession({ headers: await headers() });
-  if (!session) redirect("/login");
+  await requirePageSession();
   const { id: param } = await params;
 
   const resolved = await resolveStory(param);
@@ -54,29 +52,29 @@ export default async function ReviewsPage({
       <div className="mx-auto w-full max-w-2xl">
         <Link
           href={`/stories/${id}`}
-          className="text-sm font-medium text-zinc-500 [overflow-wrap:anywhere] hover:underline"
+          className="text-sm font-medium text-muted [overflow-wrap:anywhere] hover:underline"
         >
           {story.title}
         </Link>
-        <h1 className="mt-1 text-2xl font-bold text-zinc-900 dark:text-zinc-50">
+        <h1 className="mt-1 text-2xl font-bold text-ink">
           Ratings &amp; reviews
         </h1>
-        <div className="mt-2 flex flex-wrap items-center gap-2 text-zinc-600 dark:text-zinc-300">
+        <div className="mt-2 flex flex-wrap items-center gap-2 text-muted">
           <StarRating value={agg.avg ?? 0} size={22} />
           <span className="text-lg font-semibold">{(agg.avg ?? 0).toFixed(1)}</span>
-          <span className="text-zinc-400">
+          <span className="text-subtle">
             · {agg.count} {agg.count === 1 ? "review" : "reviews"}
           </span>
         </div>
 
         {reviews.length === 0 ? (
-          <p className="mt-8 text-zinc-500">No reviews yet.</p>
+          <p className="mt-8 text-muted">No reviews yet.</p>
         ) : (
           <ul className="mt-6 flex flex-col gap-4">
             {reviews.map((r) => (
               <li
                 key={r.id}
-                className="rounded-xl border border-zinc-200 bg-white p-4 [overflow-wrap:anywhere] dark:border-zinc-800 dark:bg-zinc-950"
+                className="rounded-xl border border-ui bg-surface-raised p-4 [overflow-wrap:anywhere]"
               >
                 <div className="flex flex-wrap items-center justify-between gap-3">
                   <div className="flex min-w-0 items-center gap-3">
@@ -84,7 +82,7 @@ export default async function ReviewsPage({
                     <div className="min-w-0">
                       <Link
                         href={`/${r.handle ?? ""}`}
-                        className="text-sm font-medium text-zinc-900 hover:underline dark:text-zinc-100"
+                        className="text-sm font-medium text-ink hover:underline"
                       >
                         {r.author ?? "Reader"}
                       </Link>
@@ -92,22 +90,22 @@ export default async function ReviewsPage({
                     </div>
                   </div>
                   {r.pinned && (
-                    <span className="shrink-0 rounded-full bg-amber-100 px-2 py-0.5 text-xs font-medium text-amber-700 dark:bg-amber-950/40 dark:text-amber-300">
+                    <span className="shrink-0 rounded-full bg-warning-soft px-2 py-0.5 text-xs font-medium text-warning">
                       📌 Featured
                     </span>
                   )}
                 </div>
                 {r.liked && (
-                  <p className="mt-2 text-sm text-zinc-700 dark:text-zinc-300">
-                    <span className="font-medium text-emerald-600 dark:text-emerald-400">
+                  <p className="mt-2 text-sm text-ink-soft">
+                    <span className="font-medium text-success">
                       Liked:
                     </span>{" "}
                     {r.liked}
                   </p>
                 )}
                 {r.disliked && (
-                  <p className="mt-1 text-sm text-zinc-700 dark:text-zinc-300">
-                    <span className="font-medium text-rose-600 dark:text-rose-400">
+                  <p className="mt-1 text-sm text-ink-soft">
+                    <span className="font-medium text-danger">
                       Could be better:
                     </span>{" "}
                     {r.disliked}

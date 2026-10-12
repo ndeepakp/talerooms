@@ -1,7 +1,5 @@
 import Link from "next/link";
-import { redirect } from "next/navigation";
-import { headers } from "next/headers";
-import { auth } from "@/lib/auth";
+import { requirePageSession } from "@/lib/account-session";
 import { sql } from "@/lib/db";
 import { DeleteStoryButton } from "@/components/story/DeleteStoryButton";
 
@@ -16,8 +14,7 @@ function expiryLabel(expires: string | null): string {
 }
 
 export default async function DraftsPage() {
-  const session = await auth.api.getSession({ headers: await headers() });
-  if (!session) redirect("/login");
+  const session = await requirePageSession();
   const me = session.user.id;
 
   // Drafts live for 7 days from their last save — clean up any that have
@@ -46,15 +43,15 @@ export default async function DraftsPage() {
   return (
     <div className="min-h-screen bg-[var(--page)] px-6 py-12">
       <div className="mx-auto w-full max-w-5xl">
-        <h1 className="text-2xl font-bold text-zinc-900 dark:text-zinc-50">
+        <h1 className="text-2xl font-bold text-ink">
           Your drafts
         </h1>
-        <p className="mt-1 text-sm text-zinc-500">
+        <p className="mt-1 text-sm text-muted">
           Drafts are private to you and are kept for 7 days from each save.
         </p>
 
         {drafts.length === 0 ? (
-          <p className="mt-10 text-center text-zinc-500">
+          <p className="mt-10 text-center text-muted">
             No drafts right now.{" "}
             <Link href="/write" className="underline">
               Start writing
@@ -66,26 +63,26 @@ export default async function DraftsPage() {
             {drafts.map((d) => (
               <li
                 key={d.id}
-                className="rounded-2xl border border-dashed border-amber-300 bg-amber-50/50 p-5 dark:border-amber-900 dark:bg-amber-950/20"
+                className="rounded-2xl border border-dashed border-warning bg-warning-soft p-5 "
               >
                 <div className="flex flex-col items-start justify-between gap-3 sm:flex-row">
                   <Link href={`/stories/${d.id}/edit`} className="min-w-0">
-                    <h2 className="text-lg font-semibold text-zinc-900 [overflow-wrap:anywhere] hover:underline dark:text-zinc-50">
+                    <h2 className="text-lg font-semibold text-ink [overflow-wrap:anywhere] hover:underline">
                       {d.title || "Untitled"}
                     </h2>
                   </Link>
-                  <span className="shrink-0 rounded-full bg-amber-100 px-2.5 py-0.5 text-xs font-medium text-amber-800 dark:bg-amber-950/50 dark:text-amber-300">
+                  <span className="shrink-0 rounded-full bg-warning-soft px-2.5 py-0.5 text-xs font-medium text-warning">
                     {expiryLabel(d.draft_expires_at)}
                   </span>
                 </div>
                 {d.draft_of && (
-                  <p className="mt-1 inline-flex items-center gap-1 rounded-full bg-emerald-100 px-2 py-0.5 text-xs font-medium text-emerald-700 dark:bg-emerald-950/40 dark:text-emerald-300">
+                  <p className="mt-1 inline-flex items-center gap-1 rounded-full bg-success-soft px-2 py-0.5 text-xs font-medium text-success">
                     ✏️ Unpublished edits — your published version stays live
                   </p>
                 )}
                 {d.summary && (
                   <Link href={`/stories/${d.id}/edit`} className="block [overflow-wrap:anywhere]">
-                    <p className="mt-2 line-clamp-3 text-zinc-700 dark:text-zinc-300">
+                    <p className="mt-2 line-clamp-3 text-ink-soft">
                       {d.summary}
                     </p>
                   </Link>
@@ -93,7 +90,7 @@ export default async function DraftsPage() {
                 <div className="mt-3 flex items-center gap-4">
                   <Link
                     href={`/stories/${d.id}/edit`}
-                    className="text-sm font-medium text-amber-700 hover:underline dark:text-amber-300"
+                    className="text-sm font-medium text-warning hover:underline"
                   >
                     Continue editing
                   </Link>

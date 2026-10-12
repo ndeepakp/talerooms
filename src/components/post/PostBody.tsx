@@ -32,7 +32,7 @@ export function PostBody({ text }: { text: string }) {
   if (last < text.length) nodes.push(<span key={key++}>{text.slice(last)}</span>);
 
   return (
-    <p className="whitespace-pre-wrap break-words text-zinc-800 dark:text-zinc-200">
+    <p className="whitespace-pre-wrap break-words text-ink">
       {nodes}
     </p>
   );

@@ -83,12 +83,12 @@ export function ProfileForm({
   return (
     <div className="min-h-screen bg-[var(--page)] px-6 py-12">
       <div className="mx-auto w-full max-w-lg">
-        <h1 className="text-2xl font-bold text-zinc-900 dark:text-zinc-50">
+        <h1 className="text-2xl font-bold text-ink">
           Edit profile
         </h1>
 
         <div className="mt-8">
-          <span className="text-sm font-medium text-zinc-700 dark:text-zinc-300">
+          <span className="text-sm font-medium text-ink-soft">
             Profile picture
           </span>
           <div className="mt-2">
@@ -98,7 +98,7 @@ export function ProfileForm({
 
         <form onSubmit={handleSubmit} className="mt-6 flex flex-col gap-4">
           <label className="flex flex-col gap-1.5 text-left">
-            <span className="text-sm font-medium text-zinc-700 dark:text-zinc-300">
+            <span className="text-sm font-medium text-ink-soft">
               Display name
             </span>
             <input
@@ -106,33 +106,33 @@ export function ProfileForm({
               value={name}
               onChange={(e) => setName(e.target.value)}
               required
-              className="h-11 rounded-lg border border-zinc-300 bg-white px-3 text-zinc-900 outline-none focus:border-zinc-900 dark:border-zinc-700 dark:bg-zinc-950 dark:text-zinc-100 dark:focus:border-zinc-300"
+              className="h-11 rounded-lg border border-ui-strong bg-surface-raised px-3 text-ink outline-none focus:border-accent"
             />
           </label>
 
           <label className="flex flex-col gap-1.5 text-left">
-            <span className="text-sm font-medium text-zinc-700 dark:text-zinc-300">
+            <span className="text-sm font-medium text-ink-soft">
               Handle
             </span>
-            <div className="flex items-center rounded-lg border border-zinc-300 bg-white pl-3 focus-within:border-zinc-900 dark:border-zinc-700 dark:bg-zinc-950 dark:focus-within:border-zinc-300">
-              <span className="text-zinc-500">$</span>
+            <div className="flex items-center rounded-lg border border-ui-strong bg-surface-raised pl-3 focus-within:border-accent">
+              <span className="text-muted">$</span>
               <input
                 type="text"
                 value={username}
                 onChange={(e) => setUsername(e.target.value.replace(/[^A-Za-z0-9_]/g, ""))}
                 required
                 placeholder="Deepak"
-                className="h-11 flex-1 bg-transparent px-1 text-zinc-900 outline-none dark:text-zinc-100"
+                className="h-11 flex-1 bg-transparent px-1 text-ink outline-none"
               />
             </div>
-            <span className="text-xs text-zinc-500">
+            <span className="text-xs text-muted">
               3–20 letters, numbers, or underscores. People find you with ${username || "handle"}.
             </span>
           </label>
 
           <label className="flex flex-col gap-1.5 text-left">
-            <span className="text-sm font-medium text-zinc-700 dark:text-zinc-300">
-              Status <span className="font-normal text-zinc-500">(optional)</span>
+            <span className="text-sm font-medium text-ink-soft">
+              Status <span className="font-normal text-muted">(optional)</span>
             </span>
             <textarea
               value={bio}
@@ -140,16 +140,16 @@ export function ProfileForm({
               rows={3}
               maxLength={500}
               placeholder="A short line that captures your current mood or status."
-              className="rounded-lg border border-zinc-300 bg-white p-3 text-zinc-900 outline-none focus:border-zinc-900 dark:border-zinc-700 dark:bg-zinc-950 dark:text-zinc-100 dark:focus:border-zinc-300"
+              className="rounded-lg border border-ui-strong bg-surface-raised p-3 text-ink outline-none focus:border-accent"
             />
           </label>
 
           <label className="flex flex-col gap-1.5 text-left">
-            <span className="flex items-center justify-between text-sm font-medium text-zinc-700 dark:text-zinc-300">
+            <span className="flex items-center justify-between text-sm font-medium text-ink-soft">
               <span>
-                About <span className="font-normal text-zinc-500">(optional)</span>
+                About <span className="font-normal text-muted">(optional)</span>
               </span>
-              <span className="font-normal text-zinc-500">
+              <span className="font-normal text-muted">
                 {about.length}/{MAX_ABOUT}
               </span>
             </span>
@@ -159,28 +159,28 @@ export function ProfileForm({
               rows={6}
               maxLength={MAX_ABOUT}
               placeholder="Tell readers more about you — your motto, what drives you, your day-to-day, hobbies and interests."
-              className="rounded-lg border border-zinc-300 bg-white p-3 text-zinc-900 outline-none focus:border-zinc-900 dark:border-zinc-700 dark:bg-zinc-950 dark:text-zinc-100 dark:focus:border-zinc-300"
+              className="rounded-lg border border-ui-strong bg-surface-raised p-3 text-ink outline-none focus:border-accent"
             />
           </label>
 
           <label className="flex flex-col gap-1.5 text-left">
-            <span className="text-sm font-medium text-zinc-700 dark:text-zinc-300">
+            <span className="text-sm font-medium text-ink-soft">
               Subscription price{" "}
-              <span className="font-normal text-zinc-500">(optional)</span>
+              <span className="font-normal text-muted">(optional)</span>
             </span>
-            <div className="flex items-center rounded-lg border border-zinc-300 bg-white pl-3 focus-within:border-zinc-900 dark:border-zinc-700 dark:bg-zinc-950 dark:focus-within:border-zinc-300">
-              <span className="text-zinc-500">{CURRENCY}</span>
+            <div className="flex items-center rounded-lg border border-ui-strong bg-surface-raised pl-3 focus-within:border-accent">
+              <span className="text-muted">{CURRENCY}</span>
               <input
                 type="number"
                 min={0}
                 value={subscriptionPrice}
                 onChange={(e) => setSubscriptionPrice(e.target.value)}
                 placeholder="0"
-                className="h-11 flex-1 bg-transparent px-2 text-zinc-900 outline-none dark:text-zinc-100"
+                className="h-11 flex-1 bg-transparent px-2 text-ink outline-none"
               />
-              <span className="px-3 text-sm text-zinc-500">/ 30 days</span>
+              <span className="px-3 text-sm text-muted">/ 30 days</span>
             </div>
-            <span className="text-xs text-zinc-500">
+            <span className="text-xs text-muted">
               Set a price to offer a subscription. Subscribers can read all your
               private chapters while their subscription is active. Leave blank or
               0 to not offer one.
@@ -188,9 +188,9 @@ export function ProfileForm({
           </label>
 
           <div className="flex flex-col gap-2 text-left">
-            <span className="text-sm font-medium text-zinc-700 dark:text-zinc-300">
+            <span className="text-sm font-medium text-ink-soft">
               Favourite genres{" "}
-              <span className="font-normal text-zinc-500">
+              <span className="font-normal text-muted">
                 (pick at least {MIN_GENRES} — {selected.length} selected)
               </span>
             </span>
@@ -206,7 +206,7 @@ export function ProfileForm({
                       "rounded-full border px-3 py-1.5 text-sm transition-colors " +
                       (active
                         ? "chip-active"
-                        : "border-zinc-300 text-zinc-700 hover:bg-zinc-100 dark:border-zinc-700 dark:text-zinc-300 dark:hover:bg-zinc-900")
+                        : "border-ui-strong text-ink-soft hover:bg-surface-soft")
                     }
                   >
                     {g.name}
@@ -216,7 +216,7 @@ export function ProfileForm({
             </div>
           </div>
 
-          {error && <p className="text-sm text-red-600">{error}</p>}
+          {error && <p className="text-sm text-danger">{error}</p>}
           <button
             type="submit"
             disabled={loading}

@@ -146,10 +146,10 @@ export function SettingsForm({
   return (
     <div className="min-h-screen bg-[var(--page)] px-6 py-12">
       <div className="mx-auto w-full max-w-lg">
-        <h1 className="text-2xl font-bold text-zinc-900 dark:text-zinc-50">
+        <h1 className="text-2xl font-bold text-ink">
           Settings
         </h1>
-        <p className="mt-1 text-sm text-zinc-500">
+        <p className="mt-1 text-sm text-muted">
           Changes preview instantly and save to your account, so they follow you
           to every device.
         </p>
@@ -157,25 +157,25 @@ export function SettingsForm({
         {/* Quick link to your public profile. */}
         <Link
           href={`/users/${userId}`}
-          className="mt-5 inline-flex h-11 items-center rounded-full border border-zinc-300 px-5 text-sm font-medium text-zinc-900 transition-colors hover:bg-zinc-100 dark:border-zinc-700 dark:text-zinc-100 dark:hover:bg-zinc-900"
+          className="mt-5 inline-flex h-11 items-center rounded-full border border-ui-strong px-5 text-sm font-medium text-ink transition-colors hover:bg-surface-soft"
         >
           View profile
         </Link>
 
-        <h2 className="mt-8 text-lg font-semibold text-zinc-900 dark:text-zinc-50">
+        <h2 className="mt-8 text-lg font-semibold text-ink">
           Notifications
         </h2>
         <div className="mt-4">
           <PushToggle />
         </div>
 
-        <h2 className="mt-8 text-lg font-semibold text-zinc-900 dark:text-zinc-50">
+        <h2 className="mt-8 text-lg font-semibold text-ink">
           Appearance
         </h2>
 
         {/* Theme mode */}
         <div className="mt-8 flex flex-col gap-2">
-          <span className="text-sm font-medium text-zinc-700 dark:text-zinc-300">
+          <span className="text-sm font-medium text-ink-soft">
             Theme
           </span>
           <div className="grid grid-cols-3 gap-2">
@@ -185,18 +185,19 @@ export function SettingsForm({
                 <button
                   type="button"
                   key={m.id}
+                  aria-pressed={active}
                   onClick={() => setThemeMode(m.id)}
                   className={
                     "flex flex-col items-start gap-0.5 rounded-xl border px-3 py-2.5 text-left transition-colors " +
                     (active
                       ? "border-accent ring-1 ring-[var(--accent)]"
-                      : "border-zinc-300 hover:bg-zinc-100 dark:border-zinc-700 dark:hover:bg-zinc-900")
+                      : "border-ui-strong hover:bg-surface-soft")
                   }
                 >
-                  <span className="text-sm font-medium text-zinc-900 dark:text-zinc-100">
+                  <span className="text-sm font-medium text-ink">
                     {m.label}
                   </span>
-                  <span className="text-xs text-zinc-500">{m.hint}</span>
+                  <span className="text-xs text-muted">{m.hint}</span>
                 </button>
               );
             })}
@@ -205,7 +206,7 @@ export function SettingsForm({
 
         {/* Accent colour */}
         <div className="mt-6 flex flex-col gap-2">
-          <span className="text-sm font-medium text-zinc-700 dark:text-zinc-300">
+          <span className="text-sm font-medium text-ink-soft">
             Accent colour
           </span>
           <div className="flex flex-wrap gap-3">
@@ -220,9 +221,9 @@ export function SettingsForm({
                   aria-pressed={active}
                   title={a.label}
                   className={
-                    "h-9 w-9 rounded-full transition-transform " +
+                    "h-11 w-11 rounded-full transition-transform " +
                     (active
-                      ? "ring-2 ring-offset-2 ring-zinc-900 ring-offset-[var(--page)] dark:ring-zinc-100"
+                      ? "ring-2 ring-offset-2 ring-ink ring-offset-[var(--page)]"
                       : "hover:scale-110")
                   }
                   style={{ backgroundColor: a.swatch }}
@@ -234,7 +235,7 @@ export function SettingsForm({
 
         {/* Background */}
         <div className="mt-6 flex flex-col gap-2">
-          <span className="text-sm font-medium text-zinc-700 dark:text-zinc-300">
+          <span className="text-sm font-medium text-ink-soft">
             Background
           </span>
           <div className="grid grid-cols-3 gap-2">
@@ -244,12 +245,13 @@ export function SettingsForm({
                 <button
                   type="button"
                   key={b.id}
+                  aria-pressed={active}
                   onClick={() => setBackground(b.id)}
                   className={
-                    "rounded-xl border px-3 py-2.5 text-center text-sm font-medium text-zinc-900 transition-colors dark:text-zinc-100 " +
+                    "rounded-xl border px-3 py-2.5 text-center text-sm font-medium text-ink transition-colors " +
                     (active
                       ? "border-accent ring-1 ring-[var(--accent)]"
-                      : "border-zinc-300 hover:bg-zinc-100 dark:border-zinc-700 dark:hover:bg-zinc-900")
+                      : "border-ui-strong hover:bg-surface-soft")
                   }
                 >
                   {b.label}
@@ -261,9 +263,9 @@ export function SettingsForm({
 
         {/* Library shelf finish — applies to the bookshelf on your Library page. */}
         <div className="mt-6 flex flex-col gap-2">
-          <span className="text-sm font-medium text-zinc-700 dark:text-zinc-300">
+          <span className="text-sm font-medium text-ink-soft">
             Library shelf{" "}
-            <span className="font-normal text-zinc-500">
+            <span className="font-normal text-muted">
               (the bookshelf on your{" "}
               <Link href="/library" className="underline">
                 Library
@@ -281,12 +283,13 @@ export function SettingsForm({
                   <button
                     type="button"
                     key={s.id}
+                    aria-pressed={active}
                     onClick={() => setShelf(s.id)}
                     className={
-                      "flex items-center gap-2 rounded-xl border px-3 py-2.5 text-sm font-medium text-zinc-900 transition-colors dark:text-zinc-100 " +
+                      "flex items-center gap-2 rounded-xl border px-3 py-2.5 text-sm font-medium text-ink transition-colors " +
                       (active
                         ? "border-accent ring-1 ring-[var(--accent)]"
-                        : "border-zinc-300 hover:bg-zinc-100 dark:border-zinc-700 dark:hover:bg-zinc-900")
+                        : "border-ui-strong hover:bg-surface-soft")
                     }
                   >
                     <span
@@ -304,22 +307,22 @@ export function SettingsForm({
 
         {/* Feed wallpaper — applies only to the feed page. */}
         <div className="mt-6 flex flex-col gap-2">
-          <span className="text-sm font-medium text-zinc-700 dark:text-zinc-300">
+          <span className="text-sm font-medium text-ink-soft">
             Feed wallpaper{" "}
-            <span className="font-normal text-zinc-500">
+            <span className="font-normal text-muted">
               (shown only on your feed)
             </span>
-            <span className="ml-2 rounded-full bg-amber-100 px-2 py-0.5 text-xs font-medium text-amber-800 dark:bg-amber-900/40 dark:text-amber-300">
+            <span className="ml-2 rounded-full bg-warning-soft px-2 py-0.5 text-xs font-medium text-warning">
               Beta
             </span>
           </span>
-          <p className="rounded-lg bg-amber-50 px-3 py-2 text-xs text-amber-800 dark:bg-amber-950/40 dark:text-amber-300">
+          <p className="rounded-lg bg-warning-soft px-3 py-2 text-xs text-warning">
             Heads up: this feature is in beta. Your wallpaper may be erased after
             you log out, so you might need to upload it again next time.
           </p>
 
           {wallpaper ? (
-            <div className="overflow-hidden rounded-xl border border-zinc-300 dark:border-zinc-700">
+            <div className="overflow-hidden rounded-xl border border-ui-strong">
               {/* eslint-disable-next-line @next/next/no-img-element */}
               <img
                 src={wallpaper}
@@ -328,7 +331,7 @@ export function SettingsForm({
               />
             </div>
           ) : (
-            <p className="text-sm text-zinc-500">
+            <p className="text-sm text-muted">
               No wallpaper yet — your feed uses the background colour above.
             </p>
           )}
@@ -349,7 +352,7 @@ export function SettingsForm({
               type="button"
               onClick={() => fileRef.current?.click()}
               disabled={wpBusy}
-              className="h-10 rounded-full border border-zinc-300 px-4 text-sm font-medium text-zinc-900 transition-colors hover:bg-zinc-100 disabled:opacity-50 dark:border-zinc-700 dark:text-zinc-100 dark:hover:bg-zinc-900"
+              className="h-10 rounded-full border border-ui-strong px-4 text-sm font-medium text-ink transition-colors hover:bg-surface-soft disabled:opacity-50"
             >
               {wpBusy ? "Working…" : wallpaper ? "Replace image" : "Upload image"}
             </button>
@@ -357,19 +360,19 @@ export function SettingsForm({
               <button
                 type="button"
                 onClick={removeWallpaper}
-                className="text-sm text-red-600 hover:underline dark:text-red-400"
+                className="text-sm text-danger hover:underline"
               >
                 Remove
               </button>
             )}
           </div>
-          <span className="text-xs text-zinc-500">
+          <span className="text-xs text-muted">
             JPG, PNG, WEBP, or GIF, up to 8&nbsp;MB.
           </span>
-          {wpError && <p className="text-sm text-red-600">{wpError}</p>}
+          {wpError && <p className="text-sm text-danger">{wpError}</p>}
         </div>
 
-        {error && <p className="mt-6 text-sm text-red-600">{error}</p>}
+        {error && <p className="mt-6 text-sm text-danger">{error}</p>}
         <div className="mt-8 flex items-center gap-3">
           <button
             type="button"
@@ -380,16 +383,16 @@ export function SettingsForm({
             {saving ? "Saving…" : "Save changes"}
           </button>
           {saved && !saving && (
-            <span className="text-sm text-zinc-500">Saved ✓</span>
+            <span className="text-sm text-muted">Saved ✓</span>
           )}
         </div>
 
         {/* Danger zone — permanently delete this account. */}
-        <div className="mt-12 border-t border-zinc-200 pt-6 dark:border-zinc-800">
-          <h2 className="text-lg font-semibold text-red-600 dark:text-red-400">
+        <div className="mt-12 border-t border-ui pt-6">
+          <h2 className="text-lg font-semibold text-danger">
             Delete account
           </h2>
-          <p className="mt-1 text-sm text-zinc-500">
+          <p className="mt-1 text-sm text-muted">
             Permanently deletes your account and everything tied to it — your
             stories, comments, reactions, and follows. This can&apos;t be undone.
           </p>
@@ -398,13 +401,13 @@ export function SettingsForm({
             <button
               type="button"
               onClick={() => setConfirmDelete(true)}
-              className="mt-4 h-11 rounded-full border border-red-300 px-5 text-sm font-medium text-red-600 transition-colors hover:bg-red-50 dark:border-red-900 dark:text-red-400 dark:hover:bg-red-950/40"
+              className="mt-4 h-11 rounded-full border border-danger px-5 text-sm font-medium text-danger transition-colors hover:bg-danger-soft"
             >
               Delete account
             </button>
           ) : (
-            <div className="mt-4 flex flex-col gap-3 rounded-xl border border-red-300 p-4 dark:border-red-900">
-              <label className="text-sm font-medium text-zinc-700 dark:text-zinc-300">
+            <div className="mt-4 flex flex-col gap-3 rounded-xl border border-danger p-4 ">
+              <label className="text-sm font-medium text-ink-soft">
                 Enter your password to confirm
               </label>
               <input
@@ -412,15 +415,15 @@ export function SettingsForm({
                 value={deletePassword}
                 onChange={(e) => setDeletePassword(e.target.value)}
                 autoComplete="current-password"
-                className="h-11 w-full rounded-lg border border-zinc-300 bg-white px-3 text-sm text-zinc-900 outline-none focus:border-zinc-900 dark:border-zinc-700 dark:bg-zinc-950 dark:text-zinc-100 dark:focus:border-zinc-300"
+                className="h-11 w-full rounded-lg border border-ui-strong bg-surface-raised px-3 text-sm text-ink outline-none focus:border-accent"
               />
-              {deleteError && <p className="text-sm text-red-600">{deleteError}</p>}
+              {deleteError && <p className="text-sm text-danger">{deleteError}</p>}
               <div className="flex items-center gap-3">
                 <button
                   type="button"
                   onClick={deleteAccount}
                   disabled={deleting || deletePassword.length === 0}
-                  className="h-11 rounded-full bg-red-600 px-5 text-sm font-medium text-white transition-colors hover:bg-red-700 disabled:opacity-50"
+                  className="h-11 rounded-full btn-danger px-5 text-sm font-medium transition-colors disabled:opacity-50"
                 >
                   {deleting ? "Deleting…" : "Permanently delete"}
                 </button>
@@ -431,7 +434,7 @@ export function SettingsForm({
                     setDeletePassword("");
                     setDeleteError(null);
                   }}
-                  className="text-sm text-zinc-600 hover:underline dark:text-zinc-400"
+                  className="text-sm text-muted hover:underline"
                 >
                   Cancel
                 </button>

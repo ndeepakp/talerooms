@@ -28,11 +28,11 @@ export function StarRating({ value, size = 16 }: { value: number; size?: number 
             style={{ width: size, height: size }}
             aria-hidden="true"
           >
-            <span className="absolute inset-0 text-zinc-300 dark:text-zinc-600">
+            <span className="absolute inset-0 text-ui-strong">
               <StarSvg />
             </span>
             <span
-              className="absolute inset-0 overflow-hidden text-amber-400"
+              className="absolute inset-0 overflow-hidden text-rating"
               style={{ width: `${fill * 100}%` }}
             >
               <StarSvg />

@@ -1,7 +1,6 @@
 import Link from "next/link";
-import { notFound, redirect } from "next/navigation";
-import { headers } from "next/headers";
-import { auth } from "@/lib/auth";
+import { notFound } from "next/navigation";
+import { requirePageSession } from "@/lib/account-session";
 import { sql } from "@/lib/db";
 import { getAuthorWorks } from "@/lib/profile";
 import { AuthorWorks } from "@/components/profile/AuthorWorks";
@@ -15,8 +14,7 @@ export default async function HandleStoriesPage({
   params: Promise<{ handle: string }>;
 }) {
   const { handle } = await params;
-  const session = await auth.api.getSession({ headers: await headers() });
-  if (!session) redirect("/login");
+  const session = await requirePageSession();
 
   const [user] = await sql<{ id: string; name: string | null; username: string | null }[]>`
     SELECT id, name, username FROM "user" WHERE lower(username) = lower(${handle})

@@ -1,5 +1,4 @@
-import { headers } from "next/headers";
-import { auth } from "@/lib/auth";
+import { getActiveSession } from "@/lib/account-session";
 import { sql } from "@/lib/db";
 import {
   DEFAULT_APPEARANCE,
@@ -21,7 +20,7 @@ export async function getAppearance(
   session?: { user: { id: string } } | null,
 ): Promise<Appearance> {
   const resolved =
-    session ?? (await auth.api.getSession({ headers: await headers() }));
+    session ?? (await getActiveSession());
   if (!resolved) return DEFAULT_APPEARANCE;
 
   const [row] = await sql<

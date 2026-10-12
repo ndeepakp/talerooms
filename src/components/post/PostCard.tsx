@@ -84,7 +84,7 @@ export function PostCard({ post }: { post: PostRow }) {
   }
 
   return (
-    <div className="rounded-2xl border border-zinc-200 bg-white p-4 dark:border-zinc-800 dark:bg-zinc-950">
+    <div className="rounded-2xl border border-ui bg-surface-raised p-4">
       <div className="flex items-start justify-between gap-3">
         <div className="flex items-center gap-3">
           <Link href={`/${post.handle ?? post.author_id}`} aria-label={`${post.author ?? "Author"}'s profile`}>
@@ -93,18 +93,18 @@ export function PostCard({ post }: { post: PostRow }) {
           <div>
             <Link
               href={`/${post.handle ?? post.author_id}`}
-              className="text-sm font-medium text-zinc-900 hover:underline dark:text-zinc-100"
+              className="text-sm font-medium text-ink hover:underline"
             >
               {post.author ?? "Someone"}
             </Link>
-            <p className="text-xs text-zinc-400">{timeAgo(post.created_at)}</p>
+            <p className="text-xs text-subtle">{timeAgo(post.created_at)}</p>
           </div>
         </div>
         {post.mine && (
           <button
             type="button"
             onClick={remove}
-            className="text-xs text-zinc-400 hover:text-red-600 dark:hover:text-red-400"
+            className="text-xs text-subtle hover:text-danger"
           >
             Delete
           </button>
@@ -120,7 +120,7 @@ export function PostCard({ post }: { post: PostRow }) {
           {post.answer_story_id && (
             <Link
               href={`/stories/${post.answer_story_slug ?? post.answer_story_id}?chapter=${post.answer_chapter ?? 0}`}
-              className="mb-2 block text-xs text-zinc-500 hover:underline"
+              className="mb-2 block text-xs text-muted hover:underline"
             >
               📖 {post.answer_story_title ?? "the story"} · Chapter{" "}
               {(post.answer_chapter ?? 0) + 1} →
@@ -132,9 +132,9 @@ export function PostCard({ post }: { post: PostRow }) {
             <button
               type="button"
               onClick={() => setRevealed(true)}
-              className="flex w-full flex-col items-center gap-0.5 rounded-lg border border-dashed border-zinc-300 bg-zinc-50 px-3 py-5 text-center hover:bg-zinc-100 dark:border-zinc-700 dark:bg-zinc-900/40 dark:hover:bg-zinc-900"
+              className="flex w-full flex-col items-center gap-0.5 rounded-lg border border-dashed border-ui-strong bg-surface-soft px-3 py-5 text-center hover:bg-surface-soft"
             >
-              <span className="text-sm text-zinc-500">
+              <span className="text-sm text-muted">
                 🙈 Chapter {(post.answer_chapter ?? 0) + 1} answer — may contain spoilers
               </span>
               <span className="text-xs font-medium text-accent">Tap to reveal</span>
@@ -147,7 +147,7 @@ export function PostCard({ post }: { post: PostRow }) {
         </div>
       )}
 
-      <div className="mt-3 flex items-center gap-5 text-sm text-zinc-500">
+      <div className="mt-3 flex items-center gap-5 text-sm text-muted">
         <button
           type="button"
           onClick={toggleLike}
@@ -155,7 +155,7 @@ export function PostCard({ post }: { post: PostRow }) {
           aria-label={liked ? "Unlike" : "Like"}
           className={
             "inline-flex items-center gap-1.5 transition-colors " +
-            (liked ? "text-rose-600 dark:text-rose-400" : "hover:text-rose-600 dark:hover:text-rose-400")
+            (liked ? "text-danger" : "hover:text-danger")
           }
         >
           <svg
@@ -177,31 +177,31 @@ export function PostCard({ post }: { post: PostRow }) {
         <button
           type="button"
           onClick={toggleComments}
-          className="inline-flex items-center gap-1.5 hover:text-zinc-700 dark:hover:text-zinc-300"
+          className="inline-flex items-center gap-1.5 hover:text-ink-soft"
         >
           <span aria-hidden="true">💬</span> {commentCount}
         </button>
       </div>
 
       {open && (
-        <div className="mt-3 border-t border-zinc-100 pt-3 dark:border-zinc-800">
+        <div className="mt-3 border-t border-ui pt-3">
           {comments === null ? (
-            <p className="text-xs text-zinc-400">Loading…</p>
+            <p className="text-xs text-subtle">Loading…</p>
           ) : comments.length === 0 ? (
-            <p className="text-xs text-zinc-400">No comments yet — be the first.</p>
+            <p className="text-xs text-subtle">No comments yet — be the first.</p>
           ) : (
             <ul className="flex flex-col gap-2">
               {comments.map((c) => (
                 <li key={c.id} className="flex items-start gap-2">
                   <Avatar src={c.image} name={c.author} size={26} />
-                  <div className="min-w-0 rounded-lg bg-zinc-50 px-3 py-1.5 dark:bg-zinc-900">
+                  <div className="min-w-0 rounded-lg bg-surface-soft px-3 py-1.5">
                     <Link
                       href={`/${c.handle ?? ""}`}
-                      className="text-xs font-medium text-zinc-800 hover:underline dark:text-zinc-200"
+                      className="text-xs font-medium text-ink hover:underline"
                     >
                       {c.author ?? "Someone"}
                     </Link>
-                    <p className="whitespace-pre-wrap break-words text-sm text-zinc-700 dark:text-zinc-300">
+                    <p className="whitespace-pre-wrap break-words text-sm text-ink-soft">
                       {c.body}
                     </p>
                   </div>
@@ -221,7 +221,7 @@ export function PostCard({ post }: { post: PostRow }) {
               }}
               maxLength={1000}
               placeholder="Write a comment…"
-              className="min-h-11 min-w-0 flex-1 rounded-full border border-zinc-300 bg-white px-3 py-1.5 text-sm text-zinc-900 outline-none focus:border-zinc-900 dark:border-zinc-700 dark:bg-zinc-950 dark:text-zinc-100"
+              className="min-h-11 min-w-0 flex-1 rounded-full border border-ui-strong bg-surface-raised px-3 py-1.5 text-sm text-ink outline-none focus:border-accent"
             />
             <button
               type="button"

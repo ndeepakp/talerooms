@@ -1,5 +1,8 @@
 import { betterAuth } from "better-auth";
 import { Pool } from "pg";
+import { emailOTP } from "better-auth/plugins";
+import { googleAuthEnabled } from "@/lib/auth-config";
+import { sendVerificationCode } from "@/lib/verification-email";
 import { deleteWallpapersForUser } from "@/lib/wallpaper";
 import { deleteAvatarsForUser } from "@/lib/avatar";
 
@@ -8,7 +11,7 @@ import { deleteAvatarsForUser } from "@/lib/avatar";
 // different localhost port, or a public demo tunnel — fails with "Invalid
 // origin". Dev/prod localhost and Cloudflare quick-tunnel subdomains are always
 // allowed; set BETTER_AUTH_TRUSTED_ORIGINS (comma-separated) for real domains.
-const trustedOrigins = [
+export const trustedOrigins = [
   "http://localhost:3000",
   "http://localhost:3001",
   "https://talerooms.com",
@@ -23,10 +26,23 @@ const trustedOrigins = [
 export const auth = betterAuth({
   database: new Pool({ connectionString: process.env.DATABASE_URL }),
   trustedOrigins,
+  socialProviders: googleAuthEnabled() ? {
+    google: { clientId: process.env.GOOGLE_CLIENT_ID!, clientSecret: process.env.GOOGLE_CLIENT_SECRET! },
+  } : {},
+  account: { accountLinking: { enabled: true, disableImplicitLinking: true, requireLocalEmailVerified: true } },
+  plugins: [emailOTP({
+    otpLength: 6, expiresIn: 300, allowedAttempts: 5, storeOTP: "hashed",
+    resendStrategy: "rotate", disableSignUp: true,
+    sendVerificationOnSignUp: false,
+    changeEmail: { enabled: true, verifyCurrentEmail: false },
+    sendVerificationOTP: sendVerificationCode,
+    rateLimit: { window: 60, max: 5 },
+  })],
   emailAndPassword: {
     enabled: true,
   },
   user: {
+    additionalFields: { verificationGraceUntil: { type: "date", required: false, input: false } },
     deleteUser: {
       // Allow an account to be deleted through the app. Deleting the "user" row
       // cascades to all of that account's data (stories, reactions, comments,

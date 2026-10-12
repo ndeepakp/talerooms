@@ -1,7 +1,5 @@
 import Link from "next/link";
-import { redirect } from "next/navigation";
-import { headers } from "next/headers";
-import { auth } from "@/lib/auth";
+import { requirePageSession } from "@/lib/account-session";
 import { sql } from "@/lib/db";
 import { SearchBar } from "@/components/layout/SearchBar";
 
@@ -22,8 +20,7 @@ export default async function SearchPage({
 }: {
   searchParams: Promise<{ q?: string }>;
 }) {
-  const session = await auth.api.getSession({ headers: await headers() });
-  if (!session) redirect("/login");
+  await requirePageSession();
 
   const { q } = await searchParams;
   const raw = (q ?? "").trim();
@@ -76,14 +73,14 @@ export default async function SearchPage({
         </div>
 
         {term.length === 0 ? (
-          <p className="mt-12 text-center text-zinc-500">
+          <p className="mt-12 text-center text-muted">
             Search for a story title, a writer&apos;s name, or a $handle.
           </p>
         ) : (
           <>
             {!handleOnly && genres.length > 0 && (
               <section className="mt-8">
-                <h2 className="text-sm font-semibold uppercase tracking-wide text-zinc-500">
+                <h2 className="text-sm font-semibold uppercase tracking-wide text-muted">
                   Genres
                 </h2>
                 <div className="mt-3 flex flex-wrap gap-2">
@@ -91,7 +88,7 @@ export default async function SearchPage({
                     <Link
                       key={g.id}
                       href={`/genres/${g.id}`}
-                      className="rounded-full border border-zinc-300 px-3 py-1.5 text-sm text-zinc-700 transition-colors hover:bg-zinc-100 dark:border-zinc-700 dark:text-zinc-300 dark:hover:bg-zinc-900"
+                      className="rounded-full border border-ui-strong px-3 py-1.5 text-sm text-ink-soft transition-colors hover:bg-surface-soft"
                     >
                       {g.name}
                     </Link>
@@ -101,27 +98,27 @@ export default async function SearchPage({
             )}
 
             <section className="mt-8">
-              <h2 className="text-sm font-semibold uppercase tracking-wide text-zinc-500">
+              <h2 className="text-sm font-semibold uppercase tracking-wide text-muted">
                 People
               </h2>
               {users.length === 0 ? (
-                <p className="mt-3 text-zinc-500">No people found.</p>
+                <p className="mt-3 text-muted">No people found.</p>
               ) : (
                 <ul className="mt-3 flex flex-col gap-2">
                   {users.map((u) => (
                     <li key={u.id}>
                       <Link
                         href={`/${u.username ?? u.id}`}
-                        className="block rounded-2xl border border-zinc-200 bg-white p-4 transition-colors hover:border-zinc-400 dark:border-zinc-800 dark:bg-zinc-950 dark:hover:border-zinc-600"
+                        className="block rounded-2xl border border-ui bg-surface-raised p-4 transition-colors hover:border-ui-strong"
                       >
-                        <span className="font-semibold text-zinc-900 dark:text-zinc-50">
+                        <span className="font-semibold text-ink">
                           {u.name ?? "Unknown writer"}
                         </span>{" "}
                         {u.username && (
-                          <span className="text-sm text-zinc-500">${u.username}</span>
+                          <span className="text-sm text-muted">${u.username}</span>
                         )}
                         {u.bio && (
-                          <p className="mt-1 line-clamp-2 text-sm text-zinc-600 dark:text-zinc-400">
+                          <p className="mt-1 line-clamp-2 text-sm text-muted">
                             {u.bio}
                           </p>
                         )}
@@ -134,26 +131,26 @@ export default async function SearchPage({
 
             {!handleOnly && (
               <section className="mt-10">
-                <h2 className="text-sm font-semibold uppercase tracking-wide text-zinc-500">
+                <h2 className="text-sm font-semibold uppercase tracking-wide text-muted">
                   Stories
                 </h2>
                 {stories.length === 0 ? (
-                  <p className="mt-3 text-zinc-500">No stories found.</p>
+                  <p className="mt-3 text-muted">No stories found.</p>
                 ) : (
                   <ul className="mt-3 flex flex-col gap-2">
                     {stories.map((s) => (
                       <li key={s.id}>
                         <Link
                           href={`/stories/${s.id}`}
-                          className="block rounded-2xl border border-zinc-200 bg-white p-4 transition-colors hover:border-zinc-400 dark:border-zinc-800 dark:bg-zinc-950 dark:hover:border-zinc-600"
+                          className="block rounded-2xl border border-ui bg-surface-raised p-4 transition-colors hover:border-ui-strong"
                         >
-                          <h3 className="font-semibold text-zinc-900 dark:text-zinc-50">
+                          <h3 className="font-semibold text-ink">
                             {s.title}
                           </h3>
-                          <p className="mt-1 text-sm text-zinc-500">
+                          <p className="mt-1 text-sm text-muted">
                             by {s.author ?? "Unknown"}
                           </p>
-                          <p className="mt-1 line-clamp-2 text-sm text-zinc-600 dark:text-zinc-400">
+                          <p className="mt-1 line-clamp-2 text-sm text-muted">
                             {s.summary}
                           </p>
                         </Link>

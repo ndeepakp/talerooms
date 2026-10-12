@@ -43,7 +43,7 @@ export function FollowButton({
       className={
         "min-h-11 rounded-full px-5 text-sm font-medium transition-colors disabled:opacity-50 " +
         (following
-          ? "border border-zinc-300 text-zinc-700 hover:bg-zinc-100 dark:border-zinc-700 dark:text-zinc-300 dark:hover:bg-zinc-900"
+          ? "border border-ui-strong text-ink-soft hover:bg-surface-soft"
           : "btn-primary")
       }
     >

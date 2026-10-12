@@ -1,12 +1,11 @@
 import { NextResponse } from "next/server";
-import { headers } from "next/headers";
-import { auth } from "@/lib/auth";
+import { requireSession, withErrors } from "@/lib/http";
 import { sql } from "@/lib/db";
 
 const MIN_GENRES = 3;
 
-export async function POST(req: Request) {
-  const session = await auth.api.getSession({ headers: await headers() });
+export const POST = withErrors(async function POST(req: Request) {
+  const session = await requireSession();
   if (!session) {
     return NextResponse.json({ error: "You must be signed in." }, { status: 401 });
   }
@@ -29,4 +28,4 @@ export async function POST(req: Request) {
   await sql`INSERT INTO user_genres ${sql(rows, "user_id", "genre_id")} ON CONFLICT DO NOTHING`;
 
   return NextResponse.json({ ok: true });
-}
+});

@@ -1,7 +1,6 @@
 import Link from "next/link";
 import { notFound, redirect } from "next/navigation";
-import { headers } from "next/headers";
-import { auth } from "@/lib/auth";
+import { getActiveSession } from "@/lib/account-session";
 import { sql } from "@/lib/db";
 import { Avatar } from "@/components/layout/Avatar";
 import { StarRating } from "@/components/story/StarRating";
@@ -95,7 +94,7 @@ export default async function StoryPage({
   const { chapter: chapterParam } = await searchParams;
 
   // Session is optional: logged-out visitors get a public, indexable view.
-  const session = await auth.api.getSession({ headers: await headers() });
+  const session = await getActiveSession();
 
   // The route param may be a clean slug or a legacy UUID. Resolve it, and if it
   // came in as a UUID, redirect to the canonical slug URL so the address bar
@@ -494,7 +493,7 @@ export default async function StoryPage({
           </div>
         </section>}
         <div className="mx-auto max-w-4xl">
-        <section className="mt-10 border-t border-ui pt-6 ">
+        <section className="mt-10 border-t border-ui pt-6">
           <h2 className="mb-5 font-serif text-2xl text-ink">Reviews</h2>
           <RatingBreakdown ratings={ratings} />
 
@@ -538,7 +537,7 @@ export default async function StoryPage({
                     </div>
                     <div className="flex max-w-full flex-wrap items-center gap-2">
                       {r.pinned && (
-                        <span className="rounded-full bg-amber-100 px-2 py-0.5 text-xs font-medium text-amber-700 dark:bg-amber-950/40 dark:text-amber-300">
+                        <span className="rounded-full bg-warning-soft px-2 py-0.5 text-xs font-medium text-warning">
                           📌 Featured by author
                         </span>
                       )}
@@ -549,7 +548,7 @@ export default async function StoryPage({
                   </div>
                   {r.liked && (
                     <p className="mt-2 text-sm text-ink-soft">
-                      <span className="font-medium text-emerald-600 dark:text-emerald-400">
+                      <span className="font-medium text-success">
                         Liked:
                       </span>{" "}
                       {r.liked}
@@ -557,7 +556,7 @@ export default async function StoryPage({
                   )}
                   {r.disliked && (
                     <p className="mt-1 text-sm text-ink-soft">
-                      <span className="font-medium text-rose-600 dark:text-rose-400">
+                      <span className="font-medium text-danger">
                         Could be better:
                       </span>{" "}
                       {r.disliked}
@@ -569,7 +568,7 @@ export default async function StoryPage({
           )}
         </section>
 
-        <section className="mt-10 border-t border-ui pt-6 ">
+        <section className="mt-10 border-t border-ui pt-6">
           <h2 className="text-lg font-semibold text-ink">
             Posts about this story
           </h2>
@@ -601,7 +600,7 @@ export default async function StoryPage({
         </section>
 
         {similar.length > 0 && (
-          <section className="mt-10 border-t border-ui pt-6 ">
+          <section className="mt-10 border-t border-ui pt-6">
             <h2 className="text-lg font-semibold text-ink">
               Similar stories
             </h2>

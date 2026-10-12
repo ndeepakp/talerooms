@@ -132,7 +132,7 @@ export function NotificationBell() {
                     "flex gap-2 px-4 py-3 " +
                     (n.seen
                       ? "bg-surface-raised"
-                      : "bg-zinc-100 dark:bg-zinc-800/50")
+                      : "bg-surface-soft")
                   }
                 >
                   <span

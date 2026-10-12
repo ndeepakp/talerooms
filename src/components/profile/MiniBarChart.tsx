@@ -31,7 +31,7 @@ export function MiniBarChart({
             >
               <span
                 className={
-                  "mb-1 tabular-nums text-zinc-500 " + (large ? "text-xs" : "text-[10px]")
+                  "mb-1 tabular-nums text-muted " + (large ? "text-xs" : "text-[10px]")
                 }
               >
                 {showValues && d.value > 0 ? format(d.value) : ""}
@@ -50,7 +50,7 @@ export function MiniBarChart({
         {data.map((d, i) => (
           <span
             key={i}
-            className="flex-1 overflow-hidden text-center text-[10px] text-zinc-400 dark:text-zinc-500"
+            className="flex-1 overflow-hidden text-center text-[10px] text-subtle"
           >
             {i % step === 0 ? d.label : ""}
           </span>

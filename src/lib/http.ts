@@ -1,6 +1,8 @@
 import { NextResponse } from "next/server";
 import { headers } from "next/headers";
 import { auth } from "@/lib/auth";
+import { sessionAccountState } from "@/lib/account-session";
+import { accountIsActive } from "@/lib/account-policy";
 
 // A logged-in session (never null). Derived from better-auth's own return type so
 // it stays in sync if the auth config changes.
@@ -24,6 +26,8 @@ export class ApiError extends Error {
 export async function requireSession(): Promise<Session> {
   const session = await auth.api.getSession({ headers: await headers() });
   if (!session) throw new ApiError(401, "You must be signed in.");
+  const state = await sessionAccountState(session.user.id);
+  if (!state || !accountIsActive(state)) throw new ApiError(403, "Verify your email to activate your account.");
   return session;
 }
 

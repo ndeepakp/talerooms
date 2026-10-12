@@ -20,7 +20,7 @@ A comprehensive roadmap and tracking ledger for the visual, typographic, archite
 | [`TASK-SYS-02`](#task-sys-02-brand-identity--logo-refinement) | Brand Identity & Header Overhaul | Design System | High | `[x] Completed` |
 | [`TASK-SYS-03`](#task-sys-03-modern-bookshelf-elevation--spine-shadows) | Modern Bookshelf Elevation & 3D Spine Depth | Design System | High | `[x] Completed` |
 | [`TASK-SYS-04`](#task-sys-04-generative-book-jacket-designer) | Generative Book Jacket Designer & Cover Art | Design System | Medium | `[x] Completed` |
-| [`TASK-SYS-05`](#task-sys-05-unified-surface-tokens--border-softening) | Unified Surface Tokens & Border Softening | Design System | High | `[-] In Progress` |
+| [`TASK-SYS-05`](#task-sys-05-unified-surface-tokens--border-softening) | Unified Surface Tokens & Border Softening | Design System | High | `[x] Completed locally` |
 | [`TASK-PAGE-01`](#task-page-01-landing-page-colorful-welcome--original-stories) | Landing Page: Colorful Welcome & Original Stories | Pages & UI | High | `[x] Completed` |
 | [`TASK-PAGE-02`](#task-page-02-reading-room--customization-suite) | Reading Room: Distraction-Free & Customization Drawer | Reader | High | `[x] Completed` |
 | [`TASK-PAGE-03`](#task-page-03-story-overview-page-split-layout) | Story Overview Page: Two-Column Editorial Layout | Story View | High | `[x] Completed` |
@@ -28,9 +28,10 @@ A comprehensive roadmap and tracking ledger for the visual, typographic, archite
 | [`TASK-PAGE-05`](#task-page-05-author-studio-multi-step-focused-writing-suite) | Author Studio: Multi-Step Focused Writing Suite | Author Studio | High | `[x] Completed` |
 | [`TASK-PAGE-06`](#task-page-06-author-portfolio--profile-page) | Author Profile: Literary Portfolio & Memberships | Profiles | Medium | `[x] Completed and deployed` |
 | [`TASK-PAGE-07`](#task-page-07-library-bookshelf-redesign) | Personal Library: Gallery & Reading Progress | Library | Medium | `[x] Completed and deployed` |
-| [`TASK-AUTH-01`](#task-auth-01-google-signup--email-otp-verification) | Google Signup & Email OTP Verification / Account Activation | Authentication | High | `[ ] Pending` |
+| [`TASK-AUTH-01`](#task-auth-01-google-signup--email-otp-verification) | Google Signup & Email OTP Verification / Account Activation | Authentication | High | `[-] In Progress` |
 | [`TASK-PAY-01`](#task-pay-01-stripe-payments-integration) | Stripe Platform: Checkout, Subscriptions, Connect & Webhooks | Payments | High | `[ ] Pending` |
 | [`TASK-ADMIN-01`](#task-admin-01-admin-console--observability-dashboard) | Admin Console & Observability Dashboard | Administration & Analytics | High | `[ ] Pending` |
+| [`TASK-SAFE-01`](#task-safe-01-protected-under-18-reader--writer-experience) | Protected Under-18 Reader & Writer Experience | Age Access & Publishing | High | `[ ] Pending` |
 
 
 ---
@@ -47,10 +48,12 @@ The requested application-wide mobile layout audit was validated and deployed on
 
 Author Profiles (`TASK-PAGE-06`) and mobile sanity fixes were validated, pushed and deployed on 2026-10-08 in `6cbbf59` (Fly machine v37, health 1/1).
 
-1. **Visual Consistency & Theme Audit** — Finish `TASK-SYS-05`, including shared-component colors, surfaces, and light/dark styling.
-2. **Signup, User Verification & Account Testing** — `TASK-AUTH-01`; add Google signup/sign-in and email OTP activation, then complete outstanding end-to-end checks for bookmarks, reviews, community submissions, reading resume, and protected account flows against the activation rules.
-3. **Payments** — `TASK-PAY-01`; complete and validate before starting administration.
-4. **Admin Console & Observability Dashboard** — `TASK-ADMIN-01`; user management, content moderation, product analytics, and operational visibility. Start only after the payments task is completed and validated.
+Visual Consistency & Theme Audit (`TASK-SYS-05`) was completed and validated locally on 2026-10-09; review, push and deployment are pending. See [theme audit](docs/THEME_AUDIT.md).
+
+1. **Signup, User Verification & Account Testing** — `TASK-AUTH-01`; add Google signup/sign-in and email OTP activation, then complete outstanding end-to-end checks for bookmarks, reviews, community submissions, reading resume, and protected account flows against the activation rules.
+2. **Payments** — `TASK-PAY-01`; complete and validate before starting administration.
+3. **Admin Console & Observability Dashboard** — `TASK-ADMIN-01`; user management, content moderation, product analytics, and operational visibility. Start only after the payments task is completed and validated.
+4. **Protected Under-18 Reader & Writer Experience** — `TASK-SAFE-01`; parent-managed accounts, curated discovery, private writing and reviewed publishing. Keep this last, after administration is completed and validated. Planning only; under-18 access must not be advertised as supported before its safeguards are ready.
 
 ---
 
@@ -137,7 +140,7 @@ Author Profiles (`TASK-PAGE-06`) and mobile sanity fixes were validated, pushed 
 ---
 
 #### `TASK-SYS-05`: Unified Surface Tokens & Border Softening
-- **Status**: `[-] In Progress` — First foundation batch implemented and validated; remaining component audit pending.
+- **Status**: `[x] Completed locally (2026-10-09)` — remaining component/theme audit validated; pending review, push and deployment.
 - **Priority**: High — Foundation for the page redesigns.
 - **Files Affected**:
   - `src/app/globals.css`
@@ -149,9 +152,10 @@ Author Profiles (`TASK-PAGE-06`) and mobile sanity fixes were validated, pushed 
   - Unify border-radius definitions across buttons, cards, modals, and pills.
 - **Checklist**:
   - [x] Define semantic surface, text, border, radius, and shadow tokens in `globals.css`.
-  - [ ] Audit component color classes to ensure theme compatibility.
+  - [x] Audit component color classes to ensure theme compatibility.
   - [x] Migrate navigation, search/menu/notification surfaces, bookshelves, library, access/review panels, and feed cards to semantic tokens.
-  - [ ] Complete the remaining shared-component color audit during the subsequent page redesigns.
+  - [x] Complete the remaining shared-component color audit across account forms, collections, community, reviews, analytics and editor controls.
+- **Final audit (2026-10-09)**: Remaining UI surfaces/forms use semantic tokens. Added shared status and rating colors, explicit field radius, accessible appearance selection states, and reader-local feedback/code/link colors. 42 appearance/contrast combinations and 60 route/viewport checks passed. Lint, 64 tests and production build passed. Details and limitations: [theme audit](docs/THEME_AUDIT.md). Local only; payment/signup/admin implementations remain separate.
 - **Validated first batch (2026-10-05)**:
   - Shared literary brand, responsive navigation, scalable generated covers, and always-visible library chapter positions.
   - Library positions are labelled "last opened"; they do not claim completed reading percentages.
@@ -416,7 +420,7 @@ Author Profiles (`TASK-PAGE-06`) and mobile sanity fixes were validated, pushed 
 ### Signup & Account Verification
 
 #### `TASK-AUTH-01`: Google Signup & Email OTP Verification
-- **Status**: `[ ] Pending`
+- **Status**: `[-] In Progress` — Implemented; real email OTP verified and production rollout authorized. Completed Google OAuth success/cancellation remains a manual validation follow-up.
 - **Priority**: High — Complete before payments; validate both signup paths before advancing.
 - **Files / Areas Affected**:
   - `src/lib/auth.ts` and authentication client configuration
@@ -432,15 +436,16 @@ Author Profiles (`TASK-PAGE-06`) and mobile sanity fixes were validated, pushed 
   - Define how existing accounts transition before rollout, avoiding accidental activation of unverified accounts or unexplained lockouts.
 - **Checklist**:
   - [ ] Configure Google OAuth credentials and approved callback URLs for local and production environments; add signup/login controls and handle cancellation/errors.
-  - [ ] Implement transactional email OTP delivery and an accessible verification screen with resend cooldown and clear pending/expired/error states.
-  - [ ] Use short-lived, single-use codes with secure storage, limited attempts, and request/resend rate limits; invalidate consumed or superseded codes.
-  - [ ] Persist verification/activation state using the auth provider's supported model and enforce it consistently on the server.
-  - [ ] Handle returning inactive users and interrupted signup so verification can resume safely; a changed email must be verified before activation.
-  - [ ] Handle duplicate emails and account linking safely without automatically merging identities solely because email strings match.
-  - [ ] Document and validate the existing-account migration policy and required Google/email environment configuration.
+  - [x] Implement transactional email OTP delivery and an accessible verification screen with resend cooldown and clear pending/expired/error states. Real Resend inbox delivery and user-completed OTP verification passed on 2026-10-12.
+  - [x] Use short-lived, single-use codes with secure storage, limited attempts, and request/resend rate limits; invalidate consumed or superseded codes.
+  - [x] Persist verification/activation state using the auth provider's supported model and enforce it consistently on the server.
+  - [x] Handle returning inactive users and interrupted signup so verification can resume safely; a changed email must be verified before activation.
+  - [x] Handle duplicate emails and account linking safely without automatically merging identities solely because email strings match. Implicit linking is disabled; explicit linking UI is outside this batch.
+  - [x] Document and validate the existing-account migration policy and required Google/email environment configuration. Existing users get 30 days from migration; new users get no grace. Production auth secrets staged and migration applied on 2026-10-12; eight existing accounts received the transition window.
   - [ ] Validate Google success/cancellation, email OTP success/wrong/expired/reused codes, resend limits, session activation, and direct protected-route/API attempts from inactive users.
-  - [ ] Complete outstanding account-level end-to-end checks for existing bookmarking, reviews, community submissions, saved reading position, and access/subscription flows; repeat protected-flow checks with active and inactive accounts. Real payment validation belongs to the final payments phase.
-  - [ ] Run relevant auth tests, lint, TypeScript, production build, and mobile/keyboard flow checks before moving to the next task.
+  - [x] Complete outstanding account-level end-to-end checks for existing bookmarking, reviews, community submissions, saved reading position, and access/subscription flows; repeat protected-flow checks with active and inactive accounts. Local synthetic accounts and mock payment flows only; real payment validation belongs to the final payments phase.
+  - [x] Run relevant auth tests, lint, TypeScript, production build, and mobile/keyboard flow checks before moving to the next task.
+- **Local implementation / validation (2026-10-11)**: Google provider/client controls, Resend delivery, hashed 5-minute OTPs, account-bound requests, PostgreSQL serialization and durable resend/attempt limits, verification/correction screens and post-verification onboarding implemented. Shared page/API checks read current activation state; follow/reaction/genre bypasses closed. Migration `0049` applied only locally and re-run without extending grace. 81 local API/security/reader-flow checks, 72 tests, lint, TypeScript and production build passed; signup/verification fit 320/390/768/1280px and keyboard verification/onboarding completed without browser errors. Temporary synthetic-only mail configuration restored. Actual Google success/cancellation and real Resend inbox delivery remain pending credentials. Setup and rollout: [auth verification](docs/AUTH_VERIFICATION.md). No push/deployment, production migration or real payments. Local fixtures retained pending cleanup approval.
 - **Acceptance criteria**: A new email/password account remains inactive until its email OTP is verified. A Google signup with a validated verified email becomes active after the provider flow. Unverified users cannot bypass activation through login, stale sessions, or direct API requests. Real payments remain the final phase.
 
 ---
@@ -501,10 +506,38 @@ Author Profiles (`TASK-PAGE-06`) and mobile sanity fixes were validated, pushed 
 
 ---
 
+### Protected Under-18 Experience
+
+#### `TASK-SAFE-01`: Protected Under-18 Reader & Writer Experience
+- **Status**: `[ ] Pending` — Planning only; no implementation started.
+- **Priority**: High
+- **Execution dependency**: Last roadmap item. Start after `TASK-ADMIN-01` is completed and validated; preserve Signup/Verification → Payments → Administration → Protected Under-18 Experience.
+- **Objectives**:
+  - Provide one protected experience for everyone under 18, while applying age-specific consent requirements for the intended launch markets. Define age screening/assurance, guardian consent and eligibility before enabling child accounts; Google login/email OTP alone do not establish age.
+  - Parent-managed accounts with private profiles by default, minimal personal-data collection and guardian controls. Define age transitions and the move to adult permissions.
+  - Curated, age-appropriate discovery with reviewed suitability labels and content warnings. Enforce access restrictions on server routes/APIs and shared links, not only feed visibility.
+  - Private writing by default: saved drafts do not enter public shelves, search or discovery. No open public publishing; public stories require both guardian approval and moderation review, with an audit trail and reversible withdrawal.
+  - No open social interaction: prevent direct messaging, public comments and exposure of contact details; define any restricted interactions explicitly before enabling them.
+  - No independent monetisation for under-18 accounts. Any future guardian-managed earnings or purchases require a separately designed and validated flow.
+  - Control catalogue clutter through publishing readiness checks, submission limits and spam/duplicate review. Judge completeness, originality, accurate labels and policy compliance rather than age or genre. Define draft/rejected-submission retention and notify users before any deletion.
+- **Checklist**:
+  - [ ] Define launch markets, minimum supported age, age-assurance/consent rules, guardian responsibilities, retention and adult-transition policy.
+  - [ ] Implement parent-managed onboarding, private profiles and server-enforced age/guardian permissions.
+  - [ ] Add reviewed suitability labels and curated discovery; validate restricted content cannot leak through previews, search or shared links.
+  - [ ] Keep writing private by default; add guardian approval and moderation queues for public submissions using the admin console.
+  - [ ] Enforce interaction and monetisation restrictions, submission limits and reversible publication withdrawal.
+  - [ ] Validate consent withdrawal, guardian access boundaries, adult transitions, publishing bypass attempts, content isolation and desktop/mobile layouts before release.
+
+---
+
 ## Progress Log
 
 | Date | Task ID | Update Description | Author |
 | :--- | :--- | :--- | :--- |
+| 2026-10-11 | `TASK-AUTH-01` | Implemented Google/Resend integration and server-enforced account activation with a 30-day existing-account transition. Local OTP/security/reader-flow and responsive checks passed; live provider/delivery tests need credentials before release. No deployment. | Codex |
+| 2026-10-11 | `TASK-PAGE-01` | Clarified landing-page audience through the hero introduction and positioning strip: discover independent authors, publish original stories, keep rights and build returning readership. Preserved the existing visual headline/layout. Checked 320/390/768/1280px with no horizontal overflow or browser errors; scoped ESLint and diff checks passed. Local only. | Codex |
+| 2026-10-11 | `TASK-SAFE-01` | Added the combined parent-managed under-18 experience: curated discovery, private profiles/writing, guardian-approved and moderated publishing, restricted interaction and no independent monetisation. Scheduled last after administration; planning only. | Codex |
+| 2026-10-09 | `TASK-SYS-05` | Completed remaining shared-component/theme audit, semantic status/rating colors and reader palette isolation. 42 contrast combinations, 60 responsive route checks, lint, 64 tests and production build passed locally. Pending review/push/deployment. | Codex |
 | 2026-10-08 | Mobile sanity follow-up | Rechecked public and signed-in page templates at 320px and 390px. Fixed unbroken draft-title/review text overflow and wrapping of featured-review author controls. Mobile menu and screenshots checked; scoped lint and production build passed. Included in `6cbbf59`, deployed to Fly v37, health 1/1. | Codex |
 | 2026-10-08 | `TASK-PAGE-06` | Implemented author portfolio banner, book gallery/format filters, membership card, selected reader quotes and owner-only drafts/dashboard. Narrow preview animation positioning fixed. Local lint, TypeScript, 64 tests, production build and account/viewport checks passed. Pushed `6cbbf59`, deployed to Fly v37 with health 1/1; live profile/public mobile/redirect smoke checks passed. | Codex |
 | 2026-10-08 | `TASK-PAGE-07`, mobile layout audit | Pushed `5fe087d` and deployed to Fly (machine v36, health 1/1). Applied and verified production migration 0048 before rollout. Live DB health, public pages, protected-page redirects and mobile profile/story layouts passed. No production account mutations or purchases used for smoke testing. | Codex |
@@ -522,3 +555,7 @@ Author Profiles (`TASK-PAGE-06`) and mobile sanity fixes were validated, pushed 
 | 2026-10-06 | `TASK-PAGE-01`, `04`, `07` | Shared hinged book previews across landing, feed, library, and new-chapter shelves. Book-only hover, continuous spread hover area, responsive placement, tap/keyboard controls, and saved-chapter reading links validated locally. Broader feed/library tasks remain pending. | Codex |
 | 2026-10-06 | `TASK-PAGE-01` | Removed inside titles, blocked normal text selection/copy/drag, and changed the preview label to “A glimpse”. Copy shortcut and reading action checked; final wording edit passed diff checks. Batch not deployed; payments remain last. | Codex |
 | 2026-10-06 | `TASK-PAGE-01` to `03`, shared shelves | Pushed app release `82691f8` to main and deployed to Fly.io (machine v28, health 1/1). Verified production health, landing and open-book preview, reading/About/login navigation, mobile overflow, and browser console. | Codex |
+
+### Release preparation — 2026-10-12
+
+User requested GitHub push and Fly deployment after live OTP verification. Release includes account verification/onboarding, the pending semantic theme audit, landing-page positioning, and roadmap updates. 72 tests, lint, TypeScript, production build and diff checks passed. Real OTP delivery and user verification reached onboarding with database-confirmed activation. Google reached its official login screen; completed Google success/cancellation remains pending manual testing, so TASK-AUTH-01 stays In Progress. Fly auth secrets staged without committing credentials; additive migration 0049 granted eight existing accounts 30 days. Generated media and local secrets are excluded from the commit.

@@ -30,7 +30,7 @@ export function ShareButton({ title }: { title: string }) {
     <button
       type="button"
       onClick={share}
-      className="inline-flex items-center gap-1.5 rounded-full border border-zinc-300 px-3 py-1.5 text-sm font-medium text-zinc-700 transition-colors hover:bg-zinc-100 dark:border-zinc-700 dark:text-zinc-300 dark:hover:bg-zinc-900"
+      className="inline-flex items-center gap-1.5 rounded-full border border-ui-strong px-3 py-1.5 text-sm font-medium text-ink-soft transition-colors hover:bg-surface-soft"
     >
       <span aria-hidden="true">{copied ? "✓" : "↗"}</span>
       {copied ? "Link copied" : "Share"}

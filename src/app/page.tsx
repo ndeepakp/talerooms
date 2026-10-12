@@ -1,7 +1,6 @@
 import type { Metadata } from "next";
 import { redirect } from "next/navigation";
-import { headers } from "next/headers";
-import { auth } from "@/lib/auth";
+import { getActiveSession } from "@/lib/account-session";
 import { sql } from "@/lib/db";
 import { LandingWelcome, type LandingStory } from "@/components/story/LandingWelcome";
 
@@ -11,7 +10,7 @@ export const metadata: Metadata = {
 };
 
 export default async function Home() {
-  const session = await auth.api.getSession({ headers: await headers() });
+  const session = await getActiveSession();
   if (session) redirect("/feed");
 
   const stories = await sql<LandingStory[]>`

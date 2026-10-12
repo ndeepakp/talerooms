@@ -26,7 +26,7 @@ export function DeleteCollectionButton({ collectionId }: { collectionId: string 
       type="button"
       onClick={remove}
       disabled={busy}
-      className="text-sm font-medium text-red-600 hover:underline disabled:opacity-50 dark:text-red-400"
+      className="text-sm font-medium text-danger hover:underline disabled:opacity-50"
     >
       Delete collection
     </button>

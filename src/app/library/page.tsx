@@ -1,14 +1,11 @@
-import { redirect } from "next/navigation";
-import { headers } from "next/headers";
-import { auth } from "@/lib/auth";
+import { requirePageSession } from "@/lib/account-session";
 import { sql } from "@/lib/db";
 import { LibraryShelf, type LibraryStory } from "@/components/story/LibraryShelf";
 
 export const dynamic = "force-dynamic";
 
 export default async function LibraryPage() {
-  const session = await auth.api.getSession({ headers: await headers() });
-  if (!session) redirect("/login");
+  const session = await requirePageSession();
   const me = session.user.id;
 
   const collections = await sql<{ id: string; name: string }[]>`

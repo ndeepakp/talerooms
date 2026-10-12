@@ -1,6 +1,5 @@
 import { NextResponse } from "next/server";
-import { headers } from "next/headers";
-import { auth } from "@/lib/auth";
+import { requireSession, withErrors } from "@/lib/http";
 import { sql } from "@/lib/db";
 import { notify } from "@/lib/notify";
 
@@ -11,12 +10,7 @@ async function followerCount(userId: string) {
   return (row as { count: number }).count;
 }
 
-async function requireSession() {
-  const session = await auth.api.getSession({ headers: await headers() });
-  return session;
-}
-
-export async function POST(
+export const POST = withErrors(async function POST(
   _req: Request,
   { params }: { params: Promise<{ id: string }> },
 ) {
@@ -42,9 +36,9 @@ export async function POST(
   }
 
   return NextResponse.json({ following: true, followerCount: await followerCount(id) });
-}
+});
 
-export async function DELETE(
+export const DELETE = withErrors(async function DELETE(
   _req: Request,
   { params }: { params: Promise<{ id: string }> },
 ) {
@@ -59,4 +53,4 @@ export async function DELETE(
   `;
 
   return NextResponse.json({ following: false, followerCount: await followerCount(id) });
-}
+});

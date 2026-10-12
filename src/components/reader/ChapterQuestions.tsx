@@ -49,9 +49,9 @@ function QuizItem({
               className={
                 "rounded-lg border px-3 py-2 text-left text-sm transition-colors " +
                 (isCorrect
-                  ? "border-emerald-500 bg-[color-mix(in_srgb,#10b981_12%,var(--reader-paper))]"
+                  ? "border-[var(--reader-success)] bg-[color-mix(in_srgb,var(--reader-success)_10%,var(--reader-paper))]"
                   : isWrongPick
-                    ? "border-red-500 bg-[color-mix(in_srgb,#ef4444_12%,var(--reader-paper))]"
+                    ? "border-[var(--reader-danger)] bg-[color-mix(in_srgb,var(--reader-danger)_10%,var(--reader-paper))]"
                     : answered
                       ? "border-[var(--reader-border)]"
                       : "border-[var(--reader-border)] hover:bg-[var(--reader-paper)]")
@@ -59,8 +59,8 @@ function QuizItem({
             >
               <span className="flex items-center justify-between gap-2">
                 <span className="text-[var(--reader-ink)]">{opt}</span>
-                {isCorrect && <span className="text-emerald-600 dark:text-emerald-400">✓</span>}
-                {isWrongPick && <span className="text-red-600 dark:text-red-400">✗</span>}
+                {isCorrect && <span className="text-[var(--reader-success)]">✓</span>}
+                {isWrongPick && <span className="text-[var(--reader-danger)]">✗</span>}
               </span>
             </button>
           );
@@ -105,7 +105,7 @@ export function ChapterQuestions({
           Chapter quiz
         </h4>
         {answeredAll && (
-          <span className="shrink-0 rounded-full bg-accent/10 px-2.5 py-0.5 text-xs font-semibold text-accent">
+          <span className="shrink-0 rounded-full bg-[var(--reader-surface)] px-2.5 py-0.5 text-xs font-semibold text-[var(--reader-ink)]">
             You scored {score}/{questions.length} 🎉
           </span>
         )}

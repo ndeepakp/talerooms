@@ -1,6 +1,5 @@
 import { notFound, redirect } from "next/navigation";
-import { headers } from "next/headers";
-import { auth } from "@/lib/auth";
+import { requirePageSession } from "@/lib/account-session";
 import { sql } from "@/lib/db";
 
 export const dynamic = "force-dynamic";
@@ -15,8 +14,7 @@ export default async function LegacyCollectionRedirect({
 }) {
   const { id } = await params;
   if (!UUID_RE.test(id)) notFound();
-  const session = await auth.api.getSession({ headers: await headers() });
-  if (!session) redirect("/login");
+  await requirePageSession();
 
   const [row] = await sql<{ handle: string | null }[]>`
     SELECT u.username AS handle

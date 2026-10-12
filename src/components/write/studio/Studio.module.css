@@ -75,7 +75,7 @@
 .reviewRow { display:flex; align-items:start; justify-content:space-between; gap:16px; padding:16px 0; border-bottom:1px solid var(--border); font-size:13px; }
 .reviewRow:last-child { border:0; }
 .reviewRow button { flex-shrink:0; color:var(--accent); cursor:pointer; font-weight:550; }
-.alert { padding:14px 18px; border:1px solid color-mix(in srgb,#d94a43 50%,var(--border)); border-radius:12px; color:var(--foreground); background:color-mix(in srgb,#d94a43 8%,var(--surface)); font-size:13px; margin:18px 0; }
+.alert { padding:14px 18px; border:1px solid var(--danger-border); border-radius:12px; color:var(--foreground); background:var(--danger-soft); font-size:13px; margin:18px 0; }
 :global(body):has(.focus) :global(.app-header) { display:none; }
 .focus .top, .focus .steps, .focus .heading, .focus .chapterRail, .focus .footer { display:none; }
 .focus .manuscript { display:block; max-width:920px; margin:auto; }

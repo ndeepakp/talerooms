@@ -31,7 +31,7 @@ export function DeleteStoryButton({
       type="button"
       onClick={handleDelete}
       disabled={loading}
-      className="text-sm font-medium text-red-600 hover:underline disabled:opacity-50 dark:text-red-400"
+      className="text-sm font-medium text-danger hover:underline disabled:opacity-50"
     >
       {loading ? "Deleting…" : "Delete"}
     </button>

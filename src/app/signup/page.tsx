@@ -1,10 +1,6 @@
-import { sql } from "@/lib/db";
 import { SignupForm } from "./SignupForm";
-
-export default async function SignupPage() {
-  const genres = await sql<{ id: number; name: string }[]>`
-    SELECT id, name FROM genres ORDER BY name
-  `;
-
-  return <SignupForm genres={genres} />;
+import { googleAuthEnabled, verificationEmailEnabled } from "@/lib/auth-config";
+export const dynamic = "force-dynamic";
+export default function SignupPage() {
+  return <SignupForm googleEnabled={googleAuthEnabled()} emailEnabled={verificationEmailEnabled()}/>;
 }

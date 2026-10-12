@@ -17,7 +17,7 @@ export function PostsSection({
     <div className="flex flex-col gap-4">
       {composer && <PostComposer />}
       {posts.length === 0 ? (
-        <p className="text-sm text-zinc-500">{emptyText ?? "No posts yet."}</p>
+        <p className="text-sm text-muted">{emptyText ?? "No posts yet."}</p>
       ) : (
         posts.map((p) => <PostCard key={p.id} post={p} />)
       )}

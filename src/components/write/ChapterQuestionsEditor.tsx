@@ -70,7 +70,7 @@ export function ChapterQuestionsEditor({
               <button
                 type="button"
                 onClick={() => remove(i)}
-                className="ml-auto shrink-0 text-xs text-subtle hover:text-red-600 dark:hover:text-red-400"
+                className="ml-auto shrink-0 text-xs text-subtle hover:text-danger"
               >
                 Remove
               </button>
@@ -105,7 +105,7 @@ export function ChapterQuestionsEditor({
                     <button
                       type="button"
                       onClick={() => removeOption(i, oi)}
-                      className="text-xs text-subtle hover:text-red-600"
+                      className="text-xs text-subtle hover:text-danger"
                       aria-label="Remove option"
                     >
                       ✕

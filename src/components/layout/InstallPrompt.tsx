@@ -73,14 +73,14 @@ export function InstallPrompt() {
 
   return (
     <div className="fixed inset-x-0 bottom-0 z-50 flex justify-center px-4 pb-[calc(env(safe-area-inset-bottom)+12px)]">
-      <div className="flex w-full max-w-md items-center gap-3 rounded-2xl border border-zinc-200 bg-white p-3 shadow-xl dark:border-zinc-700 dark:bg-zinc-900">
+      <div className="flex w-full max-w-md items-center gap-3 rounded-2xl border border-ui bg-surface-raised p-3 shadow-xl">
         {/* eslint-disable-next-line @next/next/no-img-element */}
         <img src="/icons/icon-192.png" alt="" className="h-10 w-10 rounded-lg" />
         <div className="min-w-0 flex-1">
-          <p className="text-sm font-semibold text-zinc-900 dark:text-zinc-50">
+          <p className="text-sm font-semibold text-ink">
             Install Talerooms
           </p>
-          <p className="truncate text-xs text-zinc-500">
+          <p className="truncate text-xs text-muted">
             {platform === "ios"
               ? "Tap the Share icon, then “Add to Home Screen.”"
               : "Add it to your home screen for a full-screen app."}
@@ -99,7 +99,7 @@ export function InstallPrompt() {
           type="button"
           onClick={dismiss}
           aria-label="Dismiss"
-          className="shrink-0 rounded-full p-1.5 text-zinc-400 hover:bg-zinc-100 hover:text-zinc-600 dark:hover:bg-zinc-800"
+          className="shrink-0 rounded-full p-1.5 text-subtle hover:bg-surface-soft hover:text-muted"
         >
           ✕
         </button>

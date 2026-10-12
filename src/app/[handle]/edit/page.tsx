@@ -1,6 +1,5 @@
 import { notFound, redirect } from "next/navigation";
-import { headers } from "next/headers";
-import { auth } from "@/lib/auth";
+import { requirePageSession } from "@/lib/account-session";
 import { sql } from "@/lib/db";
 import { ProfileForm } from "@/app/[handle]/edit/ProfileForm";
 
@@ -13,8 +12,7 @@ export default async function EditProfilePage({
 }) {
   const { handle } = await params;
 
-  const session = await auth.api.getSession({ headers: await headers() });
-  if (!session) redirect("/login");
+  const session = await requirePageSession();
 
   const [user] = await sql<
     {

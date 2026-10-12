@@ -1,6 +1,4 @@
-import { redirect } from "next/navigation";
-import { headers } from "next/headers";
-import { auth } from "@/lib/auth";
+import { requirePageSession } from "@/lib/account-session";
 import { sql } from "@/lib/db";
 import {
   NotificationMessage,
@@ -22,8 +20,7 @@ function timeAgo(iso: string): string {
 }
 
 export default async function NotificationsPage() {
-  const session = await auth.api.getSession({ headers: await headers() });
-  if (!session) redirect("/login");
+  const session = await requirePageSession();
   const me = session.user.id;
 
   // Viewing the list reads everything — clear the unread state.
@@ -47,31 +44,31 @@ export default async function NotificationsPage() {
   return (
     <div className="min-h-screen bg-[var(--page)] px-6 py-12">
       <div className="mx-auto w-full max-w-5xl">
-        <h1 className="text-2xl font-bold text-zinc-900 dark:text-zinc-50">
+        <h1 className="text-2xl font-bold text-ink">
           Notifications
         </h1>
-        <p className="mt-1 text-sm text-zinc-500">
+        <p className="mt-1 text-sm text-muted">
           Purchases, followers, comments and subscriptions.
         </p>
 
         {items.length === 0 ? (
-          <p className="mt-10 text-center text-zinc-500">No notifications yet.</p>
+          <p className="mt-10 text-center text-muted">No notifications yet.</p>
         ) : (
           <ul className="mt-6 flex flex-col gap-2">
             {items.map((n) => (
               <li
                 key={n.id}
                 className={
-                  "rounded-xl border border-zinc-200 px-4 py-3 dark:border-zinc-800 " +
+                  "rounded-xl border border-ui px-4 py-3 " +
                   (n.seen
-                    ? "bg-white dark:bg-zinc-950"
-                    : "bg-zinc-100 dark:bg-zinc-800/50")
+                    ? "bg-surface-raised"
+                    : "bg-surface-soft")
                 }
               >
-                <p className="text-sm text-zinc-700 dark:text-zinc-300">
+                <p className="text-sm text-ink-soft">
                   <NotificationMessage n={n} />
                 </p>
-                <p className="mt-0.5 text-xs text-zinc-400">{timeAgo(n.created_at)}</p>
+                <p className="mt-0.5 text-xs text-subtle">{timeAgo(n.created_at)}</p>
               </li>
             ))}
           </ul>

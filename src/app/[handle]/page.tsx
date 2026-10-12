@@ -2,8 +2,7 @@ import Link from "next/link";
 import { notFound } from "next/navigation";
 import type { Metadata } from "next";
 import type { CSSProperties } from "react";
-import { headers } from "next/headers";
-import { auth } from "@/lib/auth";
+import { getActiveSession } from "@/lib/account-session";
 import { sql } from "@/lib/db";
 import { FollowButton } from "@/components/profile/FollowButton";
 import { Avatar } from "@/components/layout/Avatar";
@@ -57,7 +56,7 @@ export default async function ProfilePage({
   const { handle } = await params;
 
   // Session is optional — profiles are public (indexable + shareable).
-  const session = await auth.api.getSession({ headers: await headers() });
+  const session = await getActiveSession();
   const userId = session?.user.id ?? null;
 
   const [user] = await sql<

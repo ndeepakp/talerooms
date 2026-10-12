@@ -58,7 +58,7 @@ export function PostComposer({
   }
 
   return (
-    <div className="rounded-2xl border border-zinc-200 bg-white p-4 dark:border-zinc-800 dark:bg-zinc-950">
+    <div className="rounded-2xl border border-ui bg-surface-raised p-4">
       {answer ? (
         <p className="mb-2 inline-flex items-center gap-1.5 rounded-full bg-accent/10 px-2.5 py-1 text-xs font-medium text-accent">
           <span aria-hidden="true">💬</span>
@@ -79,11 +79,11 @@ export function PostComposer({
         rows={3}
         maxLength={2000}
         placeholder={answer ? "Write your answer… type @ to tag someone" : placeholder}
-        className="w-full resize-none rounded-lg border border-zinc-300 bg-white px-3 py-2 text-sm text-zinc-900 outline-none focus:border-zinc-900 dark:border-zinc-700 dark:bg-zinc-950 dark:text-zinc-100"
+        className="w-full resize-none rounded-lg border border-ui-strong bg-surface-raised px-3 py-2 text-sm text-ink outline-none focus:border-accent"
       />
-      {error && <p className="mt-1 text-sm text-red-600">{error}</p>}
+      {error && <p className="mt-1 text-sm text-danger">{error}</p>}
       <div className="mt-2 flex items-center justify-between gap-3">
-        <span className="text-xs text-zinc-400">
+        <span className="text-xs text-subtle">
           Tip: press Ctrl + Enter to post
         </span>
         <button

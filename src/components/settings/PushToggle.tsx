@@ -110,7 +110,7 @@ export function PushToggle() {
 
   if (supported === false) {
     return (
-      <p className="rounded-lg bg-zinc-50 px-3 py-2 text-xs text-zinc-500 dark:bg-zinc-900/40">
+      <p className="rounded-lg bg-surface-soft px-3 py-2 text-xs text-muted">
         Push notifications aren&apos;t supported in this browser. On iPhone, add
         Talerooms to your Home Screen first, then open it from there.
       </p>
@@ -119,12 +119,12 @@ export function PushToggle() {
 
   return (
     <div className="flex flex-col gap-2">
-      <div className="flex items-center justify-between gap-3 rounded-xl border border-zinc-200 p-4 dark:border-zinc-800">
+      <div className="flex items-center justify-between gap-3 rounded-xl border border-ui p-4">
         <div>
-          <p className="text-sm font-medium text-zinc-900 dark:text-zinc-100">
+          <p className="text-sm font-medium text-ink">
             New-chapter & activity alerts
           </p>
-          <p className="text-xs text-zinc-500">
+          <p className="text-xs text-muted">
             {enabled
               ? "On for this device — you'll get a push when something happens."
               : "Get pushed when an author you follow drops a new chapter, and more."}
@@ -137,14 +137,14 @@ export function PushToggle() {
           className={
             "shrink-0 rounded-full px-4 py-2 text-sm font-medium disabled:opacity-50 " +
             (enabled
-              ? "border border-zinc-300 text-zinc-700 hover:bg-zinc-100 dark:border-zinc-700 dark:text-zinc-300 dark:hover:bg-zinc-900"
+              ? "border border-ui-strong text-ink-soft hover:bg-surface-soft"
               : "btn-primary")
           }
         >
           {busy ? "…" : enabled ? "Turn off" : "Turn on"}
         </button>
       </div>
-      {error && <p className="text-xs text-red-600 dark:text-red-400">{error}</p>}
+      {error && <p className="text-xs text-danger">{error}</p>}
     </div>
   );
 }

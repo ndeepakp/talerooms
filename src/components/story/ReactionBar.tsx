@@ -45,7 +45,7 @@ export function ReactionBar({
   const base =
     "flex items-center gap-2 rounded-full border px-4 py-2 text-sm font-medium transition-colors disabled:opacity-50";
   const idle =
-    "border-zinc-300 text-zinc-700 hover:bg-zinc-100 dark:border-zinc-700 dark:text-zinc-300 dark:hover:bg-zinc-900";
+    "border-ui-strong text-ink-soft hover:bg-surface-soft";
 
   return (
     <div className="flex gap-3">
@@ -71,7 +71,7 @@ export function ReactionBar({
           base +
           " " +
           (reaction === -1
-            ? "border-red-600 bg-red-600 text-white"
+            ? "border-danger bg-danger-soft text-danger"
             : idle)
         }
       >

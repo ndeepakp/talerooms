@@ -1,6 +1,5 @@
-import { redirect, notFound } from "next/navigation";
-import { headers } from "next/headers";
-import { auth } from "@/lib/auth";
+import { notFound } from "next/navigation";
+import { requirePageSession } from "@/lib/account-session";
 import { getPost } from "@/lib/posts";
 import { PostCard } from "@/components/post/PostCard";
 
@@ -13,8 +12,7 @@ export default async function PostPage({
 }: {
   params: Promise<{ id: string }>;
 }) {
-  const session = await auth.api.getSession({ headers: await headers() });
-  if (!session) redirect("/login");
+  const session = await requirePageSession();
 
   const { id } = await params;
   if (!UUID_RE.test(id)) notFound();

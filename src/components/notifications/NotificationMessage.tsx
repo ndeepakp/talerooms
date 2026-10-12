@@ -43,13 +43,13 @@ function Actor({ n }: { n: Notification }) {
     return (
       <Link
         href={`/${n.actor_handle ?? n.actor_id}`}
-        className="font-medium text-zinc-900 hover:underline dark:text-zinc-100"
+        className="font-medium text-ink hover:underline"
       >
         {n.actor_name ?? "A reader"}
       </Link>
     );
   }
-  return <span className="font-medium text-zinc-900 dark:text-zinc-100">Someone</span>;
+  return <span className="font-medium text-ink">Someone</span>;
 }
 
 function Story({ n }: { n: Notification }) {
@@ -57,7 +57,7 @@ function Story({ n }: { n: Notification }) {
     return (
       <Link
         href={`/stories/${n.story_id}`}
-        className="font-medium text-zinc-900 hover:underline dark:text-zinc-100"
+        className="font-medium text-ink hover:underline"
       >
         {n.story_title ?? "a story"}
       </Link>
@@ -73,7 +73,7 @@ function PostLink({ id, label = "a post" }: { id?: string; label?: string }) {
     return (
       <Link
         href={`/posts/${id}`}
-        className="font-medium text-zinc-900 hover:underline dark:text-zinc-100"
+        className="font-medium text-ink hover:underline"
       >
         {label}
       </Link>

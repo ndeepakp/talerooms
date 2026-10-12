@@ -135,9 +135,9 @@ export function MentionInput({
         className={className}
       />
       {open && (
-        <ul className="absolute z-20 mt-1 max-h-64 w-full overflow-auto rounded-lg border border-zinc-200 bg-white py-1 shadow-lg dark:border-zinc-700 dark:bg-zinc-900">
+        <ul className="absolute z-20 mt-1 max-h-64 w-full overflow-auto rounded-lg border border-ui bg-surface-raised py-1 shadow-lg">
           {users.length > 0 && (
-            <li className="px-3 pb-0.5 pt-1 text-xs font-medium text-zinc-400">People</li>
+            <li className="px-3 pb-0.5 pt-1 text-xs font-medium text-subtle">People</li>
           )}
           {users.map((u, i) => (
             <li key={`u${u.handle}`}>
@@ -147,18 +147,18 @@ export function MentionInput({
                 onClick={() => pick(i)}
                 className={
                   "flex w-full items-center gap-2 px-3 py-1.5 text-left text-sm " +
-                  (active === i ? "bg-zinc-100 dark:bg-zinc-800" : "")
+                  (active === i ? "bg-surface-soft" : "")
                 }
               >
-                <span className="font-medium text-zinc-800 dark:text-zinc-200">
+                <span className="font-medium text-ink">
                   {u.name ?? u.handle}
                 </span>
-                <span className="text-zinc-400">@{u.handle}</span>
+                <span className="text-subtle">@{u.handle}</span>
               </button>
             </li>
           ))}
           {stories.length > 0 && (
-            <li className="px-3 pb-0.5 pt-1 text-xs font-medium text-zinc-400">Stories</li>
+            <li className="px-3 pb-0.5 pt-1 text-xs font-medium text-subtle">Stories</li>
           )}
           {stories.map((s, i) => {
             const idx = users.length + i;
@@ -170,11 +170,11 @@ export function MentionInput({
                   onClick={() => pick(idx)}
                   className={
                     "flex w-full items-center gap-2 px-3 py-1.5 text-left text-sm " +
-                    (active === idx ? "bg-zinc-100 dark:bg-zinc-800" : "")
+                    (active === idx ? "bg-surface-soft" : "")
                   }
                 >
                   <span aria-hidden="true">📖</span>
-                  <span className="truncate text-zinc-800 dark:text-zinc-200">{s.title}</span>
+                  <span className="truncate text-ink">{s.title}</span>
                 </button>
               </li>
             );

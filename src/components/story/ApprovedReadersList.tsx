@@ -36,27 +36,27 @@ export function ApprovedReadersList({
   if (list.length === 0) return null;
 
   return (
-    <div className="mt-4 rounded-xl border border-zinc-200 bg-zinc-50 p-4 dark:border-zinc-800 dark:bg-zinc-900/40">
-      <p className="text-sm font-medium text-zinc-700 dark:text-zinc-300">
+    <div className="mt-4 rounded-xl border border-ui bg-surface-soft p-4">
+      <p className="text-sm font-medium text-ink-soft">
         Readers with access
       </p>
       <ul className="mt-2 flex flex-col gap-2">
         {list.map((r) => (
           <li key={r.user_id} className="flex items-center justify-between gap-3 text-sm">
-            <span className="min-w-0 truncate text-zinc-700 dark:text-zinc-300">
+            <span className="min-w-0 truncate text-ink-soft">
               <Link
                 href={`/${r.handle ?? r.user_id}`}
-                className="font-medium text-zinc-900 hover:underline dark:text-zinc-100"
+                className="font-medium text-ink hover:underline"
               >
                 {r.name ?? "A reader"}
               </Link>{" "}
-              <span className="text-zinc-500">· {r.label}</span>
+              <span className="text-muted">· {r.label}</span>
             </span>
             <button
               type="button"
               onClick={() => revoke(r.user_id)}
               disabled={busy === r.user_id}
-              className="shrink-0 rounded-full border border-red-300 px-3 py-1 text-xs font-medium text-red-600 hover:bg-red-50 disabled:opacity-50 dark:border-red-900 dark:text-red-400 dark:hover:bg-red-950/30"
+              className="shrink-0 rounded-full border border-danger px-3 py-1 text-xs font-medium text-danger hover:bg-danger-soft disabled:opacity-50"
             >
               {busy === r.user_id ? "…" : "Revoke"}
             </button>

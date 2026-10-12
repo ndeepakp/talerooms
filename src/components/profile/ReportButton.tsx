@@ -39,7 +39,7 @@ export function ReportButton({ userId }: { userId: string }) {
 
   if (done) {
     return (
-      <p className="text-xs text-zinc-500">
+      <p className="text-xs text-muted">
         Thanks — this report is now under review.
       </p>
     );
@@ -50,10 +50,10 @@ export function ReportButton({ userId }: { userId: string }) {
       <button
         type="button"
         onClick={() => setOpen(true)}
-        className="text-xs text-zinc-500 underline hover:text-zinc-700 dark:hover:text-zinc-300"
+        className="text-xs text-muted underline hover:text-ink-soft"
       >
         Report this user
-        <span className="ml-1 rounded bg-amber-100 px-1 py-0.5 text-[10px] font-semibold uppercase tracking-wide text-amber-700 no-underline dark:bg-amber-950/40 dark:text-amber-300">
+        <span className="ml-1 rounded bg-warning-soft px-1 py-0.5 text-[10px] font-semibold uppercase tracking-wide text-warning no-underline">
           Beta
         </span>
       </button>
@@ -61,25 +61,25 @@ export function ReportButton({ userId }: { userId: string }) {
   }
 
   return (
-    <div className="w-full max-w-sm rounded-xl border border-zinc-200 bg-white p-4 text-left dark:border-zinc-800 dark:bg-zinc-950">
-      <p className="flex items-center gap-2 text-sm font-medium text-zinc-900 dark:text-zinc-100">
+    <div className="w-full max-w-sm rounded-xl border border-ui bg-surface-raised p-4 text-left">
+      <p className="flex items-center gap-2 text-sm font-medium text-ink">
         Report this user
-        <span className="rounded bg-amber-100 px-1.5 py-0.5 text-[10px] font-semibold uppercase tracking-wide text-amber-700 dark:bg-amber-950/40 dark:text-amber-300">
+        <span className="rounded bg-warning-soft px-1.5 py-0.5 text-[10px] font-semibold uppercase tracking-wide text-warning">
           Beta
         </span>
       </p>
-      <p className="mt-1 text-xs text-zinc-500">
+      <p className="mt-1 text-xs text-muted">
         This feature is in beta. Reports go to a review queue for due-diligence
         checks — no automated action is taken, and the reported user isn&apos;t
         told who reported them.
       </p>
 
-      <label className="mt-3 block text-xs font-medium text-zinc-600 dark:text-zinc-400">
+      <label className="mt-3 block text-xs font-medium text-muted">
         Reason
         <select
           value={reason}
           onChange={(e) => setReason(e.target.value)}
-          className="mt-1 h-9 w-full rounded-lg border border-zinc-300 bg-white px-2 text-sm text-zinc-900 outline-none dark:border-zinc-700 dark:bg-zinc-950 dark:text-zinc-100"
+          className="mt-1 h-9 w-full rounded-lg border border-ui-strong bg-surface-raised px-2 text-sm text-ink outline-none"
         >
           {REASONS.map((r) => (
             <option key={r} value={r}>
@@ -95,10 +95,10 @@ export function ReportButton({ userId }: { userId: string }) {
         rows={3}
         maxLength={1000}
         placeholder="Anything else we should know? (optional)"
-        className="mt-2 w-full rounded-lg border border-zinc-300 bg-white p-2 text-sm text-zinc-900 outline-none dark:border-zinc-700 dark:bg-zinc-950 dark:text-zinc-100"
+        className="mt-2 w-full rounded-lg border border-ui-strong bg-surface-raised p-2 text-sm text-ink outline-none"
       />
 
-      {error && <p className="mt-2 text-xs text-red-600">{error}</p>}
+      {error && <p className="mt-2 text-xs text-danger">{error}</p>}
 
       <div className="mt-3 flex gap-2">
         <button
@@ -112,7 +112,7 @@ export function ReportButton({ userId }: { userId: string }) {
         <button
           type="button"
           onClick={() => setOpen(false)}
-          className="rounded-full px-3 py-1.5 text-xs font-medium text-zinc-600 hover:bg-zinc-100 dark:text-zinc-400 dark:hover:bg-zinc-900"
+          className="rounded-full px-3 py-1.5 text-xs font-medium text-muted hover:bg-surface-soft"
         >
           Cancel
         </button>

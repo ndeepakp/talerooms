@@ -33,7 +33,7 @@ export function ChapterPrompts({
           <div key={i}>
             <p className="text-sm font-medium text-[var(--reader-ink)]">{p}</p>
             {done[p] ? (
-              <p className="mt-1 text-xs font-medium text-emerald-600 dark:text-emerald-400">
+              <p className="mt-1 text-xs font-medium text-[var(--reader-success)]">
                 ✓ Posted — find it on the feed.
               </p>
             ) : openPrompt === p ? (

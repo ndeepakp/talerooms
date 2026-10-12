@@ -26,6 +26,7 @@
    equal specificity) always win by source order. Reproduces the original look
    before any attribute is applied. */
 :root {
+  color-scheme: light;
   --page: #f6f5f2;
   --background: #ffffff;
   --foreground: #171717;
@@ -60,12 +61,29 @@
   --muted: color-mix(in srgb, var(--foreground) 72%, var(--page));
   --subtle: color-mix(in srgb, var(--foreground) 70%, var(--page));
   --card-shadow: 0 2px 4px rgb(20 20 30 / 2%), 0 16px 48px -24px rgb(20 20 30 / 16%);
+  --success: #166534;
+  --warning: #854d0e;
+  --danger: #b91c1c;
+  --info: #1d4ed8;
+  --success-soft: color-mix(in srgb, var(--success) 10%, var(--surface-raised));
+  --warning-soft: color-mix(in srgb, var(--warning) 10%, var(--surface-raised));
+  --danger-soft: color-mix(in srgb, var(--danger) 10%, var(--surface-raised));
+  --info-soft: color-mix(in srgb, var(--info) 10%, var(--surface-raised));
+  --success-border: color-mix(in srgb, var(--success) 40%, var(--surface-raised));
+  --warning-border: color-mix(in srgb, var(--warning) 40%, var(--surface-raised));
+  --danger-border: color-mix(in srgb, var(--danger) 40%, var(--surface-raised));
+  --rating: #a16207;
 }
 .dark {
   color-scheme: dark;
   --surface: color-mix(in srgb, var(--page) 94%, white);
   --surface-raised: color-mix(in srgb, var(--page) 89%, white);
   --card-shadow: 0 2px 4px rgb(0 0 0 / 8%), 0 16px 48px -24px rgb(0 0 0 / 45%);
+  --success: #86efac;
+  --warning: #fde68a;
+  --danger: #fca5a5;
+  --info: #93c5fd;
+  --rating: #fbbf24;
 }
 
 /* Accent presets. Graphite reproduces the original black/white inverted look. */
@@ -99,6 +117,16 @@
   --color-ink-soft: var(--ink-soft);
   --color-muted: var(--muted);
   --color-subtle: var(--subtle);
+  --color-success: var(--success);
+  --color-success-soft: var(--success-soft);
+  --color-warning: var(--warning);
+  --color-warning-soft: var(--warning-soft);
+  --color-danger: var(--danger);
+  --color-danger-soft: var(--danger-soft);
+  --color-info: var(--info);
+  --color-info-soft: var(--info-soft);
+  --color-rating: var(--rating);
+  --radius-lg: 0.75rem;
   --radius-xl: 1rem;
   --radius-2xl: 1.5rem;
   --shadow-card: var(--card-shadow);
@@ -112,6 +140,15 @@ body {
   color: var(--foreground);
   font-family: var(--font-sans);
 }
+
+input::placeholder, textarea::placeholder { color: var(--muted); opacity: 1; }
+input, textarea { caret-color: var(--accent); }
+input[type="checkbox"], input[type="radio"] { accent-color: var(--accent); }
+
+/* Status borders are quieter than the corresponding readable status text. */
+@utility border-success { border-color: var(--success-border); }
+@utility border-warning { border-color: var(--warning-border); }
+@utility border-danger { border-color: var(--danger-border); }
 
 /* Visible keyboard focus is shared by links, controls and shelf previews. */
 :where(a, button, input, textarea, select, summary):focus-visible {
@@ -147,6 +184,9 @@ body {
     background-color: var(--accent-strong);
     box-shadow: 0 4px 14px color-mix(in srgb, var(--accent) 18%, transparent);
   }
+
+  .btn-danger { background: #b91c1c; color: #ffffff; }
+  .btn-danger:hover:not(:disabled) { background: #991b1b; }
 
   /* Selected genre chip / active tab — accent filled. */
   .chip-active {
@@ -349,6 +389,8 @@ body {
   --reader-paper: #fffcf7;
   --reader-surface: #f7f4ee;
   --reader-ink: #292722;
+  --reader-success: #166534;
+  --reader-danger: #b91c1c;
   --reader-font: var(--font-serif);
   --reader-size: 18px;
   --reader-leading: 1.85;
@@ -363,6 +405,17 @@ body {
 .reading-room[data-reader-theme="sepia"] { --reader-paper: #f5ebd7; --reader-surface: #eee2ca; --reader-ink: #3b3023; }
 .reading-room[data-reader-theme="night"] { --reader-paper: #222329; --reader-surface: #191a20; --reader-ink: #eae5dc; color-scheme: dark; }
 .reading-room[data-reader-theme="oled"] { --reader-paper: #000000; --reader-surface: #000000; --reader-ink: #e1e1e1; color-scheme: dark; }
+.reading-room[data-reader-theme="night"], .reading-room[data-reader-theme="oled"] {
+  --reader-success: #86efac;
+  --reader-danger: #fca5a5;
+}
+.reading-room[data-reader-theme="paper"], .reading-room[data-reader-theme="sepia"] { color-scheme: light; }
+.reading-room input::placeholder { color: var(--reader-muted); }
+.reading-room input, .reading-room textarea { caret-color: var(--reader-ink); }
+.reader-text pre, .reader-text :not(pre) > code {
+  background: color-mix(in srgb, var(--reader-ink) 7%, var(--reader-paper));
+}
+.reader-text a { color: var(--reader-ink); }
 .reader-muted { color: var(--reader-muted); }
 .reader-eyebrow { color: var(--reader-muted); font-size: 10px; font-weight: 600; letter-spacing: .16em; text-transform: uppercase; }
 .reader-label { font-size: 13px; font-weight: 500; }

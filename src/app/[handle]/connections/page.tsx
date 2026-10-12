@@ -1,7 +1,6 @@
 import Link from "next/link";
-import { notFound, redirect } from "next/navigation";
-import { headers } from "next/headers";
-import { auth } from "@/lib/auth";
+import { notFound } from "next/navigation";
+import { requirePageSession } from "@/lib/account-session";
 import { sql } from "@/lib/db";
 
 export const dynamic = "force-dynamic";
@@ -15,8 +14,7 @@ export default async function ConnectionsPage({
   params: Promise<{ handle: string }>;
   searchParams: Promise<{ tab?: string }>;
 }) {
-  const session = await auth.api.getSession({ headers: await headers() });
-  if (!session) redirect("/login");
+  await requirePageSession();
 
   const { handle } = await params;
   const { tab } = await searchParams;
@@ -49,12 +47,12 @@ export default async function ConnectionsPage({
     "rounded-full px-4 py-1.5 text-sm font-medium transition-colors " +
     (active
       ? "btn-primary"
-      : "text-zinc-600 hover:bg-zinc-100 dark:text-zinc-400 dark:hover:bg-zinc-900");
+      : "text-muted hover:bg-surface-soft");
 
   return (
     <div className="min-h-screen bg-[var(--page)] px-6 py-12">
       <div className="mx-auto w-full max-w-5xl">
-        <h1 className="text-lg font-semibold text-zinc-900 dark:text-zinc-50">
+        <h1 className="text-lg font-semibold text-ink">
           {user.name ?? "Writer"}&apos;s connections
         </h1>
         <div className="mt-4 flex gap-2">
@@ -67,7 +65,7 @@ export default async function ConnectionsPage({
         </div>
 
         {people.length === 0 ? (
-          <p className="mt-12 text-center text-zinc-500">
+          <p className="mt-12 text-center text-muted">
             {showFollowing ? "Not following anyone yet." : "No followers yet."}
           </p>
         ) : (
@@ -76,16 +74,16 @@ export default async function ConnectionsPage({
               <li key={p.id}>
                 <Link
                   href={`/${p.username ?? p.id}`}
-                  className="block rounded-2xl border border-zinc-200 bg-white p-4 transition-colors hover:border-zinc-400 dark:border-zinc-800 dark:bg-zinc-950 dark:hover:border-zinc-600"
+                  className="block rounded-2xl border border-ui bg-surface-raised p-4 transition-colors hover:border-ui-strong"
                 >
-                  <span className="font-semibold text-zinc-900 dark:text-zinc-50">
+                  <span className="font-semibold text-ink">
                     {p.name ?? "Unknown writer"}
                   </span>
                   {p.username && (
-                    <span className="ml-2 text-sm text-zinc-500">${p.username}</span>
+                    <span className="ml-2 text-sm text-muted">${p.username}</span>
                   )}
                   {p.bio && (
-                    <p className="mt-1 line-clamp-2 text-sm text-zinc-600 dark:text-zinc-400">
+                    <p className="mt-1 line-clamp-2 text-sm text-muted">
                       {p.bio}
                     </p>
                   )}

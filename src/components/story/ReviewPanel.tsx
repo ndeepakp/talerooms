@@ -36,11 +36,11 @@ function StarInput({
               style={{ width: 30, height: 30 }}
               aria-label={`${i + 1} stars`}
             >
-              <span className="absolute inset-0 text-zinc-300 dark:text-zinc-600">
+              <span className="absolute inset-0 text-ui-strong">
                 <StarSvg />
               </span>
               <span
-                className="absolute inset-0 overflow-hidden text-amber-400"
+                className="absolute inset-0 overflow-hidden text-rating"
                 style={{ width: `${fill * 100}%` }}
               >
                 <StarSvg />
@@ -125,7 +125,7 @@ export function ReviewPanel({
             rows={3}
             maxLength={1500}
             placeholder="What worked for you?"
-            className="rounded-lg border border-ui-strong bg-surface-raised px-3 py-2 text-sm text-ink outline-none focus:border-zinc-900"
+            className="rounded-lg border border-ui-strong bg-surface-raised px-3 py-2 text-sm text-ink outline-none focus:border-accent"
           />
         </label>
         <label className="flex flex-col gap-1 text-sm">
@@ -136,11 +136,11 @@ export function ReviewPanel({
             rows={3}
             maxLength={1500}
             placeholder="What could be better? (optional)"
-            className="rounded-lg border border-ui-strong bg-surface-raised px-3 py-2 text-sm text-ink outline-none focus:border-zinc-900"
+            className="rounded-lg border border-ui-strong bg-surface-raised px-3 py-2 text-sm text-ink outline-none focus:border-accent"
           />
         </label>
       </div>
-      {error && <p className="mt-2 text-sm text-red-600">{error}</p>}
+      {error && <p className="mt-2 text-sm text-danger">{error}</p>}
       <div className="mt-3 flex items-center gap-3">
         <button
           type="button"
@@ -155,7 +155,7 @@ export function ReviewPanel({
             type="button"
             onClick={remove}
             disabled={busy}
-            className="text-sm text-subtle hover:text-red-600 dark:hover:text-red-400"
+            className="text-sm text-subtle hover:text-danger"
           >
             Delete
           </button>

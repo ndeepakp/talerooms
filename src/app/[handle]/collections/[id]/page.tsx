@@ -1,7 +1,6 @@
 import Link from "next/link";
-import { notFound, redirect } from "next/navigation";
-import { headers } from "next/headers";
-import { auth } from "@/lib/auth";
+import { notFound } from "next/navigation";
+import { requirePageSession } from "@/lib/account-session";
 import { sql } from "@/lib/db";
 import { DeleteCollectionButton } from "@/components/collections/DeleteCollectionButton";
 import { ShareCollection } from "@/components/collections/ShareCollection";
@@ -18,8 +17,7 @@ export default async function CollectionPage({
   const { handle, id } = await params;
   if (!UUID_RE.test(id)) notFound();
 
-  const session = await auth.api.getSession({ headers: await headers() });
-  if (!session) redirect("/login");
+  const session = await requirePageSession();
 
   // The collection must belong to the handle in the URL. Viewable by anyone with
   // the link; only the owner gets the management controls.
@@ -64,11 +62,11 @@ export default async function CollectionPage({
       <div className="mx-auto w-full max-w-5xl">
         <div className="flex min-w-0 flex-col items-start gap-3 sm:flex-row sm:justify-between sm:gap-4">
           <div className="min-w-0">
-            <h1 className="break-words text-2xl font-bold text-zinc-900 dark:text-zinc-50">
+            <h1 className="break-words text-2xl font-bold text-ink">
               {collection.name}
             </h1>
             {!isOwner && (
-              <p className="mt-0.5 text-sm text-zinc-500">
+              <p className="mt-0.5 text-sm text-muted">
                 a collection by {collection.owner ?? "a reader"}
               </p>
             )}
@@ -80,12 +78,12 @@ export default async function CollectionPage({
         </div>
 
         {stories.length === 0 ? (
-          <p className="mt-10 text-center text-zinc-500">
+          <p className="mt-10 text-center text-muted">
             Nothing here yet — save stories to this collection from their page.
           </p>
         ) : (
           <>
-            <p className="mt-4 text-sm text-zinc-500">
+            <p className="mt-4 text-sm text-muted">
               Titles and authors are visible to everyone. You can read a story
               only if you have access to it or subscribe to its author.
             </p>
@@ -94,25 +92,25 @@ export default async function CollectionPage({
                 <li key={s.id}>
                   <Link
                     href={`/stories/${s.id}`}
-                    className="flex min-w-0 flex-col items-start gap-3 rounded-2xl sm:flex-row sm:items-center sm:justify-between border border-zinc-200 bg-white p-5 transition-colors hover:border-zinc-400 dark:border-zinc-800 dark:bg-zinc-950 dark:hover:border-zinc-600"
+                    className="flex min-w-0 flex-col items-start gap-3 rounded-2xl sm:flex-row sm:items-center sm:justify-between border border-ui bg-surface-raised p-5 transition-colors hover:border-ui-strong"
                   >
                     <div className="min-w-0">
-                      <h2 className="break-words text-lg font-semibold text-zinc-900 dark:text-zinc-50">
+                      <h2 className="break-words text-lg font-semibold text-ink">
                         {s.title}
                       </h2>
-                      <p className="mt-1 text-sm text-zinc-500">
+                      <p className="mt-1 text-sm text-muted">
                         by{" "}
-                        <span className="font-medium text-zinc-700 dark:text-zinc-300">
+                        <span className="font-medium text-ink-soft">
                           {s.author ?? "Unknown"}
                         </span>
                       </p>
                     </div>
                     {s.accessible ? (
-                      <span className="shrink-0 rounded-full bg-green-100 px-3 py-1 text-xs font-medium text-green-700 dark:bg-green-950/40 dark:text-green-300">
+                      <span className="shrink-0 rounded-full bg-success-soft px-3 py-1 text-xs font-medium text-success">
                         Read
                       </span>
                     ) : (
-                      <span className="shrink-0 rounded-full bg-zinc-100 px-3 py-1 text-xs font-medium text-zinc-600 dark:bg-zinc-800 dark:text-zinc-300">
+                      <span className="shrink-0 rounded-full bg-surface-soft px-3 py-1 text-xs font-medium text-muted">
                         🔒 Buy or subscribe
                       </span>
                     )}

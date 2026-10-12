@@ -1,6 +1,5 @@
-import { redirect } from "next/navigation";
-import { headers, cookies } from "next/headers";
-import { auth } from "@/lib/auth";
+import { cookies } from "next/headers";
+import { requirePageSession } from "@/lib/account-session";
 import { sql } from "@/lib/db";
 import { getAppearance } from "@/lib/get-appearance";
 import { DiscoveryFeed } from '@/components/feed/DiscoveryFeed';
@@ -16,8 +15,7 @@ import { getPosts } from "@/lib/posts";
 export const dynamic = "force-dynamic";
 
 export default async function FeedPage() {
-  const session = await auth.api.getSession({ headers: await headers() });
-  if (!session) redirect("/login");
+  const session = await requirePageSession();
 
   // Optional custom wallpaper for the feed page (set in Settings). Reuses the
   // already-resolved session so there's no extra auth lookup.

@@ -1,6 +1,6 @@
 # Dependency security update — 2026-10-13
 
-Status: implemented and validated; included in the GitHub push requested on 2026-10-13. Not deployed. Production remains Fly v39 until this update is released.
+Status: implemented, validated and deployed on 2026-10-13 from app commit `9913549`. Fly v40, health 1/1.
 
 ## Changes
 
@@ -28,3 +28,7 @@ Sources: [Next ImageResponse advisory](https://github.com/vercel/next.js/securit
 - Stopped temporary QA servers and restarted the normal local dev app on port 3000 with the existing Google/Resend environment. No environment file or production database change. No migrations required.
 
 Completed Google consent/callback still requires a human provider-flow check. Physical-device testing and Linux Docker runtime validation were not repeated in this local pass. The production server and dependency changes are not yet deployed.
+
+## Production delivery — 2026-10-13
+
+App commit `9913549` deployed as Fly v40. Linux/Node 22.23.3 runtime checks passed: Sharp generated PNG output, ONNX session API loaded, and the Transformers pipeline module loaded. Seventeen production route/auth smoke checks passed; deployed CSS still contains both mobile fixes. No production data or schema changes. Local full-model inference and mobile/auth checks remain the detailed behavioral evidence; production native-module checks do not independently run full model inference.

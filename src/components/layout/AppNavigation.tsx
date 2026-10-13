@@ -14,7 +14,7 @@ export function AppNavigation({ profileHref, user, notifications = <Notification
 }) {
   return (
     <header className="app-header sticky top-0 z-40">
-      <div className="mx-auto flex min-h-18 w-full max-w-[1328px] flex-wrap items-center gap-2 px-4 py-3 sm:flex-nowrap sm:gap-5 sm:px-6">
+      <div className="mx-auto flex min-h-18 w-full max-w-[1328px] flex-wrap items-center gap-2 px-4 py-3 max-[360px]:gap-1 max-[360px]:px-2 sm:flex-nowrap sm:gap-5 sm:px-6">
         <Brand href="/feed" compact />
         <Link
           href={profileHref}
@@ -28,7 +28,7 @@ export function AppNavigation({ profileHref, user, notifications = <Notification
             <SearchBar />
           </div>
         </div>
-        <div className="ml-auto flex shrink-0 items-center gap-2 sm:ml-0">
+        <div className="ml-auto flex shrink-0 items-center gap-2 max-[360px]:gap-1 sm:ml-0">
           <HeaderWriteAction />
           {notifications}
           <NavMenu profileHref={profileHref} />

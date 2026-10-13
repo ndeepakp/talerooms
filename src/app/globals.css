@@ -467,7 +467,7 @@ input[type="checkbox"], input[type="radio"] { accent-color: var(--accent); }
 
 /* iOS Safari zooms focused text controls below 16px. Keep mobile forms at
    the page scale, including compact search and editor controls. */
-@media (max-width: 767px) {
+@media (max-width: 767px), (max-width: 900px) and (max-height: 500px) {
   input:not([type="checkbox"]):not([type="radio"]):not([type="range"]):not([type="color"]):not([type="file"]):not([type="hidden"]):not([type="button"]):not([type="submit"]),
   textarea, select { font-size: 16px !important; }
 }

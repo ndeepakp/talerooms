@@ -54,3 +54,16 @@ These are browser viewport checks, not physical iPhone/Android tests. Native vir
 Keep the broader author portfolio redesign and theme audit pending. Personal Library migration `db/0048_library_progress.sql` was applied and verified on production before this rollout.
 
 Live smoke checks on `https://talerooms.fly.dev/` passed: PostgreSQL/pgvector health, public landing/About/login/signup, anonymous redirects for library/feed/settings, and 390px landing/story/profile layouts with no horizontal page overflow or browser console errors. Signed-in library behavior was validated locally; no production account records were changed for live smoke testing. The custom domain `talerooms.com` still serves its existing holding page and was not changed by this Fly deployment.
+
+## Mobile regression — 2026-10-13
+
+Rechecked all page templates after the verified-signup/theme release, using retained synthetic local reader/author/pending accounts. Coverage includes public landing/About/login/signup, Google error presentation, pending verification and email correction/wrong-code feedback, onboarding and completion redirect, feed/library/drafts/settings/notifications/search/genres, own/other profiles and connection/story/collection pages, post detail, free/locked stories, reviews, new studio and existing-story editing, and legacy aliases. No payment, subscription, report, deletion or publication was submitted.
+
+130 local route/viewport/state checks passed at 320/390/430px and 844×390 landscape. The matrix includes all four studio steps, dark mobile settings, populated long-title/name fixtures, and alias redirects. Expanded genre/menu/notification controls, reader preferences and collection picker were opened and visually inspected. Fifteen additional deployed public-page checks (landing/About/signup/login/story × three phone widths) passed. No horizontal page overflow or application error pages remained; editable mobile text controls measured at least 16px. Results and screenshot evidence: `/private/tmp/talerooms-mobile-20261013/`.
+
+Two fixes remain local, not pushed/deployed:
+
+- At 320px, the extra feed Library control pushed the avatar onto a separate header row. Below 360px, reduced outer padding and button gaps now keep all six controls on one row while preserving 44px touch targets.
+- Extended the 16px mobile input rule to phone landscape viewports up to 900px wide and 500px high, covering compact search/editor inputs.
+
+72 unit tests passed. ESLint, TypeScript, production build and diff checks passed after the fixes. The synthetic-only OTP sink was temporarily enabled for the pending-account checks, then `.env.local` was restored byte-for-byte. Retained fixtures remain local. Real Google OAuth completion, real payment processing, physical-device keyboards/safe areas and Safari/Android-specific behavior are outside these viewport checks.

@@ -67,3 +67,9 @@ Two fixes remain local, not pushed/deployed:
 - Extended the 16px mobile input rule to phone landscape viewports up to 900px wide and 500px high, covering compact search/editor inputs.
 
 72 unit tests passed. ESLint, TypeScript, production build and diff checks passed after the fixes. The synthetic-only OTP sink was temporarily enabled for the pending-account checks, then `.env.local` was restored byte-for-byte. Retained fixtures remain local. Real Google OAuth completion, real payment processing, physical-device keyboards/safe areas and Safari/Android-specific behavior are outside these viewport checks.
+
+### Delivery — 2026-10-13
+
+Both mobile fixes above were pushed in app commit `62c1c39` and deployed as Fly v39 (Singapore, health 1/1). Seventeen production smoke checks passed, including public pages, protected-page redirects, anonymous genre mutation rejection and Google initiation with the production callback. Inspection of the deployed CSS confirmed both the narrow-header spacing classes and landscape input rule are present. No production data or schema changes were part of this release.
+
+The deployment dependency audit also flagged existing packages: the production-only audit reports 49 findings (37 moderate, 11 high, 1 critical package). Next.js 16.2.7 is among the flagged packages; a separate dependency security update needs compatibility review and regression validation. One critical advisory, [GHSA-vcvr-r3jv-pc5j](https://github.com/vercel/next.js/security/advisories/GHSA-vcvr-r3jv-pc5j), applies to attacker-controlled SVG values in Node ImageResponse; the current story OG implementation uses divs and fixed style palettes rather than that documented pattern. This check is not a complete exploitability assessment of all findings. Audit evidence: `/private/tmp/talerooms-deploy-audit.json`. Packages were not changed in the mobile deployment.

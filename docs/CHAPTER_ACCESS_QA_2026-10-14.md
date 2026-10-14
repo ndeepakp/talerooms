@@ -19,4 +19,8 @@ The link navigates to `?chapter=N&buy=N#chapter-access`. The server validates th
 
 ## Delivery
 
-Local implementation only. Push/deployment and live Stripe checkout remain separate pending work.
+App commit `5525982` pushed to GitHub and deployed to Fly v41 on 2026-10-14. This release includes the previously pushed wallet/payment foundation (`62b28ef`). Additive production migration `0050` completed transactionally; reserved wallet/payments route collisions: zero.
+
+Production health and eight HTTP smoke checks passed: health, home, about, login, signup, two published story routes and the wallet authentication redirect. The new sign-in/unlock actions were visibly verified on a live private story in desktop and 390px mobile views; mobile document width matched the viewport. Signed-in purchase preselection and actual mock grant fulfillment were validated locally as described above, without creating production test purchases. Fly machine `9080d707a932e8` is started in Singapore with its health check passing.
+
+Production dependency audit (`npm audit --omit=dev`) reported zero known vulnerabilities. Real Stripe checkout, charges and payouts remain disabled pending merchant setup and provider validation.

@@ -4,10 +4,10 @@ Updated: **2026-10-14**. Complete and validate each task before advancing.
 
 ## Current state
 
-- **Active task:** Payments (`TASK-PAY-01`). Wallet code and mock-payment fixes are validated and pushed; real billing is still pending.
-- **Latest pushed app commit:** `62b28ef` — author wallet, payment foundation, mock-checkout fixes and regression tests. Deployment is pending.
-- **Last recorded production release:** `9913549`, Fly v40 — security update, with signup/verification and mobile fixes already deployed.
-- **Validation:** 138 standard tests and five local database tests passed; lint, TypeScript, production build and production-mode smoke checks passed. Eleven pages checked at 320/390/1280px.
+- **Active task:** Payments (`TASK-PAY-01`). Wallet code, mock-payment fixes and contextual chapter unlocking are validated, pushed and deployed; real billing is still pending.
+- **Latest pushed app commit:** `5525982` — chapter-unlock discoverability and Done/Pending task history; includes author wallet and mock-payment fixes.
+- **Last recorded production release:** `5525982`, Fly v41 — chapter unlocking, author wallet and mock-payment fixes; migration `0050` applied.
+- **Validation:** 145 standard tests and five local database tests passed; lint, TypeScript and production build passed. Eight live HTTP smoke checks and desktop/mobile unlock visibility checks passed.
 - **Provider dependency:** Singapore Stripe merchant account, approved author countries and confirmed payout controls are needed for real provider testing. No real charges or payouts are enabled.
 
 Use **Done** to track completed work by date and **Pending** to track the remaining implementation, validation and release steps. A completed portion of an in-progress task does not mark the whole task complete. GitHub delivery and production deployment are tracked separately.
@@ -20,7 +20,7 @@ Checked items describe implemented/validated work or completed planning, with de
 
 ### 2026-10-14: Wallet and mock-payment validation
 
-**Delivery:** Implemented and validated locally; pushed as `62b28ef`. Production deployment and real Stripe testing remain pending.
+**Delivery:** Pushed wallet/payment foundation as `62b28ef` and contextual unlocking as `5525982`; deployed together as Fly v41. Real Stripe testing remains pending.
 
 - [x] Official Stripe SDK, mode-checked client, server-owned quotes, currency conversion to minor units and offline direct-charge Checkout parameters.
 - [x] Accounts v2 hosted-onboarding API, approved-country gates and account-readiness checks.
@@ -35,7 +35,9 @@ Checked items describe implemented/validated work or completed planning, with de
 - [x] Check 11 pages at 320/390/1280px; verify purchased chapter access and membership resume/unlocking in the mobile reader.
 - [x] Record reader feedback and plan author-controlled rewards, language/audio pilots and age-suitability labels; these features remain pending below.
 - [x] Add contextual **Unlock this chapter** links beside locked chapters and inside the reader, showing price, duration and the demo-payment notice. Preselect the requested chapter and an available duration; distinguish whole-story-only offers and signed-out readers.
-- [x] Validate contextual purchase navigation at 320/390/1280px, mock purchase access, 145 standard tests, five database integration tests, lint, TypeScript and production build. Delivery: local changes; not yet pushed or deployed.
+- [x] Validate contextual purchase navigation at 320/390/1280px, mock purchase access, 145 standard tests, five database integration tests, lint, TypeScript and production build. Delivery: pushed as `5525982` and deployed as Fly v41.
+
+- [x] Apply additive migration `0050` to production, deploy `5525982` as Fly v41 and pass eight live HTTP smoke checks plus desktop/mobile unlock visibility checks.
 
 **Evidence:** [Chapter access QA](docs/CHAPTER_ACCESS_QA_2026-10-14.md), [Payment QA](docs/PAYMENT_QA_2026-10-14.md), [wallet implementation/setup](docs/AUTHOR_WALLET.md).
 
@@ -126,7 +128,7 @@ Older detailed notes remain available in the [dated archive](docs/IMPROVEMENT_TA
 
 | Order | Task | Priority | Status |
 | :--- | :--- | :--- | :--- |
-| 1 | [Payments and chapter-unlock visibility](#task-pay-01-payments-and-chapter-unlock-visibility) | High | In progress; local wallet validated and pushed |
+| 1 | [Payments and chapter-unlock visibility](#task-pay-01-payments-and-chapter-unlock-visibility) | High | In progress; wallet and demo unlocking deployed |
 | 2 | [Admin console and observability](#task-admin-01-admin-console-and-observability) | High | Pending |
 | 3 | [Reading milestones and author-controlled rewards](#task-eng-01-reading-milestones-and-author-controlled-rewards) | Medium | Planning |
 | 4 | [Regional-language discovery pilot](#task-lang-01-regional-language-discovery-pilot) | Medium | Planning |
@@ -158,7 +160,7 @@ Payments must be completed and validated before administration. The protected un
 - [ ] Decide platform commission, subscription currency/terms and refund/tax responsibilities before live billing.
 - [ ] Validate the new real-checkout flow on desktop/mobile, including purchase discovery, authentication/activation gates and active/expired access.
 - [ ] Complete the manual native-confirmation browser check; automated DOM confirmation/cancellation tests already pass.
-- [ ] Apply migration `0050` to production, verify configuration and perform deployment smoke checks. Enable live billing only after provider validation.
+- [ ] Enable live billing only after provider configuration and validation. Migration `0050` and the demo/wallet release are already deployed; real-checkout deployment checks remain pending.
 
 **Rules:** Funds remain with Stripe. Pending funds cannot be withdrawn. Mock purchases never credit the wallet. Keep currencies separate and authors in control of their work. Initial app withdrawals support INR/USD/EUR/GBP/SGD/AUD/CAD/JPY; the wallet shows recent provider transactions, not a lifetime earnings total. Unknown withdrawals retain reservations and must not be blindly recreated after idempotency expiry.
 

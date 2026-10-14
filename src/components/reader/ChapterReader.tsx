@@ -1,5 +1,7 @@
 "use client";
 
+import Link from "next/link";
+import type { ChapterAccessAction } from "@/lib/chapter-access";
 import { useCallback, useEffect, useMemo, useRef, useState, type CSSProperties } from "react";
 import { CHAPTER_PAGE_WORDS, htmlToText, wordCount } from "@/lib/story-validation";
 import { ChapterQuestions } from "@/components/reader/ChapterQuestions";
@@ -73,6 +75,7 @@ export type ReaderChapter = {
   title: string | null;
   body: string | null; // null when locked
   locked: boolean;
+  unlock?: ChapterAccessAction;
   prompts: string[]; // open discussion prompts ([] when locked)
 };
 export type Bookmark = {
@@ -538,7 +541,11 @@ export function ChapterReader({
         {chapter.locked ? (
           <div className="mt-4 rounded-xl border border-dashed border-[var(--reader-border)] p-6 text-center text-sm text-[var(--reader-muted)]">
             <span aria-hidden="true">🔒</span>{" "}
-            {lockedNote ?? "This chapter is locked — buy access below to read it."}
+            {lockedNote ?? (chapter.unlock ? "This chapter is locked. Choose access to keep reading." : "Chapter access is not currently offered. Check the author’s membership options or come back later.")}
+            {chapter.unlock && <div className="mt-4">
+              <Link href={chapter.unlock.href} className="inline-flex min-h-11 items-center rounded-full bg-[var(--reader-ink)] px-5 py-2 font-semibold text-[var(--reader-paper)]">{chapter.unlock.label}</Link>
+              <p className="mt-3 break-words text-xs">{chapter.unlock.detail}</p>
+            </div>}
           </div>
         ) : (
           <>

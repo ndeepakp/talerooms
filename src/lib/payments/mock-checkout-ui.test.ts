@@ -5,6 +5,7 @@ import { cleanup, render, screen, waitFor } from '@testing-library/react';
 import userEvent from '@testing-library/user-event';
 const refresh=vi.hoisted(()=>vi.fn());
 vi.mock('next/navigation',()=>({useRouter:()=>({refresh})}));
+import { StoryChapters } from '@/components/story/StoryOverview';
 import { AccessPanel } from '@/components/story/AccessPanel';
 import { SubscribeButton } from '@/components/profile/SubscribeButton';
 const props={storyId:'00000000-0000-4000-8000-000000000001',offered:['1h','always'] as ('1h'|'always')[],wholePrices:{'1h':100,always:200},currency:'SGD',chapters:[{index:0,title:'First door',prices:{'1h':20,always:40},owned:false},{index:1,title:'Second door',prices:{'1h':30,always:60},owned:false}]};
@@ -29,6 +30,31 @@ describe('reader mock purchase UI flow',()=>{
   });
   it('disables checkout during an in-flight purchase',async()=>{
     let resolve!:(response:Response)=>void;vi.mocked(fetch).mockReturnValue(new Promise<Response>(r=>{resolve=r;}));render(createElement(AccessPanel,props));const button=screen.getByRole('button',{name:'S$100'});await userEvent.click(button);expect((button as HTMLButtonElement).disabled).toBe(true);await userEvent.click(button);expect(fetch).toHaveBeenCalledOnce();resolve(new Response('{}',{status:200}));await waitFor(()=>expect(refresh).toHaveBeenCalledOnce());
+  });
+});
+describe('locked chapter discovery',()=>{
+  it('shows an unlock link only for locked entries with an available offer',()=>{
+    const unlock={href:'/stories/qa?chapter=1&buy=1#chapter-access',label:'Unlock this chapter',detail:'S$30 · 1 hour access · Demo, no charge'};
+    render(createElement(StoryChapters,{storyHref:'/stories/qa',entries:[{index:0,title:'Free chapter',access:'Free',unlock},{index:1,title:'Locked chapter',access:'Locked',unlock},{index:2,title:'Purchased chapter',access:'Purchased',unlock},{index:3,title:'Unavailable chapter',access:'Locked'}]}));
+    expect(screen.getAllByRole('link',{name:'Unlock this chapter'})).toHaveLength(1);
+    expect(screen.getByRole('link',{name:'Unlock this chapter'}).getAttribute('href')).toBe(unlock.href);
+    expect(screen.getByText(unlock.detail)).toBeTruthy();
+    expect(document.querySelector('a a')).toBeNull();
+  });
+});
+describe('contextual checkout selection',()=>{
+  it('preselects the requested chapter and its available duration, then submits only that chapter',async()=>{
+    render(createElement(AccessPanel,{...props,initialChapterIndex:1,chapters:[props.chapters[0],{...props.chapters[1],prices:{always:60}}]}));
+    expect((screen.getByRole('checkbox',{name:'Second door S$60'}) as HTMLInputElement).checked).toBe(true);
+    expect(screen.getByRole('button',{name:'Always'}).getAttribute('aria-pressed')).toBe('true');
+    await userEvent.click(screen.getByRole('button',{name:'Buy 1 selected · S$60'}));
+    await waitFor(()=>expect(refresh).toHaveBeenCalledOnce());
+    expect(fetch).toHaveBeenCalledWith(expect.any(String),expect.objectContaining({body:JSON.stringify({scope:'chapters',duration:'always',chapterIndexes:[1]})}));
+  });
+  it('does not select owned or invalid chapter targets',()=>{
+    render(createElement(AccessPanel,{...props,initialChapterIndex:1,chapters:props.chapters.map(c=>({...c,owned:c.index===1}))}));
+    expect((screen.getByRole('button',{name:'Buy selected · S$0'}) as HTMLButtonElement).disabled).toBe(true);
+    expect(screen.queryByText('Access options for Second door')).toBeNull();
   });
 });
 describe('mock membership UI flow',()=>{

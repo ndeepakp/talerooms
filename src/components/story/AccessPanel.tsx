@@ -23,6 +23,7 @@ export function AccessPanel({
   chapters,
   currency,
   renewalDiscount,
+  initialChapterIndex,
 }: {
   storyId: string;
   offered: Tier[];
@@ -31,10 +32,16 @@ export function AccessPanel({
   currency: string;
   // % off shown to a returning reader renewing access (applied server-side too).
   renewalDiscount?: number;
+  initialChapterIndex?: number;
 }) {
   const router = useRouter();
-  const [tier, setTier] = useState<Tier>(offered[0]);
-  const [picked, setPicked] = useState<Set<number>>(new Set());
+  const target = chapters.find(c => c.index === initialChapterIndex && !c.owned);
+  const initialTier = offered.find(t => target && typeof target.prices[t] === "number")
+    ?? (target ? offered.find(t => typeof wholePrices[t] === "number") : undefined) ?? offered[0];
+  const [tier, setTier] = useState<Tier>(initialTier);
+  const [picked, setPicked] = useState<Set<number>>(() => new Set(
+    target && typeof target.prices[initialTier] === "number" ? [target.index] : [],
+  ));
   const [busy, setBusy] = useState(false);
   const [error, setError] = useState<string | null>(null);
 
@@ -49,8 +56,8 @@ export function AccessPanel({
   const lockedForTier = chapters.filter(
     (c) => !c.owned && typeof c.prices[tier] === "number",
   );
-  const chaptersTotal = lockedForTier
-    .filter((c) => picked.has(c.index))
+  const selectedForTier = lockedForTier.filter(c => picked.has(c.index));
+  const chaptersTotal = selectedForTier
     .reduce((s, c) => s + disc(c.prices[tier] as number), 0);
 
   function togglePick(i: number) {
@@ -82,7 +89,7 @@ export function AccessPanel({
   }
 
   return (
-    <section className="mt-5 rounded-2xl border border-ui bg-surface-raised p-5">
+    <section id="chapter-access" tabIndex={-1} className="scroll-mt-36 lg:scroll-mt-24 mt-5 rounded-2xl border border-ui bg-surface-raised p-5">
       <h2 className="text-lg font-semibold text-ink">
         Get access to the chapters
       </h2>
@@ -97,6 +104,7 @@ export function AccessPanel({
         </p>
       ) : null}
 
+      {target && <p className="mt-3 break-words text-sm font-medium text-ink">Access options for {target.title || `Chapter ${target.index + 1}`}</p>}
       {/* Duration choice */}
       <div className="mt-4">
         <span className="text-sm font-medium text-ink-soft">
@@ -173,16 +181,16 @@ export function AccessPanel({
           </ul>
           <button
             type="button"
-            disabled={busy || picked.size === 0}
+            disabled={busy || selectedForTier.length === 0}
             onClick={() =>
               buy(
-                { scope: "chapters", duration: tier, chapterIndexes: [...picked] },
+                { scope: "chapters", duration: tier, chapterIndexes: selectedForTier.map(c => c.index) },
                 chaptersTotal,
               )
             }
             className="mt-3 rounded-full btn-primary px-4 py-2 text-sm font-medium disabled:opacity-50"
           >
-            Buy {picked.size > 0 ? `${picked.size} ` : ""}selected · {currencySymbol(currency)}
+            Buy {selectedForTier.length > 0 ? `${selectedForTier.length} ` : ""}selected · {currencySymbol(currency)}
             {chaptersTotal}
           </button>
         </div>

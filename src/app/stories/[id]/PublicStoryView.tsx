@@ -42,6 +42,7 @@ export function PublicStoryView({ story, chapters, readMinutes, totalWords, view
   const selectedChapter = clampChapter(chapterParam ? Number(chapterParam) : 0, chapters.length);
   const storyHref = `/stories/${story.slug ?? story.id}`;
   const authorHref = `/${story.author_handle ?? story.author_id}`;
+  const signInAction = { href: "/login", label: "Sign in to unlock", detail: "Sign in to view chapter prices and access options." };
   const hasReadable = chapters.some((_, i) => readable(i));
   const date = new Date(story.created_at).toLocaleDateString(undefined, {year:"numeric",month:"long",day:"numeric"});
 
@@ -66,13 +67,13 @@ export function PublicStoryView({ story, chapters, readMinutes, totalWords, view
           <p className="mt-4 text-sm text-muted">Published {date}</p>
           {story.genres.length > 0 && <div className="mt-5 flex flex-wrap gap-2">{story.genres.map(name => <span key={name} className="rounded-full border border-ui px-3 py-1 text-xs text-ink-soft">{name}</span>)}</div>}
           <section className="mt-8" aria-labelledby="synopsis-title"><h2 id="synopsis-title" className="text-xs font-semibold uppercase tracking-wider text-muted">About the story</h2><p className="mt-4 whitespace-pre-wrap break-words text-lg leading-relaxed text-ink-soft">{story.summary || "The author hasn't added a synopsis yet."}</p></section>
-          <StoryChapters storyHref={storyHref} entries={chapters.map((c,i)=>({title:c.title,index:i,access:story.chapters_public ? "Free" : readable(i) ? "Preview" : "Locked"}))} />
+          <StoryChapters storyHref={storyHref} entries={chapters.map((c,i)=>({title:c.title,index:i,unlock:readable(i) ? undefined : signInAction,access:story.chapters_public ? "Free" : readable(i) ? "Preview" : "Locked"}))} />
           <section className="mt-8" aria-label="Reader ratings"><RatingBreakdown ratings={ratings} /></section>
         </StoryOverview>
         {chapters.length > 0 && <section id="reading-room" aria-labelledby="reading-title" className="mt-12 scroll-mt-8 border-t border-ui pt-8">
           <div className="mx-auto max-w-4xl"><h2 id="reading-title" className="font-serif text-3xl">The reading room</h2>
             <ChapterReader key={selectedChapter} canInteract={false} storyId={story.id}
-              chapters={chapters.map((c,i)=>({index:i,title:c.title,body:readable(i) ? Buffer.from(c.body,"utf8").toString("base64") : null,locked:!readable(i),prompts:[]}))}
+              chapters={chapters.map((c,i)=>({index:i,title:c.title,body:readable(i) ? Buffer.from(c.body,"utf8").toString("base64") : null,locked:!readable(i),unlock:readable(i) ? undefined : signInAction,prompts:[]}))}
               initialChapter={selectedChapter} initialPage={0} initialBookmarks={[]} autoResume={false} authorName={story.author}
               lockedNote="This chapter is private. Sign in to see access options." />
           </div>

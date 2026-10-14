@@ -17,6 +17,7 @@ import { PostComposer } from "@/components/post/PostComposer";
 import { getStoryPosts } from "@/lib/posts";
 import { resolveStory, isUuid } from "@/lib/slug";
 import { DeleteStoryButton } from "@/components/story/DeleteStoryButton";
+import { chapterAccessAction } from "@/lib/chapter-access";
 import { AccessPanel } from "@/components/story/AccessPanel";
 import { ApprovedReadersList } from "@/components/story/ApprovedReadersList";
 import { ViewTracker } from "@/components/reader/ViewTracker";
@@ -88,10 +89,10 @@ export default async function StoryPage({
   searchParams,
 }: {
   params: Promise<{ id: string }>;
-  searchParams: Promise<{ chapter?: string }>;
+  searchParams: Promise<{ chapter?: string; buy?: string }>;
 }) {
   const { id: param } = await params;
-  const { chapter: chapterParam } = await searchParams;
+  const { chapter: chapterParam, buy: buyParam } = await searchParams;
 
   // Session is optional: logged-out visitors get a public, indexable view.
   const session = await getActiveSession();
@@ -102,7 +103,10 @@ export default async function StoryPage({
   const resolved = await resolveStory(param);
   if (!resolved) notFound();
   if (isUuid(param) && resolved.slug) {
-    redirect(`/stories/${resolved.slug}${chapterParam ? `?chapter=${chapterParam}` : ""}`);
+    const query = new URLSearchParams();
+    if (chapterParam) query.set("chapter", chapterParam);
+    if (buyParam) query.set("buy", buyParam);
+    redirect(`/stories/${resolved.slug}${query.size ? `?${query}` : ""}`);
   }
   const id = resolved.id;
 
@@ -404,6 +408,11 @@ export default async function StoryPage({
   });
 
   const storyHref = `/stories/${resolved.slug ?? story.id}`;
+  const buyIndex = buyParam && /^\d+$/.test(buyParam) && Number(buyParam) < allChapters.length ? Number(buyParam) : undefined;
+  const unlockAction = (i: number) => chapterUnlocked(i) ? undefined : chapterAccessAction({
+    storyHref, index: i, offered: story.offered_durations, prices: allChapters[i].prices ?? {},
+    wholePrices: story.whole_prices, currency: story.currency, discount: returning ? RENEWAL_DISCOUNT_PCT : 0,
+  });
   const selectedChapter = clampChapter(initialChapter, allChapters.length);
   const firstReadable = allChapters.findIndex((_, i) => chapterUnlocked(i));
   const startChapter = chapterUnlocked(selectedChapter) ? selectedChapter : Math.max(0, firstReadable);
@@ -432,6 +441,8 @@ export default async function StoryPage({
             </div>
             {purchasable ? (
           <AccessPanel
+            key={buyIndex ?? "default"}
+            initialChapterIndex={buyIndex}
             storyId={story.id}
             offered={story.offered_durations}
             wholePrices={story.whole_prices}
@@ -462,7 +473,7 @@ export default async function StoryPage({
           {story.genres.length > 0 && <div className="mt-5 flex flex-wrap gap-2">{story.genres.map(name => <span key={name} className="rounded-full border border-ui px-3 py-1 text-xs text-ink-soft">{name}</span>)}</div>}
           <section className="mt-8" aria-labelledby="synopsis-title"><h2 id="synopsis-title" className="text-xs font-semibold uppercase tracking-wider text-muted">About the story</h2><p className="mt-4 whitespace-pre-wrap break-words text-lg leading-relaxed text-ink-soft">{story.summary || "The author hasn't added a synopsis yet."}</p></section>
           {inspiredBy.length > 0 && <div className="mt-6 rounded-xl border border-ui p-4"><p className="text-xs font-semibold text-muted">Inspired by</p><ul className="mt-2 space-y-2">{inspiredBy.map(a => <li key={a.id} className="text-sm text-ink-soft"><Link href={`/stories/${a.id}`} className="font-medium underline">{a.title}</Link> by {a.author ?? "Unknown"}</li>)}</ul></div>}
-          <StoryChapters storyHref={storyHref} lastOpened={hasReadingPosition ? selectedChapter : undefined} entries={allChapters.map((c,i)=>({title:c.title,index:i,access:story.chapters_public ? "Free" : isAuthor ? "Author" : authorSubscription ? "Subscriber" : chapterUnlocked(i) ? "Purchased" : "Locked"}))} />
+          <StoryChapters storyHref={storyHref} lastOpened={hasReadingPosition ? selectedChapter : undefined} entries={allChapters.map((c,i)=>({title:c.title,index:i,unlock:unlockAction(i),access:story.chapters_public ? "Free" : isAuthor ? "Author" : authorSubscription ? "Subscriber" : chapterUnlocked(i) ? "Purchased" : "Locked"}))} />
         </StoryOverview>
         {allChapters.length > 0 && <section id="reading-room" aria-labelledby="reading-title" className="mt-12 scroll-mt-24 border-t border-ui pt-8">
           <div className="mx-auto max-w-4xl"><h2 id="reading-title" className="font-serif text-3xl">The reading room</h2>
@@ -479,6 +490,7 @@ export default async function StoryPage({
                   ? Buffer.from(c.body, "utf8").toString("base64")
                   : null,
                 locked: !chapterUnlocked(i),
+                unlock: unlockAction(i),
                 prompts: chapterUnlocked(i)
                   ? ((c as { prompts?: string[] }).prompts ?? [])
                   : [],

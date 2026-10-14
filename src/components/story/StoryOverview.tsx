@@ -1,3 +1,4 @@
+import type { ChapterAccessAction } from "@/lib/chapter-access";
 import Link from "next/link";
 import type { ReactNode } from "react";
 import { Avatar } from "@/components/layout/Avatar";
@@ -5,7 +6,7 @@ import { BookCover } from "@/components/story/BookCover";
 import { formatCount } from "@/lib/format";
 import type { CoverStyle } from "@/lib/cover-style";
 
-export type ChapterEntry = { title: string | null; index: number; access: "Free" | "Preview" | "Purchased" | "Subscriber" | "Author" | "Locked" };
+export type ChapterEntry = { title: string | null; index: number; unlock?: ChapterAccessAction; access: "Free" | "Preview" | "Purchased" | "Subscriber" | "Author" | "Locked" };
 
 export function StoryChapters({ entries, storyHref, lastOpened }: { entries: ChapterEntry[]; storyHref: string; lastOpened?: number }) {
   return <section aria-labelledby="contents-title" className="mt-9 border-t border-ui pt-7">
@@ -15,7 +16,10 @@ export function StoryChapters({ entries, storyHref, lastOpened }: { entries: Cha
         <span className="w-6 shrink-0 font-serif text-lg tabular-nums text-subtle">{String(entry.index + 1).padStart(2,'0')}</span>
         <span className="min-w-0 flex-1"><span className="block break-words text-sm font-medium text-ink">{entry.title ?? (entries.length === 1 ? "Read the story" : `Chapter ${entry.index + 1}`)}</span>{lastOpened === entry.index && <span className="mt-1 block text-xs text-muted">Last opened</span>}</span>
         <span className={`shrink-0 rounded-full border px-2.5 py-1 text-[11px] ${entry.access === 'Locked' ? 'border-ui text-muted' : 'border-ui-strong bg-surface-raised text-ink-soft'}`}>{entry.access}</span>
-      </Link></li>)}
+      </Link>{entry.access === "Locked" && entry.unlock && <div className="pb-4 pl-2 sm:pl-12">
+        <Link href={entry.unlock.href} className="btn-primary inline-flex min-h-11 items-center rounded-full px-4 py-2 text-sm font-semibold">{entry.unlock.label}</Link>
+        <p className="mt-2 break-words text-xs text-muted">{entry.unlock.detail}</p>
+      </div>}</li>)}
     </ol> : <p className="mt-4 text-sm text-muted">The first chapter is still to come.</p>}
   </section>;
 }

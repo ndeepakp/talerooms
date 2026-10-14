@@ -1,0 +1,669 @@
+# Improvement roadmap history — archived 2026-10-14
+
+Historical snapshot retained during roadmap cleanup. Status statements below describe earlier stages and may have been superseded. Use [the current roadmap](../IMPROVEMENT_TASKS.md) for priorities, current status and remaining work.
+
+---
+
+# Talerooms Design & Experience Improvement Tasks
+
+A comprehensive roadmap and tracking ledger for the visual, typographic, architectural, and user-experience overhaul of Talerooms.
+
+---
+
+## Status Legend
+- `[ ]` **Pending** — Not yet started
+- `[-]` **In Progress** — Currently being worked on
+- `[x]` **Completed** — Implemented and verified locally; merge status tracked separately
+- `[!]` **Blocked** — Awaiting prerequisite or user decision
+
+---
+
+## Quick Status Overview
+
+| Task ID | Feature / Module | Category | Priority | Status |
+| :--- | :--- | :--- | :--- | :--- |
+| [`TASK-SYS-01`](#task-sys-01-editorial-typography-stack) | Editorial Typography Stack (Serif + Sans pairing) | Design System | High | `[x] Completed` |
+| [`TASK-SYS-02`](#task-sys-02-brand-identity--logo-refinement) | Brand Identity & Header Overhaul | Design System | High | `[x] Completed` |
+| [`TASK-SYS-03`](#task-sys-03-modern-bookshelf-elevation--spine-shadows) | Modern Bookshelf Elevation & 3D Spine Depth | Design System | High | `[x] Completed` |
+| [`TASK-SYS-04`](#task-sys-04-generative-book-jacket-designer) | Generative Book Jacket Designer & Cover Art | Design System | Medium | `[x] Completed` |
+| [`TASK-SYS-05`](#task-sys-05-unified-surface-tokens--border-softening) | Unified Surface Tokens & Border Softening | Design System | High | `[x] Completed locally` |
+| [`TASK-PAGE-01`](#task-page-01-landing-page-colorful-welcome--original-stories) | Landing Page: Colorful Welcome & Original Stories | Pages & UI | High | `[x] Completed` |
+| [`TASK-PAGE-02`](#task-page-02-reading-room--customization-suite) | Reading Room: Distraction-Free & Customization Drawer | Reader | High | `[x] Completed` |
+| [`TASK-PAGE-03`](#task-page-03-story-overview-page-split-layout) | Story Overview Page: Two-Column Editorial Layout | Story View | High | `[x] Completed` |
+| [`TASK-PAGE-04`](#task-page-04-discovery-feed--curated-shelves) | Discovery Feed & Dynamic Categorized Shelves | Feed | Medium | `[x] Completed` |
+| [`TASK-PAGE-05`](#task-page-05-author-studio-multi-step-focused-writing-suite) | Author Studio: Multi-Step Focused Writing Suite | Author Studio | High | `[x] Completed` |
+| [`TASK-PAGE-06`](#task-page-06-author-portfolio--profile-page) | Author Profile: Literary Portfolio & Memberships | Profiles | Medium | `[x] Completed and deployed` |
+| [`TASK-PAGE-07`](#task-page-07-library-bookshelf-redesign) | Personal Library: Gallery & Reading Progress | Library | Medium | `[x] Completed and deployed` |
+| [`TASK-AUTH-01`](#task-auth-01-google-signup--email-otp-verification) | Google Signup & Email OTP Verification / Account Activation | Authentication | High | `[-] In Progress` |
+| [`TASK-PAY-01`](#task-pay-01-stripe-payments-integration) | Stripe Platform: Checkout, Subscriptions, Connect & Webhooks | Payments | High | `[-] In Progress` |
+| [`TASK-ADMIN-01`](#task-admin-01-admin-console--observability-dashboard) | Admin Console & Observability Dashboard | Administration & Analytics | High | `[ ] Pending` |
+| [`TASK-ENG-01`](#task-eng-01-reading-milestones--author-controlled-rewards) | Reading Milestones & Author-Controlled Rewards | Reader Engagement | Medium | `[ ] Pending` |
+| [`TASK-LANG-01`](#task-lang-01-regional-language-discovery-pilot) | Regional-Language Discovery Pilot | Discovery & Publishing | Medium | `[ ] Pending` |
+| [`TASK-AUDIO-01`](#task-audio-01-author-approved-audiobook-pilot) | Author-Approved Audiobook Pilot | Audio & Accessibility | Medium | `[ ] Pending` |
+| [`TASK-SAFE-01`](#task-safe-01-protected-under-18-reader--writer-experience) | Protected Under-18 Reader & Writer Experience | Age Access & Publishing | High | `[ ] Pending` |
+
+
+---
+
+## Pending Task Execution Order
+
+Complete and validate each step before advancing:
+
+Author Studio (`TASK-PAGE-05`) was completed, validated, and deployed on 2026-10-07. Discovery Feed (`TASK-PAGE-04`) was completed, validated, pushed, and deployed the same day.
+
+Personal Library (`TASK-PAGE-07`) was implemented, validated, pushed and deployed on 2026-10-08 in `5fe087d` (Fly machine v36, health 1/1). Migration `db/0048_library_progress.sql` was applied and verified on production before rollout.
+
+The requested application-wide mobile layout audit was validated and deployed on 2026-10-08 in the same release. It covers all 27 page templates, including the reported profile overflow, navigation popovers, collections, resume/library cards, settings, studio extras and comment forms. See [mobile audit coverage and validation](docs/MOBILE_LAYOUT_AUDIT.md). This does not complete the broader author portfolio redesign or theme audit.
+
+Author Profiles (`TASK-PAGE-06`) and mobile sanity fixes were validated, pushed and deployed on 2026-10-08 in `6cbbf59` (Fly machine v37, health 1/1).
+
+Visual Consistency & Theme Audit (`TASK-SYS-05`) was completed and validated locally on 2026-10-09; review, push and deployment are pending. See [theme audit](docs/THEME_AUDIT.md).
+
+1. **Signup, User Verification & Account Testing** — `TASK-AUTH-01`; add Google signup/sign-in and email OTP activation, then complete outstanding end-to-end checks for bookmarks, reviews, community submissions, reading resume, and protected account flows against the activation rules.
+2. **Payments** — `TASK-PAY-01`; prioritize contextual chapter-unlock visibility while finishing checkout, then complete and validate before starting administration.
+3. **Admin Console & Observability Dashboard** — `TASK-ADMIN-01`; user management, content moderation, product analytics, and operational visibility. Start only after the payments task is completed and validated.
+4. **Reading Milestones & Author-Controlled Rewards** — `TASK-ENG-01`; begin with badges/goals; chapter promotions require author opt-in and validated payment/access handling.
+5. **Regional-Language Discovery Pilot** — `TASK-LANG-01`; start with language metadata and filters, then validate one language with interested authors/readers.
+6. **Author-Approved Audiobook Pilot** — `TASK-AUDIO-01`; test one approved narrated story and an accessible player before expanding the audio system.
+7. **Protected Under-18 Reader & Writer Experience** — `TASK-SAFE-01`; parent-managed accounts, curated discovery, private writing and reviewed publishing, including suitability labels from reader feedback. Keep this last, after administration and the preceding feedback tasks are completed and validated. Planning only; under-18 access must not be advertised as supported before its safeguards are ready.
+
+---
+
+## Detailed Task Breakdown
+
+### Design System & Global Foundations
+
+#### `TASK-SYS-01`: Editorial Typography Stack
+- **Status**: `[x] Completed`
+- **Priority**: High
+- **Files Affected**:
+  - `src/app/layout.tsx`
+  - `src/app/globals.css`
+- **Objectives**:
+  - Remove the hardcoded `body { font-family: Arial, Helvetica, sans-serif; }` in `globals.css`.
+  - Configure Google Fonts in `layout.tsx`:
+    - **Display & Reading Serif**: `Newsreader` (editorial serif).
+    - **UI & Controls**: `Geist Sans` and `Geist Mono`.
+  - Establish a typographic scale with proper leading, letter spacing (`tracking-tight` for display headings), and optical sizing.
+- **Checklist**:
+  - [x] Add editorial serif fonts to Next.js font loader (`next/font/google`).
+  - [x] Wire CSS variables `--font-serif` and `--font-sans` into Tailwind `@theme inline`.
+  - [x] Apply reading line-height (`leading-[1.85]`) and measure limits (`max-w-prose`) to long-form content.
+
+---
+
+#### `TASK-SYS-02`: Brand Identity & Header Overhaul
+- **Status**: `[x] Completed`
+- **Priority**: High
+- **Files Affected**:
+  - `src/components/layout/TopBar.tsx`
+  - `src/app/page.tsx`
+  - `src/app/layout.tsx`
+- **Objectives**:
+  - Replace the candy-pill Web 2.0 gradient button containing block letters with an elegant, literary brand mark.
+  - Redesign the global navigation bar (`TopBar.tsx`) to feel lightweight and unobtrusive:
+    - Frosted glass effect with subtle border (`backdrop-blur-md bg-[var(--page)]/80`).
+    - Integrated brand wordmark and responsive avatar/navigation controls.
+  - Standardize the unauthenticated landing header in `page.tsx` to match the brand identity.
+- **Checklist**:
+  - [x] Design and render an editorial brand lockup with serif typography and accent mark.
+  - [x] Redesign `TopBar` for logged-in users with balanced spacing and modern typography.
+  - [x] Standardize the unauthenticated landing header in `page.tsx` to match the brand identity.
+
+---
+
+#### `TASK-SYS-03`: Modern Bookshelf Elevation & 3D Spine Depth
+- **Status**: `[x] Completed`
+- **Priority**: High
+- **Files Affected**:
+  - `src/app/globals.css`
+  - `src/components/story/Bookshelf.tsx`
+  - `src/components/story/BookCover.tsx`
+  - `src/app/library/page.tsx`
+- **Objectives**:
+  - Remove faux-wood skeuomorphic brown gradients (`.shelf`, `.shelf-case`, `.shelf-ledge`) that look dated and muddy in dark mode.
+  - Introduce modern tactile book styling:
+    - Subtle left-edge spine shadow (`inset 4px 0 6px -2px rgba(0,0,0,0.25)`).
+    - Ambient drop shadow on hover that creates real elevation off the page.
+    - Minimalist matte or frosted floating display shelves that adapt seamlessly to light, paper, slate, and dark modes.
+- **Checklist**:
+  - [x] Refactor `.shelf` and `.shelf-case` in `globals.css` to clean, modern gallery shelf surfaces.
+  - [x] Implement realistic book spine crease and lighting gradients on `BookCover`.
+  - [x] Ensure smooth hover transitions (lift, shadow spread) respecting `prefers-reduced-motion`.
+
+---
+
+#### `TASK-SYS-04`: Generative Book Jacket Designer & Cover Art
+- **Status**: `[x] Completed`
+- **Priority**: High
+- **Files Affected**:
+  - `src/components/story/BookCover.tsx`
+  - `src/lib/cover-style.ts`
+- **Objectives**:
+  - Remove harsh `border-2 border-accent` from all book covers.
+  - Upgrade generated covers for stories without custom uploaded artwork:
+    - Classic publishing templates with top ornament and brand seal.
+    - Typographic contrast (prominent serif title, crisp uppercase author badge).
+- **Checklist**:
+  - [x] Remove hardcoded borders and replace with natural book edge borders.
+  - [x] Create refined editorial cover layout in `BookCover.tsx`.
+  - [x] Add 3D spine crease highlights and right-edge bevels to both uploaded and generated covers.
+
+---
+
+#### `TASK-SYS-05`: Unified Surface Tokens & Border Softening
+- **Status**: `[x] Completed locally (2026-10-09)` — remaining component/theme audit validated; pending review, push and deployment.
+- **Priority**: High — Foundation for the page redesigns.
+- **Files Affected**:
+  - `src/app/globals.css`
+  - `src/lib/appearance.ts`
+  - All shared UI cards and panels
+- **Objectives**:
+  - Standardize surfaces across `plain`, `paper`, and `slate` backgrounds in light and dark modes.
+  - Eliminate hardcoded color leaks (e.g. `bg-indigo-100`, `border-amber-300` appearing inconsistently across themes).
+  - Unify border-radius definitions across buttons, cards, modals, and pills.
+- **Checklist**:
+  - [x] Define semantic surface, text, border, radius, and shadow tokens in `globals.css`.
+  - [x] Audit component color classes to ensure theme compatibility.
+  - [x] Migrate navigation, search/menu/notification surfaces, bookshelves, library, access/review panels, and feed cards to semantic tokens.
+  - [x] Complete the remaining shared-component color audit across account forms, collections, community, reviews, analytics and editor controls.
+- **Final audit (2026-10-09)**: Remaining UI surfaces/forms use semantic tokens. Added shared status and rating colors, explicit field radius, accessible appearance selection states, and reader-local feedback/code/link colors. 42 appearance/contrast combinations and 60 route/viewport checks passed. Lint, 64 tests and production build passed. Details and limitations: [theme audit](docs/THEME_AUDIT.md). Local only; payment/signup/admin implementations remain separate.
+- **Validated first batch (2026-10-05)**:
+  - Shared literary brand, responsive navigation, scalable generated covers, and always-visible library chapter positions.
+  - Library positions are labelled "last opened"; they do not claim completed reading percentages.
+  - Six background/mode combinations, seven accent colors in both modes, and viewport widths 320, 390, 768, and 1280px checked using a temporary fixture with the actual shared components.
+  - Sampled secondary text contrast exceeds 5.3:1; primary accent button contrast exceeds 5.4:1.
+  - Keyboard menu open/Escape dismissal, desktop/mobile shelf preview open/close, and empty-library rendering checked. Reduced-motion rules now cover book lifts and transitions.
+  - 42 unit tests, ESLint, TypeScript, and production build pass. Temporary fixture removed after verification. Full authenticated user flows remain to be tested.
+  - Reading-room work has not started. Real payments remain the final phase.
+
+---
+
+### Page & Flow Enhancements
+
+#### `TASK-PAGE-01`: Landing Page: Colorful Welcome & Original Stories
+- **Status**: `[x] Completed`
+- **Priority**: High
+- **Files Affected**:
+  - `src/app/page.tsx`
+  - `src/app/about/page.tsx`
+  - `src/components/story/LandingWelcome.tsx`
+  - `src/components/story/LandingWelcome.module.css`
+  - `src/components/story/FeaturedBookPreview.tsx`
+  - `src/components/story/BookPreview.tsx`
+  - `src/components/story/Bookshelf.tsx`
+  - `src/components/story/LibraryShelf.tsx`
+  - `src/components/feed/NewChapters.tsx`
+  - `src/app/feed/page.tsx`
+  - `src/app/library/page.tsx`
+  - `src/components/story/BookPreview.module.css`
+  - `src/components/layout/PublicNavigation.tsx`
+  - `src/app/sitemap.ts`
+- **Objectives**:
+  - Make original fiction, writer ownership, and relationships with returning readers clear through a fun, colorful welcome page.
+  - Lead with “Get lost. Find your people.” and a primary **Find your next story** action to the published shelf.
+  - Keep **Start writing** and **Log in** easy to find; preserve the signed-in feed redirect.
+  - Use a saturated blue opening, oversized mixed typography, lime actions, a peach book-jacket spotlight, and a structured shelf of real published stories. Support dark styling in the shelf and footer.
+  - Keep the layout simple and responsive, with gentle hover movement that respects reduced-motion preferences.
+  - Keep monetization and future IP licensing out of the main promise until those experiences are available. Payments remain the final reader/author implementation phase, followed by the admin console.
+- **Checklist**:
+  - [x] Rebuild the hero with the editorial headline, featured-story spotlight, and a distinct creator-ownership section.
+  - [x] Connect browsing, signup, login, and About to existing routes.
+  - [x] Use real published covers, with long-title and empty-shelf handling.
+  - [x] Preserve the creator-ownership and reader-relationship message without invented statistics.
+  - [x] Separate the cream header from the blue hero; style Our story and Log in as clear buttons without header arrows.
+  - [x] Remove the decorative “01 / OPEN” label.
+  - [x] Open books in place across the featured book, landing shelf, feed, library, and new-chapter shelf; start hover only on the book.
+  - [x] Keep the open spread within the viewport and stable when moving between its pages; support cover taps, keyboard activation, and Escape.
+  - [x] Remove duplicated details and external reading controls from the featured book; keep the reading action inside, preserving saved-chapter destinations where applicable.
+  - [x] Remove the title from the inside page and replace “About the story” with **“A glimpse”**.
+  - [x] Disable normal selection, copying, and dragging inside shared book previews; preserve the reading action and accessible story identification.
+  - [x] Validate responsive layouts, light/dark styling, contrast, keyboard focus, navigation, and the production build before advancing.
+
+- **Initial validation (2026-10-06)**: The preceding minimal welcome design passed signup/login/About navigation, anonymous story exploration, six theme combinations, empty shelves, and long titles. The existing signed-in feed redirect was preserved by inspection; account-level redirect verification remains pending.
+- **Editorial revision validation (2026-10-06)**: Replaced the initial pastel/tilted-cover revision following user feedback. Checked 320/390/768/1280px layouts, real cover images, dark styling, long titles, empty shelves, browsing anchor, signup/login, and real story navigation. Keyboard focus and reduced-motion styling retained. All 51 tests, lint, TypeScript, and production build passed. Existing signed-in redirect remains unchanged. Changes are local; temporary preview removed.
+- **Featured book preview (2026-10-06)**: Added an in-place hinged cover, inside paper page with the published story’s public synopsis, and a reading link inside the book. Removed the duplicated title/author caption and outside reading/toggle controls. Mouse entry on the book itself opens the preview; the backdrop does not. Tapping/clicking the cover toggles it. Keyboard Enter/Space controls work; Escape closes and restores focus to the cover. Checked desktop hover entry/exit, narrow mobile spread, hidden preview tab order, and inside-page navigation. Reduced-motion users receive the open state without animated transitions. No private chapter bodies are queried. Cream header and arrow-free header buttons retained. All 51 tests, lint, TypeScript, and production build passed locally.
+- **Shared shelf previews (2026-10-06)**: Extracted `BookPreview` for the featured book, landing shelf, feed Bookshelf, LibraryShelf, and NewChapters. Removed “01 / OPEN” and the feed’s separate preview drawer. Shelf books expand into a readable spread with viewport-aware placement and a continuous hover area. Hover starts on the book only; tap and keyboard activation remain available, with Escape restoring cover focus. Library/new-chapter reading links retain their saved chapter. Queries select only public synopses, never chapter bodies. Verified real landing links and presentation fixtures for all shelves at 320/390/768/1280px, opening/closing, keyboard controls, and continuation destinations. New-chapter books wrap to avoid clipping previews in a scrolling strip. 51 tests, lint, TypeScript, and production build passed; temporary fixture removed.
+- **Preview copy controls (2026-10-06)**: Removed the repeated title from the inside page. Shared book previews now disable normal text selection, prevent copy events, and prevent dragging; the inside reading action remains functional. Verified empty selection after a real text drag and a blocked browser copy shortcut using a temporary UI fixture. This deters ordinary copying of the public synopsis; it is not DRM or a guarantee against screenshots/source access. Lint, TypeScript, and production build passed. Temporary fixture removed.
+- **Latest wording (2026-10-06)**: The inside-page label is now **“A glimpse”** in the shared component, so it applies to every book preview. This final wording-only edit passed `git diff --check`; the preceding functional changes passed lint, TypeScript, production build, browser selection/copy-shortcut checks, and reading-link validation.
+- **Delivery status (2026-10-06)**: App changes committed and pushed to `origin/main` as `82691f8`, then deployed to https://talerooms.fly.dev. Fly image `deployment-01M48P5N9NMJF1BMD9H2KP5F82`, machine version 28, health 1/1 passing. Production health endpoint confirms PostgreSQL/pgvector; live landing/book preview, “A glimpse” label, removed inside titles, selection controls, reading/About/login navigation, and 390px mobile layout verified with no browser errors. Pre-deploy validation: 51 tests, lint, TypeScript, and production build passed. Account write flows remain outside this production smoke check. Real payments remain scheduled last; the existing mock payment implementation is unchanged.
+
+---
+
+#### `TASK-PAGE-02`: Reading Room: Distraction-Free & Customization Suite
+- **Status**: `[x] Completed`
+- **Priority**: High
+- **Files Affected**:
+  - `src/components/reader/ChapterReader.tsx`
+  - `src/components/reader/ChapterQuestions.tsx`
+  - `src/components/reader/ChapterPrompts.tsx`
+  - `src/app/stories/[id]/page.tsx`
+- **Objectives**:
+  - Turn the reading experience into a joyful, book-grade experience:
+    - **Reading Customizer Drawer**: Font family (Serif, Sans, Mono), font size scale (14px–24px), line height, and reading background (Paper, Sepia, Night, OLED).
+    - **Zen / Distraction-Free Mode**: One-click toggle that dims interface chrome, centering purely on the text.
+    - **Typographic Details**: Elegant drop cap on chapter opening, proper paragraph indentation or spacing, subtle dividers for existing scene breaks.
+    - **Reading Progress Bar**: Subtle, non-intrusive progress line at the top/bottom showing word-weighted page position and estimated minutes remaining.
+  - Keep Bookmark and Meaning actions usable on mobile; retain the existing author copy protection.
+- **Checklist**:
+  - [x] Create a `ReaderPreferences` client modal/drawer with persistence (localStorage or user settings).
+  - [x] Implement reader themes (Sepia, Paper, Night, OLED) scoped to the reader canvas.
+  - [x] Add drop cap formatting and scene dividers in `richtext`.
+  - [x] Clean up page-flip animation to ensure high performance and mobile responsiveness.
+
+- **Validation**: 46 tests, lint, TypeScript, and production build passed. Browser checks covered Paper/Sepia/Night/OLED, preference persistence, font changes retaining page position, focus/drawer Escape behavior, saved-page resume, cross-page bookmark jumps, locked chapters, short stories, and 320px/390px layouts. Reading fixtures were removed after validation. Authenticated bookmark writes and Q&A submissions still need account-level end-to-end verification.
+- **Scope notes**: Preferences are remembered per browser. A dedicated dyslexia font remains a future option; no reading-performance claim is made. Copy Quote is excluded while author copy protection is active.
+
+---
+
+#### `TASK-PAGE-03`: Story Overview Page: Two-Column Editorial Layout
+- **Status**: `[x] Completed`
+- **Priority**: High
+- **Files Affected**:
+  - `src/app/stories/[id]/page.tsx`
+  - `src/app/stories/[id]/PublicStoryView.tsx`
+  - `src/components/story/AccessPanel.tsx`
+  - `src/components/story/ReviewPanel.tsx`
+  - `src/components/story/StoryOverview.tsx`
+  - `src/components/story/RatingBreakdown.tsx`
+  - `src/lib/story-overview.ts`
+  - `src/lib/story-overview.test.ts`
+- **Objectives**:
+  - Replace the current single-column vertical stack with a balanced two-column layout:
+    - **Left Column (Sticky Desktop)**:
+      - Large high-res book jacket with tactile spine depth.
+      - Author profile card with avatar, follow button, and subscriber badge.
+      - Clear Access / Pricing Card (Free Preview, Rent, Buy Whole Story, Author Subscription).
+      - Quick metadata: Reading time, word count, and genres. Defer a verified similarity-check badge until durable check metadata exists; do not invent a verification claim.
+    - **Right Column**:
+      - Title, publication date, logline, and extended synopsis.
+      - Interactive Chapter Table of Contents (badge indicators for Free, Purchased, Locked).
+      - Reader ratings breakdown with explicitly labelled half-star bands (4.5–5, 3.5–4, 2.5–3, 1.5–2, 0.5–1).
+      - Community discussion & reviews.
+- **Checklist**:
+  - [x] Restructure `StoryPage` layout into a responsive two-column grid (`grid-cols-1 lg:grid-cols-12`).
+  - [x] Design sticky left book jacket and pricing card.
+  - [x] Reformat chapter listing with status chips and reading progress indicators.
+  - [x] Add star rating breakdown bar chart.
+
+- **Layout**: Shared overview for guests and signed-in readers. Cover/author/access sidebar remains sticky and scrollable on desktop; mobile shows the title first. The reading room and existing authenticated reviews/community controls remain full-width below the overview.
+- **Validated (2026-10-06)**: 51 tests, lint, TypeScript, and production build passed. Standalone production server booted; landing/About/signup/story/chapter navigation checked with no console errors. Browser checks covered free/locked chapters, first-chapter preview, no chapters, half-star rating distributions, long titles, guest follow-to-login, six themes, and 320/390/768/1280px layouts. Existing mock pricing selectors and renewal totals checked without submitting purchases. Read-only integration checks across 16 published local stories verified 15 readable bodies were serialized and 23 locked bodies were absent; a private draft returned 404. The preview fixture also excluded its locked body and was removed afterward.
+- **Remaining account verification**: Signed-in grant/subscription/resume/review/community writes still require account-level end-to-end testing. Their existing server access rules and submission handlers were retained. No schema or real-payment changes; membership options link to the author profile.
+
+---
+
+#### `TASK-PAGE-04`: Discovery Feed & Dynamic Categorized Shelves
+- **Status**: `[x] Completed` — Implemented, validated, pushed, and deployed on 2026-10-07.
+- **Priority**: Medium
+- **Files Affected**:
+  - `src/app/feed/page.tsx`
+  - `src/components/feed/ContinueReading.tsx`
+  - `src/components/feed/NewChapters.tsx`
+  - `src/components/feed/WeekPanel.tsx`
+  - `src/components/feed/DiscoveryFeed.tsx`, `DiscoveryShelf.tsx`, and `Discovery.module.css`
+  - `src/components/feed/SideTabs.tsx`
+  - `src/components/story/BookPreview.tsx`
+  - `src/lib/discovery.ts` and tests
+  - `src/components/post/PostCard.tsx` and `src/app/layout.tsx` (hydration fixes)
+- **Objectives**:
+  - Elevate `/feed` into a lively literary home:
+    - **"Continue Reading" Ribbon**: Modernized hero banner for in-progress stories with chapter title, progress bar, and instant "Resume Chapter" button.
+    - **Categorized Discovery Carousels**:
+      - *Trending in Your Genres*
+      - *New Releases from Followed Authors*
+      - *Quick Bites (Under 15 min reads)*
+    - **Redesigned "Your Week"**: Turn the right rail into an engaging personal reading streak & milestones tracker with circular completion gauges.
+- **Checklist**:
+  - [x] Redesign `ContinueReading` card into a sleek, prominent resume bar.
+  - [x] Organize feed stories into categorized shelves with horizontal scroll capability.
+  - [x] Polish `WeekPanel` stats with modern visual metrics and streak tracking.
+
+- **Related work completed (2026-10-06)**: Feed Bookshelf and NewChapters now use the shared in-place book preview. The old feed detail drawer was removed; new-chapter books wrap to prevent preview clipping, and their reading links retain the saved chapter. The broader categorized shelves, ContinueReading, and WeekPanel work was completed on 2026-10-07 as documented below.
+
+
+- **Implemented (2026-10-07)**: Editorial reading-room header; prominent Continue Reading ribbon with chapter title/position and a resume link that restores the existing page bookmark. Categorized horizontal shelves show trending stories in preferred genres (last-seven-day views), latest stories from followed authors, short reads with estimates below 15 minutes, and all published stories with genre filters. When genre activity is absent, the personal shelf honestly says “Fresh in your genres.” Existing new-chapter notifications and community posts remain accessible. Weekly activity shows a seven-day circular gauge, daily reading markers, actual reading streak, opened-story/quiz/answer counts, and quiz accuracy. Calendar-day activity is explicitly labeled UTC. Shared book spreads are clamped to the scrolling shelf and close on horizontal scrolling; keyboard/tap/Escape controls remain available. Only public story metadata and SQL-computed word counts are sent to the client; chapter bodies stay on the server.
+- **Validation corrections**: Resume links use the story slug and omit the explicit chapter query, which previously skipped the saved page. Community post dates older than 30 days now use a fixed locale/timezone to avoid hydration mismatch. The root theme element accepts the intentional pre-hydration class change from the existing theme script.
+- **Validation (2026-10-07)**: 60 tests, lint, TypeScript, production build, and diff checks passed. Four discovery/activity regression tests cover genre ranking, followed authors outside preferences, quick-read bounds, fresh fallback, unique reading days, streak resets, and month boundaries. A disposable local reader exercised real follows/preferences/view activity, a two-day streak, fresh/trending shelves, empty followed-author and inactive-week states, carousel controls, genre filtering, community navigation, locked access preservation, and saved page 2 of 4. Production-build checks confirmed persistent resume dismissal and no browser console errors on the feed/community. Responsive checks at 320/390/768/1280px found no page overflow; light/dark themes and the in-place mobile book spread were checked. Test account and all its activity/access rows were removed after verification.
+- **Approved editorial layout follow-up (2026-10-07, local)**: Implemented the selected split layout after mockup review: left-aligned reading-room introduction, Stories/Community segmented tabs, and Explore heading above the genres and books. Your week and the actual saved-story cover/Resume card sit together in a desktop sidebar anchored near the vertical middle; page scrolling does not move either card. Short viewports keep the sidebar accessible with its own overflow, while tablet/mobile cards return to normal document flow. Library and Write a story are in the top navigation; the hamburger remains beside notifications/avatar and includes Profile, Library, Drafts, Collections, Settings, and sign-out. Existing account themes, uploaded/template book covers, personalized shelves, chapter-position progress, and dismissal cookie remain supported. No generated mockup covers were substituted for author content.
+- **Follow-up validation**: Lint, TypeScript, all 60 tests, production build, and diff checks passed. Local production-browser checks covered 320/390/768/1280px without page overflow, keyboard Stories/Community switching, hamburger/Profile visibility and Escape, Historical filtering, in-place mobile book previews, saved-story resume navigation, and dismissal persistence after reload. At 1280px the sidebar remained at y=230px while the page scrolled to y=1772px; no browser errors. Fixed an invalid foreground CSS token found during visual review and tightened mobile header spacing. Disposable local reader removed after verification. Delivery is recorded in the final release entry below.
+
+- **Compact category controls (2026-10-07, local)**: Moved Explore genre selection into the shelf heading row beside the title/count. Removed previous/next arrow controls from all discovery shelves; native horizontal scrolling, swipe/trackpad navigation, and keyboard focus on book rails remain available. Expanded genres share a single column and left edge with the compact controls, rather than starting at the shelf edge. Initially shows four options (All stories plus three genres); the accessible + button expands all genres in the same grid and becomes − to collapse. A genre selected from the extra options stays visible in the compact row after collapse. On narrow screens controls wrap beneath the title/arrows without page overflow. Lint, TypeScript, production build, diff checks, and local production-browser checks at 1440/1280/320px passed, including expansion, Poetry filtering, selection retention, and collapse; no browser errors. Follow-up alignment checks confirmed identical compact/expanded left edges at desktop (396px) and mobile (16px), with no page overflow; lint and production build passed again. Disposable reader removed. Delivery is recorded in the final release entry below.
+
+- **Uniform genre and Resume cover refinement (2026-10-07)**: Replaced variable-width and split genre rows with a single equal-width grid (four columns desktop, two mobile), 48px-high buttons, and a separate expand/collapse control that cannot wrap onto an isolated row. Expanded choices keep their stable alphabetical order; a selected extra genre remains visible when collapsed. Enlarged the Resume cover to 96×144px on desktop and 84×126px on narrow mobile screens, preserving chapter position, dismissal and resume behavior. Lint and production build passed; local production-browser checks confirmed all desktop genres measure 75×48px, the cover measures 96×144px desktop / 84×126px mobile, selected Science Fiction survives collapse, and 320px has no page overflow or browser errors.
+
+- **Final release refinements (2026-10-07)**: Removed the “Your reading room” kicker and all discovery-shelf previous/next buttons, retaining native horizontal scrolling and focusable book rails. The final compact/expanded genre controls use the same aligned column. Full release validation includes lint, all 60 tests, TypeScript through the production build, and diff checks. GitHub/Fly delivery is recorded after deployment below.
+
+- **Editorial release delivery (2026-10-07)**: Pushed `63d1e71` (reading-room layout, compact genres, arrow/kicker removal) and `04ae2b0` (uniform genre grid and larger Resume covers) to `origin/main`. Final app image `deployment-01M4B3KQNQRPM6B9BW60DDNX16` deployed to https://talerooms.fly.dev on machine `9080d707a932e8`, version 35, started with 1/1 health checks passing. Live `/api/health` confirms PostgreSQL 17.10 and pgvector 0.8.2. Full lint, 60 tests, TypeScript/production build and local production-browser validation passed before deployment; authenticated visual/interaction checks used disposable local readers, which were removed. No production test accounts, schema migrations, or payment changes.
+
+- **Delivery (2026-10-07)**: Discovery Feed release `bb332e8`, invitation line break `84a791b`, roomier shelves/filters `e6d9bf3`, and heading-before-filters ordering `72e7380` were pushed to `origin/main` and deployed to https://talerooms.fly.dev. Final Fly image `deployment-01M4B0G4N2P772T5GGM4AQ4Y9R`, machine version 33, health 1/1 passing. Live health confirms PostgreSQL/pgvector; landing and signed-out feed redirect to login checked with no browser errors. Authenticated feed behavior was verified locally rather than repeated on production. Follow-up spacing and ordering were checked at 1280/390px, including an explicit invitation line break, larger card gaps, and genre filters grouped beneath the Explore heading. Disposable local preview readers were removed. No production data changes, schema migrations, or payment implementation. Personal Library is next.
+
+---
+
+#### `TASK-PAGE-05`: Author Studio: Multi-Step Focused Writing Suite
+- **Status**: `[x] Completed` — Implemented, validated, pushed, and deployed on 2026-10-07.
+- **Priority**: High
+- **Files Affected**:
+  - `src/app/write/StoryForm.tsx`
+  - `src/components/write/studio/` (four steps, state/save controller, confirmation dialog, and scoped styling)
+  - `src/components/write/RichTextEditor.tsx`
+  - `src/components/write/ChapterQuestionsEditor.tsx`
+  - `src/components/write/ChapterPromptsEditor.tsx`
+  - `src/app/api/stories/route.ts`
+  - `src/app/api/stories/[id]/route.ts`
+  - `src/lib/story-validation.ts` and tests
+  - `src/lib/studio-save-queue.ts` and tests
+  - `src/lib/similarity.ts`
+- **Objectives**:
+  - Break down the 1,300-line monolithic form into an intuitive, multi-step authoring workflow:
+    1. **Step 1: Story Identity & Cover**: Title, summary, genres, Word doc import, and interactive cover designer.
+    2. **Step 2: Chapter Manuscript**: Distraction-free writing environment with a left sidebar chapter manager (reorderable list, chapter word counts) and right-side rich text canvas.
+    3. **Step 3: Access & Monetization**: Simple, visual pricing presets with clear duration options.
+    4. **Step 4: Originality & Publish**: Clean pledge confirmation and similarity scan report before going live.
+  - Add auto-save draft indicator and word count targets.
+- **Checklist**:
+  - [x] Split `StoryForm` into modular step components.
+  - [x] Implement split-view manuscript editor (chapter drawer + editor canvas).
+  - [x] Streamline pricing configuration with one-click presets.
+  - [x] Integrate clean originality pledge checklist.
+
+
+- **Implemented (2026-10-07)**: Four navigable steps — Story, Manuscript, Access, and Publish. Live cover designer and Word import retained. The chapter manager supports selection, add/remove, and keyboard-accessible reordering without switching the selected manuscript. One rich-text editor is displayed at a time; focus mode hides app/studio navigation and exits with Escape. Chapter/total word counts and an adjustable writing target are shown. Quizzes and discussion prompts sit in optional reader extras. Access presets separate public reading, first-chapter preview, and restricted access; duration, currency, bundle, and individual chapter settings remain available. Publish review shows readiness, originality pledge, and similarity decisions. Real payments remain deferred.
+- **Save integrity**: Draft status and explicit Save/Retry controls are visible. Dirty tracking includes cover and currency. Serialized requests prevent draft creation/publish races; edits made during an in-flight save trigger another autosave. Newly created drafts update the editor URL without remounting, so reload resumes the saved draft. Draft normalization retains empty chapter outlines and unfinished quizzes/prompts; publishing still drops empty/incomplete content. Accessible confirmation dialogs protect removal, chapter merging, and unsaved navigation (including shared-header links). Published edits stay in a private working copy until publication succeeds.
+- **Originality correction**: Production-flow testing found private working copies in similarity results. Both semantic and lexical scans now include published stories only, avoiding false matches against the author's own working draft and disclosure of private draft titles.
+- **Validation (2026-10-07)**: 56 tests, lint, TypeScript, diff checks, and production build passed. A local QA author exercised signup, draft creation/reload, empty outlines, stable chapter reordering, unfinished quiz persistence, short-story conversion preserving both chapter bodies, currency-only and cover-only autosave, cover upload, access presets, bundle/chapter pricing, focus/Escape, navigation warning/cancellation, failed-save recovery, initial publication, and working-copy publication. Local PostgreSQL checks confirmed one draft rather than duplicates, an unchanged live story during draft editing, and working-copy removal after successful publication. Production API checks confirmed formatted Word import, anonymous creation rejection, and unauthorized edit rejection. A regression scenario detected a real published original while excluding two identical private drafts. All four steps were checked at 320/390/768/1280px without horizontal overflow; six background/mode combinations and narrow editor extras were checked. No browser errors were observed. Disposable local QA account, stories, sessions, and test cover were cleaned up after verification.
+- **Delivery (2026-10-07)**: App release `0536301` pushed to `origin/main` and deployed to https://talerooms.fly.dev. Fly image `deployment-01M4AYCEGGAD2JK0KNN43BXA2W`, machine version 29, health 1/1 passing. Live health confirms PostgreSQL/pgvector; landing page, book preview, and signed-out Author Studio redirect to login checked without browser errors. Authenticated author write flows were validated locally, not repeated on production. No schema migrations, production account changes, or real-payment implementation. Discovery Feed is next in the agreed order.
+
+---
+
+#### `TASK-PAGE-06`: Author Portfolio & Profile Page
+- **Status**: `[x] Completed and deployed (2026-10-08)` — `6cbbf59`, Fly machine v37, health 1/1.
+- **Priority**: Medium
+- **Files / Areas Affected**:
+  - `src/app/[handle]/page.tsx` and the author works archive
+  - `AuthorWorks`, `ProfileContent`, `Profile.module.css`, shared book previews
+  - Public bibliography query in `src/lib/profile.ts`; membership action touch targets
+- **Objectives**:
+  - Give every profile a distinctive editorial banner, author identity, biography and clear Follow/Membership actions.
+  - Present published works as a book gallery with shared in-place book opening and All works / Serials / Short stories filters.
+  - Show a membership card with the actual price, restricted-story count and existing active/cancelled subscription states.
+  - Feature author-pinned reader notes from published stories; preserve private drafts and owner-only analytics.
+- **Checklist**:
+  - [x] Integrate the author's saved accent into the banner while surfaces follow the viewer's appearance settings.
+  - [x] Separate membership information from the profile identity, including anonymous login and author management actions.
+  - [x] Build a responsive bibliography with existing cover art, format filters, genres, rating summaries and access labels.
+  - [x] Reuse the gallery in the author works archive; preserve legacy profile redirects and protected archive access.
+  - [x] Show selected reader notes only when the author has pinned a nonempty review on a published work.
+  - [x] Keep private drafts and analytics visible only to the owner, with writing/setup actions for empty profiles.
+  - [x] Validate desktop/tablet/mobile, light/dark, keyboard tabs, filters, book previews and account privacy.
+- **Content integrity**: Biography/credentials/rights statements remain author-supplied through the existing About field; no credentials or adaptation availability are inferred. The banner uses the saved accent, not a private feed wallpaper. Membership checkout remains a demo, clearly labeled; no payment implementation added. Work cards with no published chapters say "Chapters coming soon".
+- **Validation (2026-10-08)**: Lint, TypeScript, 64 tests and the production build passed. Disposable local author/reader accounts verified All works/Serials/Short stories counts, keyboard tabs and repeated story-count navigation, anonymous membership login, Follow/unfollow count refresh, active/cancelled membership states without checkout, owner-only drafts/analytics and empty profile/setup states. Pin/unpin actions added/removed the published reader quote; private-story and self-authored notes remained excluded. Public profile HTML excluded private draft titles, private reviews and manuscript bodies. Profiles, archive, aliases and shared feed/library shelves fit 320/390/430/768/1280px; dark mode and safe narrow book opening were checked with no production-browser errors. Existing local author Maya Chen supplied the final design preview. No schema migration or production data changes.
+- **Preview / delivery**: App release `6cbbf59` pushed to `origin/main` and deployed to https://talerooms.fly.dev. Image `deployment-01M4DDFDHVTZFYJBFTHSJYV805`, machine `9080d707a932e8` v37, health 1/1 passing. Live database health, public author portfolio, opening book preview, public mobile pages and protected redirects passed without browser errors. No migrations or production account mutations. Local QA fixtures remain pending explicit cleanup approval. Screenshots: `/private/tmp/talerooms-profile-qa/` and `/private/tmp/talerooms-sanity/`.
+
+---
+
+#### `TASK-PAGE-07`: Personal Library Bookshelf Redesign
+- **Status**: `[x] Completed and deployed (2026-10-08)` — `5fe087d`, Fly machine v36, health 1/1.
+- **Priority**: Medium
+- **Files / Areas Affected**:
+  - `src/app/library/page.tsx`, `src/components/story/LibraryShelf.tsx` and its CSS module
+  - `src/lib/library.ts`, library tests, shared `BookPreview`
+  - ChapterReader progress saving, progress/completion API handlers, feed resume query
+  - `db/0048_library_progress.sql`
+- **Objectives**:
+  - Bring opened stories, saved collection books and existing paid-access stories into one personal gallery.
+  - Retain realistic cover proportions, spine styling and the shared in-place book-opening preview.
+  - Show saved chapter/page position, new-chapter badges, and reader-declared completion.
+  - Filter by All books, Reading, Finished, Purchased and Collections; search books/authors and select an owned collection.
+- **Checklist**:
+  - [x] Replace the legacy shelf/wood wrapper with a responsive gallery using semantic appearance tokens.
+  - [x] Add reading-position indicators, filter counts, collection selection and search.
+  - [x] Add contextual empty states, clear-filter recovery and a discover-story call to action.
+  - [x] Continue from the saved page, without an explicit chapter query resetting pagination.
+  - [x] Add Mark as finished / Move to reading, with authenticated ownership checks and persistent status.
+  - [x] Return finished books to Reading when the author adds chapters; exclude finished books from feed resume.
+  - [x] Validate local desktop/tablet/mobile, light/dark, keyboard preview, status changes, filters and API isolation.
+- **Progress definition**: Percentages describe the saved position, with chapters weighted equally and page position within the bookmarked chapter. They do not claim words consumed or infer completion from opening the last page. Old bookmarks fall back to chapter position until resumed; 100% requires explicit completion.
+- **Purchase scope**: Uses existing positive-amount access grants (payments are still mocked). Includes expired access with a clear label; free grants are not purchases. Library metadata never grants reading access, and chapter bodies are excluded from its server/client payload.
+- **Validation (2026-10-08)**: Lint, TypeScript, 64 tests and the production build passed. Disposable local readers verified completion persistence/reversal, reader ownership, draft/unopened/own-story rejection, new-chapter handling, collection isolation, active/expired access, search/no-match recovery, empty states, anonymous redirect, saved chapter 2/page 2 restoration, keyboard book opening/Escape, and light/dark responsiveness at 320/390/768/1280px without horizontal overflow or production-browser errors.
+- **Delivery**: Additive migration `0048` was applied and its two integer columns verified on production before release. Existing bookmarks remain intact. Disposable local fixture accounts and their test-owned records were removed after validation. GitHub push and Fly deployment completed; live database health, public pages, protected-page redirects and mobile profile/story layout checks passed with no browser console errors. No live payments or admin functionality implemented.
+
+---
+
+### Signup & Account Verification
+
+#### `TASK-AUTH-01`: Google Signup & Email OTP Verification
+- **Status**: `[x] Done` — email OTP validated and Google signup confirmed working by the user on 2026-10-13. User requested moving on; additional manual provider edge-case checks are deferred.
+- **Priority**: High — Complete before payments; validate both signup paths before advancing.
+- **Files / Areas Affected**:
+  - `src/lib/auth.ts` and authentication client configuration
+  - Signup/login pages and verification UI
+  - Server session/access checks and account persistence
+  - Database migrations, transactional email delivery, and deployment configuration as needed
+- **Objectives**:
+  - Offer **Continue with Google** for signup and subsequent sign-in using the existing Better Auth stack.
+  - Activate Google accounts only after a successful, server-validated provider flow with a verified email. If the provider does not establish email verification, require email OTP verification.
+  - Keep email/password signup available for users who do not use Google. Send a one-time code to their signup email and activate the account only after successful verification. Email OTP is the intended non-Google verification channel.
+  - Treat newly registered, unverified users as **inactive / pending verification**. They may complete verification, resend a code, correct their email, or sign out, but must not gain normal authenticated access or perform protected actions until active. Public browsing remains available.
+  - Enforce activation on the server across sessions, protected pages, and API/mutation handlers; hiding UI alone must not grant access.
+  - Define how existing accounts transition before rollout, avoiding accidental activation of unverified accounts or unexplained lockouts.
+- **Checklist**:
+  - [x] Configure Google OAuth credentials and approved callback URLs for local and production environments; add signup/login controls and handle cancellation/errors. Google signup success confirmed by the user.
+  - [x] Implement transactional email OTP delivery and an accessible verification screen with resend cooldown and clear pending/expired/error states. Real Resend inbox delivery and user-completed OTP verification passed on 2026-10-12.
+  - [x] Use short-lived, single-use codes with secure storage, limited attempts, and request/resend rate limits; invalidate consumed or superseded codes.
+  - [x] Persist verification/activation state using the auth provider's supported model and enforce it consistently on the server.
+  - [x] Handle returning inactive users and interrupted signup so verification can resume safely; a changed email must be verified before activation.
+  - [x] Handle duplicate emails and account linking safely without automatically merging identities solely because email strings match. Implicit linking is disabled; explicit linking UI is outside this batch.
+  - [x] Document and validate the existing-account migration policy and required Google/email environment configuration. Existing users get 30 days from migration; new users get no grace. Production auth secrets staged and migration applied on 2026-10-12; eight existing accounts received the transition window.
+  - [x] Validate email OTP success/wrong/expired/reused codes, resend limits, session activation and inactive route/API gates. Google signup success confirmed by the user; error presentation checked. Additional manual Google cancellation/returning-account checks deferred at the user’s request.
+  - [x] Complete outstanding account-level end-to-end checks for existing bookmarking, reviews, community submissions, saved reading position, and access/subscription flows; repeat protected-flow checks with active and inactive accounts. Local synthetic accounts and mock payment flows only; real payment validation belongs to the final payments phase.
+  - [x] Run relevant auth tests, lint, TypeScript, production build, and mobile/keyboard flow checks before moving to the next task.
+- **Local implementation / validation (2026-10-11)**: Google provider/client controls, Resend delivery, hashed 5-minute OTPs, account-bound requests, PostgreSQL serialization and durable resend/attempt limits, verification/correction screens and post-verification onboarding implemented. Shared page/API checks read current activation state; follow/reaction/genre bypasses closed. Migration `0049` applied only locally and re-run without extending grace. 81 local API/security/reader-flow checks, 72 tests, lint, TypeScript and production build passed; signup/verification fit 320/390/768/1280px and keyboard verification/onboarding completed without browser errors. Temporary synthetic-only mail configuration restored. Actual Google success/cancellation and real Resend inbox delivery remain pending credentials. Setup and rollout: [auth verification](docs/AUTH_VERIFICATION.md). No push/deployment, production migration or real payments. Local fixtures retained pending cleanup approval.
+- **Acceptance criteria**: A new email/password account remains inactive until its email OTP is verified. A Google signup with a validated verified email becomes active after the provider flow. Unverified users cannot bypass activation through login, stale sessions, or direct API requests. Real payments remain the final phase.
+
+---
+
+### Monetization & Payments
+
+#### `TASK-PAY-01`: Stripe Payments Integration
+- **Status**: `[-] In Progress` — Local foundation validated; Singapore merchant test-account setup and multinational author eligibility remain prerequisites for end-to-end checkout/payout testing.
+- **Priority**: High (After signup/verification; before the admin console)
+- **Files Affected**:
+  - `src/lib/pricing.ts`
+  - `src/app/api/stories/[id]/purchase/route.ts`
+  - `src/app/api/users/[id]/subscribe/route.ts`
+  - `src/app/api/stripe/webhook/route.ts` (New)
+  - `src/components/story/AccessPanel.tsx`
+  - `src/components/profile/SubscribeButton.tsx`
+  - `src/app/wallet/` and `src/app/api/wallet/` (new; local implementation)
+  - `src/lib/wallet/` and `db/0050_author_wallet.sql` (new; local implementation)
+- **Objectives**:
+  - Replace the current mock payment layer with full-fledged Stripe processing:
+    - **Stripe Checkout / Elements**: Handle one-time chapter purchases, time-limited rentals, and whole-story bundle purchases.
+    - **Stripe Billing / Subscriptions**: 30-day recurring author subscriptions with automatic proration and cancellation handling.
+    - **Stripe Connect**: Use the current Accounts v2 configuration appropriate for author payments, bank onboarding and payout controls. Confirm author-country eligibility for the Singapore platform before enabling paid sales or withdrawals; do not assume worldwide payout support.
+    - **Webhook Endpoint**: Handle asynchronous payment confirmations (`checkout.session.completed`, `invoice.payment_succeeded`, `customer.subscription.deleted`) and securely update `access_grants` and `subscriptions` in PostgreSQL.
+    - **Author wallet**: Give authors an in-app view of their earnings and a Withdraw action, backed by their connected Stripe account balance and an auditable Talerooms transaction ledger.
+- **Reader feedback: chapter-purchase visibility (added 2026-10-14; pending)**:
+  - Readers should find an **Unlock this chapter** action beside the locked chapter in the chapter list and reading room, with its server-priced cost and selected access duration. Provide a direct route to the relevant checkout options instead of asking readers to locate a distant purchase panel.
+  - Distinguish free chapters, purchased access, author subscriptions, expired access, demo checkout and unavailable/not-yet-enabled paid checkout. Keep the no-charge demo notice visible until real billing is enabled.
+  - Preserve the praised typography, colours and interactive book previews while simplifying discovery-to-access navigation.
+  - Validate first-time and returning readers, logged-out/unverified users, existing grants/subscriptions, expired access, unavailable prices and payment failure on desktop/mobile. Real checkout return pages must display server-confirmed access state.
+- **Author wallet and withdrawal plan (added 2026-10-14)**:
+  - **Money flow**: Reader pays → pending author earnings → available balance → withdrawal requested → bank payout. Actual funds remain in the author's connected Stripe account; Talerooms displays and reconciles the financial records.
+  - **Wallet balances**:
+    - **Pending**: Earnings awaiting settlement and availability.
+    - **Available**: Withdrawable net earnings after applicable processor/platform fees, refunds, disputes and holds.
+    - **Withdrawals**: Requested, processing/in transit, paid, failed or canceled, with estimated arrival information when supplied by Stripe.
+    - **History**: Sales, subscription earnings, fees, refunds, adjustments and payouts. Show supported settlement currencies separately rather than adding different currencies into one balance.
+  - **Author onboarding**: Stripe-hosted identity verification and bank-account setup. Keep banking details with Stripe; show only the necessary masked destination information in Talerooms. Paid sales and withdrawals require an eligible country and enabled account capabilities.
+  - **Withdraw action**: Let an authenticated, active author choose an amount within the provider-confirmed available balance and select an eligible verified payout destination. Enforce author/account ownership and withdrawal limits server-side. Persist a withdrawal request, use provider idempotency keys and concurrency controls, and prevent duplicate or excessive withdrawals.
+  - **Payout permissions**: Confirm that the connected-account configuration permits Talerooms to manage manual payouts. Accounts with the full Stripe Dashboard require the appropriate platform controls. Do not enable an in-app withdrawal button before these permissions are established.
+  - **Settlement and holding limits**: Pending earnings cannot be withdrawn immediately. Keep provider-managed daily/weekly automatic payouts active as the initial fallback; permit earlier in-app withdrawals only after confirming account controls and provider support. Permanent manual schedules are blocked by the implementation; the wallet must not imply indefinite storage or guaranteed instant bank delivery.
+  - **Reconciliation**: Treat Stripe balance/payout state as authoritative. Process verified payout events idempotently; track successful, failed and canceled withdrawals and reflect refunds/disputes correctly. A failed payout must not create spendable funds twice or be shown as paid.
+  - **Implementation order**: Author onboarding and payout readiness → wallet ledger and balances → withdrawal flow → connect purchases/subscriptions and verified payment fulfillment → provider test-mode and mobile validation → live rollout.
+  - **Status**: Wallet UI, provider adapter, additive local database migration, authenticated onboarding/withdrawal APIs and signed payout-event reconciliation implemented locally. Unit tests, PostgreSQL concurrency tests and mobile checks use synthetic fixtures. Stripe account configuration and provider end-to-end testing remain pending; purchases/subscriptions still use the existing demo behavior and do not fund this wallet.
+  - **Provider references**: [Direct charges](https://docs.stripe.com/connect/direct-charges.md?platform=web&ui=stripe-hosted), [connected-account payout controls](https://docs.stripe.com/connect/payouts-connected-accounts), [manual payout rules](https://docs.stripe.com/connect/manual-payouts).
+- **Checklist**:
+  - [x] Install official `stripe` Node SDK and setup a mode-checked server client.
+  - [ ] Add contextual **Unlock this chapter** actions, visible price/duration and clear free/subscription/demo states; validate purchase discoverability on desktop/mobile.
+  - [ ] Implement Stripe Checkout Session creation for story bundles and chapter unlocks.
+  - [ ] Implement recurring subscription checkout with customer portal access for subscription management.
+  - [ ] Implement Stripe Webhook handler with signature verification (`stripe-signature`).
+  - [x] Implement Accounts v2 hosted-onboarding flow locally; actual merchant/author onboarding testing pending.
+  - [ ] Confirm supported author countries and platform permissions for manual payouts.
+  - [x] Implement author wallet UI, provider-confirmed pending/available balances and recent transaction ledger locally; provider validation pending.
+  - [x] Implement authenticated withdrawal requests, fresh email verification/sign-in, CSRF checks, balance/ownership validation, durable rate limits, idempotency and PostgreSQL reservation locks; synthetic validation passed.
+  - [x] Implement signed payout-event reconciliation with provider-state retrieval and durable event IDs; refunds/disputes are reflected through provider balance transactions. Actual provider event testing pending.
+  - [ ] Confirm actual daily/weekly Stripe automatic payout fallback and manual-withdrawal permissions for every approved launch country; code blocks permanent manual/monthly schedules.
+  - [ ] Validate wallet and withdrawals in provider test mode: pending funds, insufficient balance, duplicate/concurrent requests, unauthorized account access, payout failure/retry, refunds/disputes and mobile layouts.
+
+---
+
+### Administration & Observability
+
+#### `TASK-ADMIN-01`: Admin Console & Observability Dashboard
+- **Status**: `[ ] Pending` — Planning only; no implementation started.
+- **Priority**: High
+- **Execution dependency**: Start after `TASK-PAY-01` is completed and validated. Preserve the existing Library → Profiles → Visual Audit → Signup/Verification → Payments order.
+- **Planned Areas**:
+  - Protected `/admin` dashboard and user/content management screens.
+  - Server-authorized admin APIs and shared role/permission checks.
+  - Database migrations for admin roles, action audit records, and analytics events/aggregates.
+  - Existing `src/app/api/admin/reindex/route.ts` (currently a development-only helper); review administrative utilities before exposing any in production.
+- **Objectives**:
+  - **User management**: Search and paginate users; inspect signup date, verification/activation state, reader/author activity, and account status. Suspend/reactivate accounts with a reason and revoke sessions when appropriate. Keep account activation consistent with Google/OTP verification rules. Protect role changes from self-service escalation; use explicit authorized admin provisioning.
+  - **Content and platform control**: Review reported users, stories, reviews, and community posts; hide/restore inappropriate content and record moderation reasons. Define which platform settings admins may change, with validated values and reversible changes. Use confirmations for consequential actions and prefer suspension/hiding over permanent deletion.
+  - **Product analytics**: Show total users, new signups by day/week/month, verified versus inactive accounts, active readers/authors, story opens, and a defined inventory of clicks (e.g. story/author links, Read story, Resume chapter, genre selection, and Write a story). Include date filters, trends, and popular stories/genres. Distinguish total clicks, unique users/sessions, and story views; label definitions and timezones clearly.
+  - **Conversion and payment visibility**: Once payments exist, show signup → verification → reading/purchase conversion and aggregate purchases, subscriptions, revenue/refunds, and webhook failures. Use verified payment records rather than estimating revenue from click events; keep financial dashboards read-only initially.
+  - **Operational observability**: Surface app/database health, request errors/latency, failed background work and payment webhooks, plus relevant deployment/log links. Reuse existing health and hosting telemetry where available. Include actionable failure states rather than only cumulative counters.
+  - **Trustworthy data and admin access**: Enforce authorization on every admin page and API, not just navigation visibility. Record who changed what, when, and why in an audit trail. Minimize collected analytics data, avoid story bodies/secrets/payment credentials in events, define retention, and respect applicable consent preferences. Deduplicate retries and filter obvious bot/test traffic; validate aggregates against their underlying records.
+- **Checklist**:
+  - [ ] Define admin permissions, account-status semantics, allowed moderation/settings actions, and the initial admin provisioning process.
+  - [ ] Define the click-event inventory, unique-activity/conversion metrics, reporting timezone, privacy boundaries, and retention policy before collecting new analytics.
+  - [ ] Implement protected admin pages/APIs with server-enforced roles and audit logging.
+  - [ ] Build searchable user management and reversible content/report moderation flows.
+  - [ ] Add first-party event capture and trustworthy aggregation for signups, clicks, reading activity, and verified payment metrics.
+  - [ ] Build a responsive dashboard with date ranges, charts, useful empty/error states, and operational health links.
+  - [ ] Validate unauthorized access/role escalation, suspension and session behavior, moderation reversibility, audit records, event deduplication, metric accuracy, and dashboard desktop/mobile layouts before release.
+
+---
+
+### Reader Feedback & Discovery Pilots
+
+Reader feedback reviewed on 2026-10-14 praises the visual identity and interactive book covers, and suggests clearer chapter purchases, reading rewards, audiobooks, regional languages and age categories. Treat the suggestions as hypotheses to validate with more readers. Chapter-purchase visibility belongs to `TASK-PAY-01`; age suitability belongs to `TASK-SAFE-01`. The following features are planning only.
+
+#### `TASK-ENG-01`: Reading Milestones & Author-Controlled Rewards
+- **Status**: `[ ] Pending` — Planning only.
+- **Priority**: Medium (After payments and administration)
+- **Objectives**:
+  - Start with reading milestones, badges and optional goals using confirmed reading activity; keep a missed day from erasing all progress.
+  - Assess whether readers return more often before introducing points or paid-content rewards.
+  - Any free-chapter promotion must be explicitly enabled by its author, with chosen chapters, eligibility, access duration, limits and withdrawal from future promotions. Authors retain control of their work; no automatic giveaways of paid content.
+- **Checklist**:
+  - [ ] Define qualifying reading activity, timezone/streak rules, milestone thresholds and duplicate/spam protection.
+  - [ ] Implement accessible milestone/goals UI and validate activity counts, date boundaries and desktop/mobile layouts.
+  - [ ] Evaluate a capped author-opt-in chapter promotion after payment/access rules are stable; validate grants, repeat claims and expiry before enabling it.
+  - [ ] Compare engagement with baseline data using the admin dashboard before expanding rewards.
+
+#### `TASK-LANG-01`: Regional-Language Discovery Pilot
+- **Status**: `[ ] Pending` — Planning only.
+- **Priority**: Medium (After reading milestones; before the audiobook pilot)
+- **Objectives**:
+  - Let authors label a story's language and readers filter shelves/search by language, including a clear policy for multilingual stories and existing unlabelled works.
+  - Pilot one language based on interested authors/readers; language support does not require automatic translation of authors' work.
+  - Validate Unicode text, search, appropriate fonts and reading layouts for the selected script. Preserve attribution and author ownership.
+- **Checklist**:
+  - [ ] Select the pilot language and define language metadata, existing-story handling and filter behaviour.
+  - [ ] Add author language selection and reader discovery filters without breaking genre/search combinations.
+  - [ ] Validate publishing, search and reading with representative text on desktop/mobile, including right-to-left layouts if relevant to the chosen language.
+  - [ ] Review reader/author uptake before expanding languages or translating the interface.
+
+#### `TASK-AUDIO-01`: Author-Approved Audiobook Pilot
+- **Status**: `[ ] Pending` — Planning only.
+- **Priority**: Medium (After the regional-language pilot; before the protected under-18 experience)
+- **Objectives**:
+  - Pilot one story with an author who approves narration and a willing narrator. Reader feedback includes an offer to volunteer; no contributor has been contacted or committed.
+  - Record author/narrator permission, attribution and the agreed publication/monetisation terms before distributing recordings. Authors retain ownership and control over their work.
+  - Check keyboard and screen-reader usability of the existing reader alongside the audio pilot. Listening should have accessible controls, speed adjustment, chapter navigation and saved position, with the story text still available to authorised readers.
+  - Define audio storage, recording quality and delivery costs before building a larger catalogue. Protect private/paid audio with server-enforced access rules.
+- **Checklist**:
+  - [ ] Agree on the pilot story, contributors, recording permission, credits and audio access terms.
+  - [ ] Implement an accessible chapter player and validate playback, pause/resume, speed, navigation and saved position.
+  - [ ] Validate unauthorised/expired access, media delivery, failed loads, keyboard/screen-reader use and desktop/mobile layouts.
+  - [ ] Collect listening/reader feedback and assess operating costs before expanding the audio system.
+
+---
+
+### Protected Under-18 Experience
+
+#### `TASK-SAFE-01`: Protected Under-18 Reader & Writer Experience
+- **Status**: `[ ] Pending` — Planning only; no implementation started.
+- **Priority**: High
+- **Execution dependency**: Last roadmap item. Start after administration and the preceding reader-feedback pilots are completed and validated; preserve Signup/Verification → Payments → Administration → Reading Milestones → Regional Languages → Audiobook Pilot → Protected Under-18 Experience.
+- **Objectives**:
+  - Provide one protected experience for everyone under 18, while applying age-specific consent requirements for the intended launch markets. Define age screening/assurance, guardian consent and eligibility before enabling child accounts; Google login/email OTP alone do not establish age.
+  - Parent-managed accounts with private profiles by default, minimal personal-data collection and guardian controls. Define age transitions and the move to adult permissions.
+  - Reader-feedback age categories (e.g. below 10, 10–15, young adults and adults) are provisional content-suitability suggestions, not approved signup age bands. Define labels with guardians/readers and moderation; keep the combined under-18 protections and minimum-age/consent decisions intact.
+  - Curated, age-appropriate discovery with reviewed suitability labels and content warnings. Enforce access restrictions on server routes/APIs and shared links, not only feed visibility.
+  - Private writing by default: saved drafts do not enter public shelves, search or discovery. No open public publishing; public stories require both guardian approval and moderation review, with an audit trail and reversible withdrawal.
+  - No open social interaction: prevent direct messaging, public comments and exposure of contact details; define any restricted interactions explicitly before enabling them.
+  - No independent monetisation for under-18 accounts. Any future guardian-managed earnings or purchases require a separately designed and validated flow.
+  - Control catalogue clutter through publishing readiness checks, submission limits and spam/duplicate review. Judge completeness, originality, accurate labels and policy compliance rather than age or genre. Define draft/rejected-submission retention and notify users before any deletion.
+- **Checklist**:
+  - [ ] Define launch markets, minimum supported age, age-assurance/consent rules, guardian responsibilities, retention and adult-transition policy.
+  - [ ] Implement parent-managed onboarding, private profiles and server-enforced age/guardian permissions.
+  - [ ] Add reviewed suitability labels and curated discovery; validate restricted content cannot leak through previews, search or shared links.
+  - [ ] Keep writing private by default; add guardian approval and moderation queues for public submissions using the admin console.
+  - [ ] Enforce interaction and monetisation restrictions, submission limits and reversible publication withdrawal.
+  - [ ] Validate consent withdrawal, guardian access boundaries, adult transitions, publishing bypass attempts, content isolation and desktop/mobile layouts before release.
+
+---
+
+## Progress Log
+
+| Date | Task ID | Update Description | Author |
+| :--- | :--- | :--- | :--- |
+| 2026-10-14 | `TASK-PAY-01`, `TASK-ENG-01`, `TASK-LANG-01`, `TASK-AUDIO-01`, `TASK-SAFE-01` | Recorded reader feedback: prioritize contextual chapter unlocks within payments; plan milestone/author-opt-in rewards, regional-language discovery and an author-approved audiobook pilot after administration. Integrate provisional age-suitability labels into the protected under-18 task, which remains last. Preserve the praised visual identity; all new feedback work remains pending. | Codex |
+| 2026-10-11 | `TASK-AUTH-01` | Implemented Google/Resend integration and server-enforced account activation with a 30-day existing-account transition. Local OTP/security/reader-flow and responsive checks passed; live provider/delivery tests need credentials before release. No deployment. | Codex |
+| 2026-10-11 | `TASK-PAGE-01` | Clarified landing-page audience through the hero introduction and positioning strip: discover independent authors, publish original stories, keep rights and build returning readership. Preserved the existing visual headline/layout. Checked 320/390/768/1280px with no horizontal overflow or browser errors; scoped ESLint and diff checks passed. Local only. | Codex |
+| 2026-10-11 | `TASK-SAFE-01` | Added the combined parent-managed under-18 experience: curated discovery, private profiles/writing, guardian-approved and moderated publishing, restricted interaction and no independent monetisation. Scheduled last after administration; planning only. | Codex |
+| 2026-10-09 | `TASK-SYS-05` | Completed remaining shared-component/theme audit, semantic status/rating colors and reader palette isolation. 42 contrast combinations, 60 responsive route checks, lint, 64 tests and production build passed locally. Pending review/push/deployment. | Codex |
+| 2026-10-08 | Mobile sanity follow-up | Rechecked public and signed-in page templates at 320px and 390px. Fixed unbroken draft-title/review text overflow and wrapping of featured-review author controls. Mobile menu and screenshots checked; scoped lint and production build passed. Included in `6cbbf59`, deployed to Fly v37, health 1/1. | Codex |
+| 2026-10-08 | `TASK-PAGE-06` | Implemented author portfolio banner, book gallery/format filters, membership card, selected reader quotes and owner-only drafts/dashboard. Narrow preview animation positioning fixed. Local lint, TypeScript, 64 tests, production build and account/viewport checks passed. Pushed `6cbbf59`, deployed to Fly v37 with health 1/1; live profile/public mobile/redirect smoke checks passed. | Codex |
+| 2026-10-08 | `TASK-PAGE-07`, mobile layout audit | Pushed `5fe087d` and deployed to Fly (machine v36, health 1/1). Applied and verified production migration 0048 before rollout. Live DB health, public pages, protected-page redirects and mobile profile/story layouts passed. No production account mutations or purchases used for smoke testing. | Codex |
+| 2026-10-08 | Mobile layout audit | Fixed reported profile overflow and cramped mobile controls across navigation, collections, resume/library cards, settings, studio quiz/discussion inputs and post comments. Corrected reader date hydration. All 27 page templates audited; lint, TypeScript, 64 tests and production build passed. Full coverage in docs/MOBILE_LAYOUT_AUDIT.md. Local only; no push/deployment. | Codex |
+| 2026-10-07 | `TASK-ADMIN-01` | Added a pending admin console and observability dashboard for user/content management, signup/click/activity/payment analytics, operational health, server-enforced permissions, and audit logs. Scheduled strictly after payment implementation and validation; no implementation started. | Codex |
+| 2026-10-07 | `TASK-PAGE-04` | Completed categorized discovery shelves, genre filters, saved-page resume ribbon, and real weekly activity/streaks. Fixed shelf preview clipping and post-date/theme hydration issues found during validation. 60 tests, lint, TypeScript, production build, and local account/browser/responsive checks passed. Pushed and deployed through `72e7380` (Fly v33, health 1/1), including the approved line break, spacing, and heading/filter order. | Codex |
+| 2026-10-07 | `TASK-PAGE-05` | Completed the stepped Author Studio, chapter manager/focus mode, access presets, save integrity fixes, and publication review. Corrected similarity scans to exclude private drafts; local production/account/responsive validation passed. Pushed `0536301` and deployed to Fly (machine v29, health 1/1); live public-page/auth-gate smoke checks passed. | Codex |
+| 2026-10-06 | `TASK-AUTH-01` | Added Google signup/sign-in and email OTP activation for non-Google signups. Unverified accounts remain inactive with server-enforced restrictions; implementation and validation pending. Payments remain last. | Codex |
+| 2026-10-05 | `TASK-SYS-01` to `04` | Editorial Typography (Newsreader), Brand Identity, 3D Book Spines, Modern Gallery Shelves completed. | Antigravity |
+| 2026-10-05 | `TASK-SYS-05` | First foundation batch validated: semantic surfaces, shared brand/navigation, accessible accent buttons, scalable covers, and touch-friendly library details. Remaining component audit pending; payments last. | Codex |
+| 2026-10-05 | `TASK-PAGE-02` | Reader customization and focus mode locally validated; saved-page restore race fixed. Payments remain last. | Codex |
+| 2026-10-06 | `TASK-PAGE-01` | Editorial blue/lime/peach revision added after user feedback; locally validated. Initial purpose-led welcome page, real story shelf, and About page implemented and locally validated. | Codex |
+| 2026-10-06 | `TASK-PAGE-03` | Shared editorial story overview, chapter access list, author sidebar, and half-star rating distribution implemented; private-body isolation and production navigation verified locally. | Codex |
+| 2026-10-06 | `TASK-PAGE-01` | Cream header with clear arrow-free buttons; removed the decorative “01 / OPEN” label and duplicated featured-book details. Implemented locally. | Codex |
+| 2026-10-06 | `TASK-PAGE-01`, `04`, `07` | Shared hinged book previews across landing, feed, library, and new-chapter shelves. Book-only hover, continuous spread hover area, responsive placement, tap/keyboard controls, and saved-chapter reading links validated locally. Broader feed/library tasks remain pending. | Codex |
+| 2026-10-06 | `TASK-PAGE-01` | Removed inside titles, blocked normal text selection/copy/drag, and changed the preview label to “A glimpse”. Copy shortcut and reading action checked; final wording edit passed diff checks. Batch not deployed; payments remain last. | Codex |
+| 2026-10-06 | `TASK-PAGE-01` to `03`, shared shelves | Pushed app release `82691f8` to main and deployed to Fly.io (machine v28, health 1/1). Verified production health, landing and open-book preview, reading/About/login navigation, mobile overflow, and browser console. | Codex |
+
+### Release preparation — 2026-10-12
+
+User requested GitHub push and Fly deployment after live OTP verification. Release includes account verification/onboarding, the pending semantic theme audit, landing-page positioning, and roadmap updates. 72 tests, lint, TypeScript, production build and diff checks passed. Real OTP delivery and user verification reached onboarding with database-confirmed activation. Google reached its official login screen; completed Google success/cancellation remains pending manual testing, so TASK-AUTH-01 stays In Progress. Fly auth secrets staged without committing credentials; additive migration 0049 granted eight existing accounts 30 days. Generated media and local secrets are excluded from the commit.
+
+- **Release delivered (2026-10-12)**: App commit `02f3a9b` pushed to GitHub and deployed as Fly v38 (Singapore, health 1/1). 17 production smoke checks passed: public landing/About/signup/login/story/health; protected page redirects; anonymous genre mutation rejection; Google initiation with the exact Fly callback; cancellation/error presentation. All four Google/Resend settings are active as encrypted Fly secrets. Completed Google provider success/cancellation remains a manual follow-up; real OTP success was validated locally against Resend. LinkedIn draft: [verified signup update](docs/launch/linkedin-verified-signup-update.md).
+
+- **Mobile regression (2026-10-13, local)**: Reviewed all page templates after the auth/theme release. 130 local route/viewport/state checks and 15 live public-page checks passed at 320/390/430px plus phone landscape. Fixed the feed avatar wrapping onto a separate row at 320px while retaining six 44px controls, and extended 16px text inputs to phone landscape. Verified expanded genre/navigation/reader panels and pending verification/onboarding. 72 tests, lint, TypeScript, production build and diff checks passed. Fixes are local, not pushed/deployed; real-device testing and Google provider completion remain follow-ups. Details: [mobile audit](docs/MOBILE_LAYOUT_AUDIT.md).
+
+- **Mobile fixes delivered (2026-10-13)**: App commit `62c1c39` pushed and deployed as Fly v39, health 1/1. All 17 production smoke checks passed; deployed CSS contains the narrow-header spacing and phone-landscape input rule. No production data/schema changes. Dependency audit findings were recorded in the mobile audit for a separate security update; Next.js and other existing dependencies need compatibility-reviewed remediation.
+
+- **Dependency security update (2026-10-13, local)**: Updated Next/matching lint config, Better Auth, Tiptap, Transformers, Mammoth and Vitest; added a tested Mammoth-only argparse override. Production audit findings reduced from 49 to zero. Five dev-only lint-chain findings remain because braces has no patched published release; no suppression or incompatible downgrade used. 72 tests, lint, TypeScript/build, 44 auth/API checks, 66 mobile checks, actual Word conversion/editor formatting and native 384-dimension inference passed. Normal local dev app restored. Not pushed/deployed; completed Google OAuth still pending. Details: [dependency security update](docs/DEPENDENCY_SECURITY_UPDATE.md).
+
+- **Security update delivery (2026-10-13)**: User requested GitHub push of the validated dependency updates and documentation, including the feedback LinkedIn draft. Deployment is separate; production remains Fly v39. Secrets and generated media are excluded.
+
+- **Security release / next task (2026-10-13)**: Security app commit `9913549` deployed as Fly v40, health 1/1. Seventeen production smoke checks, deployed mobile CSS checks and Linux/Node 22 native-module checks passed. Google signup marked working based on user confirmation; further manual provider tests deferred at the user’s request. Payment preparation started: reviewed mock access/subscription paths and drafted a provider-neutral ledger/checkout/webhook/payout plan. User has no merchant account yet; country confirmation is pending before provider selection. [Payment plan](docs/PAYMENTS_IMPLEMENTATION_PLAN.md).
+
+- **Payments foundation (2026-10-13, local)**: User plans a Singapore merchant account and authors in multiple countries; no merchant account exists yet. Installed official Stripe SDK; added server quotes/currency minor units, offline author-scoped direct Checkout parameters and signed-event verification. 88 tests, lint, TypeScript/build passed; production audit remains zero findings. No checkout/webhook endpoints or real billing/payouts enabled, and no migration. Merchant setup is needed for provider end-to-end testing; country approval gates remain mandatory. [Payment plan/setup](docs/PAYMENTS_IMPLEMENTATION_PLAN.md).
+
+- **Author wallet (2026-10-14, local)**: Added wallet/setup page and hamburger entry, Accounts v2 hosted onboarding, provider-confirmed balances and recent transaction records, protected withdrawal APIs, payout-event reconciliation and additive migration `0050`. Existing mock purchases are excluded from earnings. 127 unit tests, local PostgreSQL integration, eight HTTP checks, lint/TypeScript/build and mobile layouts passed; Stripe merchant setup, country/permission confirmation and provider end-to-end tests remain release gates. No push/deployment or live money movement in this step. [Wallet setup and limitations](docs/AUTHOR_WALLET.md).
+
+- **Payment regression QA (2026-10-14, local)**: Desktop/mobile render checks across 11 pages (320/390/1280px), mock chapter/whole-story purchases, expiry/renewal, subscription concurrency/cancel/resume and wallet non-credit behavior checked. Added client confirmation/cancellation/error tests and actual-handler PostgreSQL flow tests (`npm run test:payments:local`). Fixed malformed purchase bodies, subscription race, network-error recovery and stale duration selections. Native browser confirmation automation limitation is documented; real Stripe tests remain pending. [QA report](docs/PAYMENT_QA_2026-10-14.md).

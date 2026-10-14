@@ -25,32 +25,40 @@ export const POST = withErrors(async (
     throw new ApiError(400, "This author isn't offering a subscription.");
   }
 
-  // Already subscribed and not lapsed → no charge. If they'd cancelled, just
-  // un-cancel (resume renewal); otherwise it's a no-op. Guards against a stray
-  // re-subscribe so the reader is never billed twice for an active period.
-  const [active] = await sql<{ one: number }[]>`
-    SELECT 1 AS one FROM subscriptions
-    WHERE subscriber_id = ${me} AND author_id = ${id} AND expires_at > now()
-  `;
-  if (active) {
-    await sql`
-      UPDATE subscriptions SET cancelled = false
-      WHERE subscriber_id = ${me} AND author_id = ${id}
+  // Serialize overlapping requests for this reader/author pair. An active
+  // period is resumed, never extended again by a concurrent mock checkout.
+  const alreadyActive = await sql.begin(async tx => {
+    await tx`SELECT pg_advisory_xact_lock(hashtextextended(${`subscription:${me}:${id}`}, 0))`;
+    // Already subscribed and not lapsed → no charge. If they'd cancelled, just
+    // un-cancel (resume renewal); otherwise it's a no-op. Guards against a stray
+    // re-subscribe so the reader is never billed twice for an active period.
+    const [active] = await tx<{ one: number }[]>`
+      SELECT 1 AS one FROM subscriptions
+      WHERE subscriber_id = ${me} AND author_id = ${id} AND expires_at > now()
     `;
-    return NextResponse.json({ subscribed: true, alreadyActive: true });
-  }
+    if (active) {
+      await tx`
+        UPDATE subscriptions SET cancelled = false
+        WHERE subscriber_id = ${me} AND author_id = ${id}
+      `;
+      return true;
+    }
 
-  // New (or lapsed-then-renewed) subscriptions last 30 days.
-  await sql`
-    INSERT INTO subscriptions (subscriber_id, author_id, amount, expires_at)
-    VALUES (${me}, ${id}, ${author.subscription_price}, now() + interval '30 days')
-    ON CONFLICT (subscriber_id, author_id) DO UPDATE
-      SET amount = ${author.subscription_price},
-          created_at = now(),
-          expires_at = GREATEST(subscriptions.expires_at, now()) + interval '30 days',
-          expiry_notified = false,
-          cancelled = false
-  `;
+    // New (or lapsed-then-renewed) subscriptions last 30 days.
+    await tx`
+      INSERT INTO subscriptions (subscriber_id, author_id, amount, expires_at)
+      VALUES (${me}, ${id}, ${author.subscription_price}, now() + interval '30 days')
+      ON CONFLICT (subscriber_id, author_id) DO UPDATE
+        SET amount = ${author.subscription_price},
+            created_at = now(),
+            expires_at = GREATEST(subscriptions.expires_at, now()) + interval '30 days',
+            expiry_notified = false,
+            cancelled = false
+    `;
+
+    return false;
+  });
+  if (alreadyActive) return NextResponse.json({ subscribed: true, alreadyActive: true });
 
   await notify({
     userId: id,

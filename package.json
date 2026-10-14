@@ -8,7 +8,8 @@
     "start": "next start",
     "lint": "eslint",
     "test": "vitest run",
-    "test:watch": "vitest"
+    "test:watch": "vitest",
+    "test:payments:local": "PAYMENTS_DB_TESTS=true WALLET_DB_TESTS=true node --env-file=.env.local node_modules/vitest/vitest.mjs run src/lib/payments/mock-flow.integration.test.ts src/lib/wallet/store.integration.test.ts"
   },
   "dependencies": {
     "@huggingface/transformers": "^4.3.1",
@@ -26,10 +27,13 @@
     "postgres": "^3.4.9",
     "react": "19.2.4",
     "react-dom": "19.2.4",
+    "stripe": "^23.0.0",
     "web-push": "^3.6.7"
   },
   "devDependencies": {
     "@tailwindcss/postcss": "^4",
+    "@testing-library/react": "^16.3.3",
+    "@testing-library/user-event": "^14.6.8",
     "@types/node": "^20",
     "@types/pg": "^8.20.0",
     "@types/react": "^19",
@@ -37,6 +41,7 @@
     "@types/web-push": "^3.6.4",
     "eslint": "^9",
     "eslint-config-next": "16.4.0",
+    "jsdom": "^30.1.2",
     "tailwindcss": "^4",
     "typescript": "^5",
     "vitest": "~4.1.11"

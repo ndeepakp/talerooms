@@ -1,5 +1,6 @@
 "use client";
 
+import { completeMockRequest } from "@/lib/mock-checkout";
 import { useState } from "react";
 import { useRouter } from "next/navigation";
 import { currencySymbol, TIER_LABELS, formatPrice, type Tier } from "@/lib/pricing";
@@ -67,15 +68,14 @@ export function AccessPanel({
     }
     setBusy(true);
     setError(null);
-    const res = await fetch(`/api/stories/${storyId}/purchase`, {
+    const res = await completeMockRequest(`/api/stories/${storyId}/purchase`, {
       method: "POST",
       headers: { "Content-Type": "application/json" },
       body: JSON.stringify(payload),
     });
     setBusy(false);
     if (!res.ok) {
-      const data = await res.json().catch(() => ({}));
-      setError(data.error ?? "Could not complete the purchase.");
+      setError(res.error);
       return;
     }
     router.refresh();
@@ -107,7 +107,7 @@ export function AccessPanel({
             <button
               key={t}
               type="button"
-              onClick={() => setTier(t)}
+              onClick={() => { setTier(t); setPicked(new Set()); }}
               className={
                 "min-h-11 rounded-full border px-3 py-2 text-sm transition-colors " +
                 (t === tier
@@ -156,6 +156,7 @@ export function AccessPanel({
                 <label className="flex items-center gap-3 rounded-lg border border-ui px-3 py-2 text-sm">
                   <input
                     type="checkbox"
+                    aria-label={`${c.title || `Chapter ${c.index + 1}`} ${formatPrice(disc(c.prices[tier] as number), currency)}`}
                     checked={picked.has(c.index)}
                     onChange={() => togglePick(c.index)}
                     className="h-4 w-4 accent-[var(--accent)]"
@@ -193,7 +194,7 @@ export function AccessPanel({
         </p>
       )}
 
-      {error && <p className="mt-3 text-sm text-danger">{error}</p>}
+      {error && <p role="alert" className="mt-3 text-sm text-danger">{error}</p>}
     </section>
   );
 }

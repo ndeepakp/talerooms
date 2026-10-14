@@ -5,6 +5,8 @@ import { sql } from "@/lib/db";
 export const RESERVED_HANDLES = new Set([
   "feed",
   "settings",
+  "wallet",
+  "payments",
   "write",
   "drafts",
   "notifications",

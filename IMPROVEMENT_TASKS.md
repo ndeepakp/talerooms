@@ -29,7 +29,7 @@ A comprehensive roadmap and tracking ledger for the visual, typographic, archite
 | [`TASK-PAGE-06`](#task-page-06-author-portfolio--profile-page) | Author Profile: Literary Portfolio & Memberships | Profiles | Medium | `[x] Completed and deployed` |
 | [`TASK-PAGE-07`](#task-page-07-library-bookshelf-redesign) | Personal Library: Gallery & Reading Progress | Library | Medium | `[x] Completed and deployed` |
 | [`TASK-AUTH-01`](#task-auth-01-google-signup--email-otp-verification) | Google Signup & Email OTP Verification / Account Activation | Authentication | High | `[-] In Progress` |
-| [`TASK-PAY-01`](#task-pay-01-stripe-payments-integration) | Stripe Platform: Checkout, Subscriptions, Connect & Webhooks | Payments | High | `[ ] Pending` |
+| [`TASK-PAY-01`](#task-pay-01-stripe-payments-integration) | Stripe Platform: Checkout, Subscriptions, Connect & Webhooks | Payments | High | `[-] In Progress` |
 | [`TASK-ADMIN-01`](#task-admin-01-admin-console--observability-dashboard) | Admin Console & Observability Dashboard | Administration & Analytics | High | `[ ] Pending` |
 | [`TASK-SAFE-01`](#task-safe-01-protected-under-18-reader--writer-experience) | Protected Under-18 Reader & Writer Experience | Age Access & Publishing | High | `[ ] Pending` |
 
@@ -453,7 +453,7 @@ Visual Consistency & Theme Audit (`TASK-SYS-05`) was completed and validated loc
 ### Monetization & Payments
 
 #### `TASK-PAY-01`: Stripe Payments Integration
-- **Status**: `[ ] Pending`
+- **Status**: `[-] In Progress` — Local foundation validated; Singapore merchant test-account setup and multinational author eligibility remain prerequisites for end-to-end checkout/payout testing.
 - **Priority**: High (After signup/verification; before the admin console)
 - **Files Affected**:
   - `src/lib/pricing.ts`
@@ -462,18 +462,42 @@ Visual Consistency & Theme Audit (`TASK-SYS-05`) was completed and validated loc
   - `src/app/api/stripe/webhook/route.ts` (New)
   - `src/components/story/AccessPanel.tsx`
   - `src/components/profile/SubscribeButton.tsx`
+  - `src/app/wallet/` and `src/app/api/wallet/` (new; local implementation)
+  - `src/lib/wallet/` and `db/0050_author_wallet.sql` (new; local implementation)
 - **Objectives**:
   - Replace the current mock payment layer with full-fledged Stripe processing:
     - **Stripe Checkout / Elements**: Handle one-time chapter purchases, time-limited rentals, and whole-story bundle purchases.
     - **Stripe Billing / Subscriptions**: 30-day recurring author subscriptions with automatic proration and cancellation handling.
-    - **Stripe Connect (Express/Custom)**: Seamless payouts and revenue splits to storytellers/authors, enabling Talerooms to act as a true IP marketplace.
+    - **Stripe Connect**: Use the current Accounts v2 configuration appropriate for author payments, bank onboarding and payout controls. Confirm author-country eligibility for the Singapore platform before enabling paid sales or withdrawals; do not assume worldwide payout support.
     - **Webhook Endpoint**: Handle asynchronous payment confirmations (`checkout.session.completed`, `invoice.payment_succeeded`, `customer.subscription.deleted`) and securely update `access_grants` and `subscriptions` in PostgreSQL.
+    - **Author wallet**: Give authors an in-app view of their earnings and a Withdraw action, backed by their connected Stripe account balance and an auditable Talerooms transaction ledger.
+- **Author wallet and withdrawal plan (added 2026-10-14)**:
+  - **Money flow**: Reader pays → pending author earnings → available balance → withdrawal requested → bank payout. Actual funds remain in the author's connected Stripe account; Talerooms displays and reconciles the financial records.
+  - **Wallet balances**:
+    - **Pending**: Earnings awaiting settlement and availability.
+    - **Available**: Withdrawable net earnings after applicable processor/platform fees, refunds, disputes and holds.
+    - **Withdrawals**: Requested, processing/in transit, paid, failed or canceled, with estimated arrival information when supplied by Stripe.
+    - **History**: Sales, subscription earnings, fees, refunds, adjustments and payouts. Show supported settlement currencies separately rather than adding different currencies into one balance.
+  - **Author onboarding**: Stripe-hosted identity verification and bank-account setup. Keep banking details with Stripe; show only the necessary masked destination information in Talerooms. Paid sales and withdrawals require an eligible country and enabled account capabilities.
+  - **Withdraw action**: Let an authenticated, active author choose an amount within the provider-confirmed available balance and select an eligible verified payout destination. Enforce author/account ownership and withdrawal limits server-side. Persist a withdrawal request, use provider idempotency keys and concurrency controls, and prevent duplicate or excessive withdrawals.
+  - **Payout permissions**: Confirm that the connected-account configuration permits Talerooms to manage manual payouts. Accounts with the full Stripe Dashboard require the appropriate platform controls. Do not enable an in-app withdrawal button before these permissions are established.
+  - **Settlement and holding limits**: Pending earnings cannot be withdrawn immediately. Keep provider-managed daily/weekly automatic payouts active as the initial fallback; permit earlier in-app withdrawals only after confirming account controls and provider support. Permanent manual schedules are blocked by the implementation; the wallet must not imply indefinite storage or guaranteed instant bank delivery.
+  - **Reconciliation**: Treat Stripe balance/payout state as authoritative. Process verified payout events idempotently; track successful, failed and canceled withdrawals and reflect refunds/disputes correctly. A failed payout must not create spendable funds twice or be shown as paid.
+  - **Implementation order**: Author onboarding and payout readiness → wallet ledger and balances → withdrawal flow → connect purchases/subscriptions and verified payment fulfillment → provider test-mode and mobile validation → live rollout.
+  - **Status**: Wallet UI, provider adapter, additive local database migration, authenticated onboarding/withdrawal APIs and signed payout-event reconciliation implemented locally. Unit tests, PostgreSQL concurrency tests and mobile checks use synthetic fixtures. Stripe account configuration and provider end-to-end testing remain pending; purchases/subscriptions still use the existing demo behavior and do not fund this wallet.
+  - **Provider references**: [Direct charges](https://docs.stripe.com/connect/direct-charges.md?platform=web&ui=stripe-hosted), [connected-account payout controls](https://docs.stripe.com/connect/payouts-connected-accounts), [manual payout rules](https://docs.stripe.com/connect/manual-payouts).
 - **Checklist**:
-  - [ ] Install official `stripe` Node SDK and setup server client.
+  - [x] Install official `stripe` Node SDK and setup a mode-checked server client.
   - [ ] Implement Stripe Checkout Session creation for story bundles and chapter unlocks.
   - [ ] Implement recurring subscription checkout with customer portal access for subscription management.
   - [ ] Implement Stripe Webhook handler with signature verification (`stripe-signature`).
-  - [ ] Wire Stripe Connect onboarding flow for authors to connect their bank accounts.
+  - [x] Implement Accounts v2 hosted-onboarding flow locally; actual merchant/author onboarding testing pending.
+  - [ ] Confirm supported author countries and platform permissions for manual payouts.
+  - [x] Implement author wallet UI, provider-confirmed pending/available balances and recent transaction ledger locally; provider validation pending.
+  - [x] Implement authenticated withdrawal requests, fresh email verification/sign-in, CSRF checks, balance/ownership validation, durable rate limits, idempotency and PostgreSQL reservation locks; synthetic validation passed.
+  - [x] Implement signed payout-event reconciliation with provider-state retrieval and durable event IDs; refunds/disputes are reflected through provider balance transactions. Actual provider event testing pending.
+  - [ ] Confirm actual daily/weekly Stripe automatic payout fallback and manual-withdrawal permissions for every approved launch country; code blocks permanent manual/monthly schedules.
+  - [ ] Validate wallet and withdrawals in provider test mode: pending funds, insufficient balance, duplicate/concurrent requests, unauthorized account access, payout failure/retry, refunds/disputes and mobile layouts.
 
 ---
 
@@ -571,3 +595,9 @@ User requested GitHub push and Fly deployment after live OTP verification. Relea
 - **Security update delivery (2026-10-13)**: User requested GitHub push of the validated dependency updates and documentation, including the feedback LinkedIn draft. Deployment is separate; production remains Fly v39. Secrets and generated media are excluded.
 
 - **Security release / next task (2026-10-13)**: Security app commit `9913549` deployed as Fly v40, health 1/1. Seventeen production smoke checks, deployed mobile CSS checks and Linux/Node 22 native-module checks passed. Google signup marked working based on user confirmation; further manual provider tests deferred at the user’s request. Payment preparation started: reviewed mock access/subscription paths and drafted a provider-neutral ledger/checkout/webhook/payout plan. User has no merchant account yet; country confirmation is pending before provider selection. [Payment plan](docs/PAYMENTS_IMPLEMENTATION_PLAN.md).
+
+- **Payments foundation (2026-10-13, local)**: User plans a Singapore merchant account and authors in multiple countries; no merchant account exists yet. Installed official Stripe SDK; added server quotes/currency minor units, offline author-scoped direct Checkout parameters and signed-event verification. 88 tests, lint, TypeScript/build passed; production audit remains zero findings. No checkout/webhook endpoints or real billing/payouts enabled, and no migration. Merchant setup is needed for provider end-to-end testing; country approval gates remain mandatory. [Payment plan/setup](docs/PAYMENTS_IMPLEMENTATION_PLAN.md).
+
+- **Author wallet (2026-10-14, local)**: Added wallet/setup page and hamburger entry, Accounts v2 hosted onboarding, provider-confirmed balances and recent transaction records, protected withdrawal APIs, payout-event reconciliation and additive migration `0050`. Existing mock purchases are excluded from earnings. 127 unit tests, local PostgreSQL integration, eight HTTP checks, lint/TypeScript/build and mobile layouts passed; Stripe merchant setup, country/permission confirmation and provider end-to-end tests remain release gates. No push/deployment or live money movement in this step. [Wallet setup and limitations](docs/AUTHOR_WALLET.md).
+
+- **Payment regression QA (2026-10-14, local)**: Desktop/mobile render checks across 11 pages (320/390/1280px), mock chapter/whole-story purchases, expiry/renewal, subscription concurrency/cancel/resume and wallet non-credit behavior checked. Added client confirmation/cancellation/error tests and actual-handler PostgreSQL flow tests (`npm run test:payments:local`). Fixed malformed purchase bodies, subscription race, network-error recovery and stale duration selections. Native browser confirmation automation limitation is documented; real Stripe tests remain pending. [QA report](docs/PAYMENT_QA_2026-10-14.md).

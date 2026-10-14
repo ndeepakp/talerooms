@@ -1,5 +1,6 @@
 "use client";
 
+import { completeMockRequest } from "@/lib/mock-checkout";
 import { useState } from "react";
 import { useRouter } from "next/navigation";
 import { CURRENCY, formatPrice } from "@/lib/pricing";
@@ -25,6 +26,7 @@ export function SubscribeButton({
   const [daysLeft, setDaysLeft] = useState(initialDaysLeft);
   const [cancelled, setCancelled] = useState(initialCancelled);
   const [loading, setLoading] = useState(false);
+  const [error, setError] = useState<string | null>(null);
   const active = daysLeft !== null && daysLeft > 0;
 
   async function subscribe() {
@@ -35,13 +37,14 @@ export function SubscribeButton({
       }
     }
     setLoading(true);
-    const res = await fetch(`/api/users/${authorId}/subscribe`, { method: "POST" });
+    setError(null);
+    const res = await completeMockRequest(`/api/users/${authorId}/subscribe`, { method: "POST" });
     setLoading(false);
     if (res.ok) {
       if (!active) setDaysLeft(30);
       setCancelled(false);
       router.refresh();
-    }
+    } else { setError(res.error); }
   }
 
   async function unsubscribe() {
@@ -53,17 +56,19 @@ export function SubscribeButton({
       return;
     }
     setLoading(true);
-    const res = await fetch(`/api/users/${authorId}/subscribe`, { method: "DELETE" });
+    setError(null);
+    const res = await completeMockRequest(`/api/users/${authorId}/subscribe`, { method: "DELETE" });
     setLoading(false);
     if (res.ok) {
       setCancelled(true);
       router.refresh();
-    }
+    } else { setError(res.error); }
   }
 
   if (active) {
     return (
       <div className="flex max-w-full flex-col items-start gap-1 sm:items-end">
+        {error && <p role="alert" className="max-w-xs text-sm text-danger">{error}</p>}
         {cancelled ? (
           <>
             <span className="rounded-full bg-warning-soft px-3 py-1 text-xs font-medium text-warning">
@@ -98,6 +103,7 @@ export function SubscribeButton({
   }
 
   return (
+    <div className="flex max-w-full flex-col items-start gap-2">
     <button
       type="button"
       onClick={subscribe}
@@ -107,5 +113,7 @@ export function SubscribeButton({
       Subscribe · {CURRENCY}
       {price}/30d
     </button>
+    {error && <p role="alert" className="max-w-xs text-sm text-danger">{error}</p>}
+    </div>
   );
 }

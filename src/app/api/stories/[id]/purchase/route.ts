@@ -1,13 +1,15 @@
 import { NextResponse } from "next/server";
 import { sql } from "@/lib/db";
 import { ApiError, requireSession, withErrors } from "@/lib/http";
-import { expiryFor, isTier, RENEWAL_DISCOUNT_PCT, type Tier } from "@/lib/pricing";
+import { expiryFor } from "@/lib/pricing";
+import { quoteStoryPurchase, PaymentQuoteError } from "@/lib/payments/quote";
 import { notify } from "@/lib/notify";
 
 const UUID_RE = /^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i;
 
 type StoryRow = {
   author_id: string;
+  currency: string;
   status: string;
   chapters_public: boolean;
   offered_durations: string[];
@@ -31,68 +33,34 @@ export const POST = withErrors(async (
   const buyer = session.user.id;
 
   const [story] = await sql<StoryRow[]>`
-    SELECT author_id, status, chapters_public, offered_durations, whole_prices, chapters
+    SELECT author_id, currency, status, chapters_public, offered_durations, whole_prices, chapters
     FROM stories WHERE id = ${id}
   `;
   if (!story || story.status !== "published") throw new ApiError(404, "Not found.");
   if (story.chapters_public) throw new ApiError(400, "These chapters are already free to read.");
   if (story.author_id === buyer) throw new ApiError(400, "You can't buy your own story.");
 
-  const body = await req.json().catch(() => ({}));
-  const duration = body.duration;
-  if (!isTier(duration) || !story.offered_durations.includes(duration)) {
-    throw new ApiError(400, "That access option isn't available.");
-  }
-  const tier = duration as Tier;
-  const expires = expiryFor(tier);
-
-  // Win-back: a returning reader (anyone who has bought access to this story
-  // before, even expired) renews at a discount.
+  const body: unknown = await req.json().catch(() => null);
   const [prior] = await sql<{ one: number }[]>`
     SELECT 1 AS one FROM access_grants
     WHERE story_id = ${id} AND user_id = ${buyer} LIMIT 1
   `;
-  const renew = (price: number) =>
-    prior ? Math.round((price * (100 - RENEWAL_DISCOUNT_PCT)) / 100) : price;
-
-  // Build the list of grant rows + total price from the server-side pricing.
-  const rows: {
-    story_id: string;
-    user_id: string;
-    scope: string;
-    chapter_index: number | null;
-    duration: string;
-    amount: number;
-    expires_at: Date | null;
-  }[] = [];
-
-  if (body.scope === "whole") {
-    const price = story.whole_prices?.[tier];
-    if (typeof price !== "number") {
-      throw new ApiError(400, "The whole story isn't sold for that duration.");
-    }
-    rows.push({
-      story_id: id, user_id: buyer, scope: "whole", chapter_index: null,
-      duration: tier, amount: renew(price), expires_at: expires,
-    });
-  } else if (body.scope === "chapters") {
-    const idxs: number[] = Array.isArray(body.chapterIndexes)
-      ? [...new Set(body.chapterIndexes.filter((n: unknown) => Number.isInteger(n)))] as number[]
-      : [];
-    if (idxs.length === 0) throw new ApiError(400, "Pick at least one chapter.");
-    for (const i of idxs) {
-      const price = story.chapters[i]?.prices?.[tier];
-      if (typeof price !== "number") {
-        throw new ApiError(400, `Chapter ${i + 1} isn't sold for that duration.`);
-      }
-      rows.push({
-        story_id: id, user_id: buyer, scope: "chapter", chapter_index: i,
-        duration: tier, amount: renew(price), expires_at: expires,
-      });
-    }
-  } else {
-    throw new ApiError(400, "Choose what to buy.");
+  let quote;
+  try {
+    quote = quoteStoryPurchase({
+      authorId: story.author_id, status: story.status, chaptersPublic: story.chapters_public,
+      currency: story.currency, offeredDurations: story.offered_durations,
+      wholePrices: story.whole_prices, chapters: story.chapters,
+    }, buyer, body, !!prior);
+  } catch (error) {
+    if (error instanceof PaymentQuoteError) throw new ApiError(400, error.message);
+    throw error;
   }
+  if (quote.items.some(item => item.amountMajor > 2147483647)) throw new ApiError(400, "That price exceeds the supported mock purchase limit.");
+  const rows = quote.items.map(item => ({
+    story_id: id, user_id: buyer, scope: item.scope, chapter_index: item.chapterIndex,
+    duration: item.duration, amount: item.amountMajor, expires_at: expiryFor(item.duration),
+  }));
 
   await sql`
     INSERT INTO access_grants ${sql(
@@ -135,7 +103,8 @@ export const DELETE = withErrors(async (
   if (!UUID_RE.test(id)) throw new ApiError(404, "Not found.");
 
   const session = await requireSession();
-  const { userId } = await req.json().catch(() => ({}));
+  const body = await req.json().catch(() => null);
+  const userId = body && typeof body === "object" && !Array.isArray(body) ? body.userId : null;
   if (typeof userId !== "string" || !userId) throw new ApiError(400, "Missing reader.");
 
   const removed = await sql<{ id: string }[]>`

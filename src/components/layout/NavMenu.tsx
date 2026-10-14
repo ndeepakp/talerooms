@@ -61,6 +61,7 @@ export function NavMenu({ profileHref }: { profileHref: string }) {
           >
             Drafts
           </Link>
+          <Link href="/wallet" onClick={() => setOpen(false)} className="block px-4 py-2.5 text-sm text-ink-soft hover:bg-surface-soft">Author wallet</Link>
           <Link
             href="/settings"
             onClick={() => setOpen(false)}

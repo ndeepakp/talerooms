@@ -5,9 +5,9 @@ Updated: **2026-10-17**. Complete and validate each task before advancing.
 ## Current state
 
 - **Active task:** Payments (`TASK-PAY-01`). Stripe sandbox checkout is enabled on the deployed site for user-led manual validation. Live billing and app withdrawals remain disabled; actual-provider end-to-end validation is pending.
-- **Latest app commit:** `b7b57c4` — shared form UI corrections and blocked mock subscriptions in Stripe mode.
-- **Last recorded production release:** `b7b57c4`, Fly v44 — shared UI corrections; mock subscriptions blocked; Stripe sandbox story/chapter checkout and SG wallet onboarding enabled. Live billing and app withdrawals remain disabled.
-- **Validation:** 193 standard tests, 14 local payment/wallet DB tests, lint, TypeScript and the production build passed for v44; 14 deployed release smoke checks passed. UI checks cover 22 representative routes at 320/390/1280px plus signed-out landing and interactive/light/dark states. Actual-provider purchase completion remains pending manual verification.
+- **Latest app commit:** `e96faf5` — clickable Stripe payout setup guidance to the author wallet.
+- **Last recorded production release:** `e96faf5`, Fly v45 — payout setup errors link to the wallet. Shared UI corrections and mock-subscription blocking remain deployed; Stripe sandbox checkout/SG onboarding are enabled, with live billing and app withdrawals disabled.
+- **Validation:** 196 standard tests, targeted lint, TypeScript and the production build passed for v45; 14 deployed release smoke checks passed. The v44 pass included 14 local DB tests, full lint and 22 representative routes at 320/390/1280px. Wallet-link click-through and 390px layout were verified locally. Actual-provider purchase completion remains pending manual verification.
 - **Provider dependency:** Singapore Stripe merchant account, approved author countries and confirmed payout controls are needed for real provider testing. No live charges or payouts are enabled.
 
 Use **Done** to track completed work by date and **Pending** to track the remaining implementation, validation and release steps. A completed portion of an in-progress task does not mark the whole task complete. GitHub delivery and production deployment are tracked separately.
@@ -22,7 +22,7 @@ Checked items describe implemented/validated work or completed planning, with de
 
 - [x] Link “payout setup” to `/wallet` in both missing-account and incomplete-provider readiness errors; clarify that setup must be completed from the story author's account.
 - [x] Keep unrelated checkout failures as plain errors. Pass 196 standard tests, TypeScript and targeted lint; verify actual backend rejection, 390px layout and clicking through to the wallet. No payment was made.
-- [ ] Record deployment of the wallet guidance link.
+- [x] Deploy app commit `e96faf5` as Fly v45 and pass 14 release smoke checks; wallet remains authenticated and payment guards remain active.
 
 ### 2026-10-17: Shared form UI and subscription correction
 

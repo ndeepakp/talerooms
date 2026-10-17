@@ -69,3 +69,12 @@ Added additive migration `0051_stripe_checkout_orders.sql`, persisted immutable 
 Validation after implementation: **178 standard tests and 13 local DB integration tests passed**, along with lint, TypeScript and production build. New order/fulfillment DB tests use explicitly simulated provider responses to validate SQL transaction behavior; they are **not provider end-to-end proof**. Actual local HTTP checks confirmed the demo endpoint is disabled, an unready author gets 409, a foreign origin gets 403, private unknown order status gets 404 and anonymous status gets 401.
 
 The full actual-provider journey remains NOT RUN. No checkout was paid, no new paid access was claimed, and author earnings from a real sandbox purchase have not been verified. Await author onboarding, then validate through hosted Stripe checkout and real signed webhook delivery.
+
+
+## Deployment record
+
+App commit `3887fa5` was pushed and deployed on 2026-10-17 as Fly v42 in Singapore. Additive migration `0051` was applied transactionally to production; the application database role has read/insert/update permissions on orders and insert permission on processed payment events. Production explicitly sets `STRIPE_CHECKOUT_ENABLED=false`. Local `.env.local` keys and signing secrets were excluded from Git and the image.
+
+Thirteen live checks passed: health, home, about, login, signup, a published story, wallet page/API authentication, private payment-return/status authentication, rejected disabled checkout, anonymous legacy purchase rejection and unsigned webhook rejection. Fly's health check passes. Production dependency audit reported zero known vulnerabilities.
+
+Deployment is complete. Actual-provider purchase validation is not complete; no successful Stripe checkout or author earnings from a purchase are asserted by this release record.

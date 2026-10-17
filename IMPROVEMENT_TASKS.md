@@ -4,10 +4,10 @@ Updated: **2026-10-17**. Complete and validate each task before advancing.
 
 ## Current state
 
-- **Active task:** Payments (`TASK-PAY-01`). Wallet code, mock-payment fixes and contextual chapter unlocking are validated, pushed and deployed; real billing is still pending.
-- **Latest pushed app commit:** `5525982` — chapter-unlock discoverability and Done/Pending task history; includes author wallet and mock-payment fixes.
-- **Last recorded production release:** `5525982`, Fly v41 — chapter unlocking, author wallet and mock-payment fixes; migration `0050` applied.
-- **Validation:** 145 standard tests and five local database tests passed; lint, TypeScript and production build passed. Eight live HTTP smoke checks and desktop/mobile unlock visibility checks passed.
+- **Active task:** Payments (`TASK-PAY-01`). Sandbox wallet connection and gated Stripe checkout code are deployed; production Stripe checkout is disabled and actual-provider end-to-end validation is pending.
+- **Latest pushed app commit:** `3887fa5` — gated Stripe checkout/order fulfillment, sandbox connection tooling and expanded payment validation.
+- **Last recorded production release:** `3887fa5`, Fly v42 — migration `0051` applied; Stripe checkout explicitly disabled in production.
+- **Validation:** 178 standard tests and 13 local database integration tests passed; lint, TypeScript and production build passed. Thirteen live release smoke checks passed. These do not constitute a completed actual-provider purchase journey.
 - **Provider dependency:** Singapore Stripe merchant account, approved author countries and confirmed payout controls are needed for real provider testing. No real charges or payouts are enabled.
 
 Use **Done** to track completed work by date and **Pending** to track the remaining implementation, validation and release steps. A completed portion of an in-progress task does not mark the whole task complete. GitHub delivery and production deployment are tracked separately.
@@ -20,7 +20,7 @@ Checked items describe implemented/validated work or completed planning, with de
 
 ### 2026-10-17: Stripe sandbox connection
 
-**Delivery:** Local configuration and development tooling only; production billing remains disabled.
+**Delivery:** App changes pushed as `3887fa5` and deployed as Fly v42. Sandbox credentials remain local. Production Stripe checkout and app withdrawals remain disabled.
 
 - [x] Verify the Singapore Stripe sandbox key without exposing credentials; enable local wallet onboarding for SG while keeping app withdrawals disabled.
 - [x] Create an isolated QA author through the app and open actual Stripe-hosted onboarding on desktop/mobile; retries reuse the same connected account.
@@ -29,6 +29,8 @@ Checked items describe implemented/validated work or completed planning, with de
 - [x] Validate authentication/origin/country/signature guards and blocked withdrawals for an incomplete author; pass 145 standard tests, TypeScript and helper lint/syntax checks.
 - [x] Prepare feature-gated sandbox order persistence, Stripe Checkout creation, private order status and verified webhook fulfillment. Pass 178 standard tests, 13 DB integration tests, lint, TypeScript and production build. Actual-provider end-to-end purchase remains blocked by author onboarding; production checkout stays disabled.
 - [x] Expand stress coverage to 155 standard tests and 10 local database integration tests; pass 22 actual HTTP stress scenarios, 15 route smoke checks, full lint, TypeScript and production build. Check wallet layouts at 320/390/768/1280px and enforce local-only wallet integration testing.
+
+- [x] Apply additive migration `0051`, deploy `3887fa5` as Fly v42, verify application table permissions and pass 13 live smoke checks with production checkout disabled.
 
 **Pending:** The author must complete Stripe onboarding. Provider-observed pending/ready states, bank/payout controls and sandbox checkout/fulfillment remain unverified. SG sandbox testing does not approve international live payouts.
 
@@ -165,7 +167,7 @@ Payments must be completed and validated before administration. The protected un
 - [ ] Validate the new order ledger and immutable snapshots through actual Stripe checkout. The gated implementation separates order-linked provider grants from legacy demo grants.
 - [ ] Complete actual-provider end-to-end validation of the gated Checkout Session implementation for chapters, whole stories and time-limited access.
 - [ ] Add recurring author subscriptions and billing/customer-portal management; align displayed access terms with actual billing periods.
-- [ ] Fulfil access transactionally from verified payment/subscription webhooks. Check order ownership, amount, currency and paid state; handle duplicates, delayed events, unpaid renewals, refunds and disputes.
+- [ ] Validate the implemented one-time checkout fulfillment with actual Stripe payment/webhook delivery. Extend it for subscriptions, unpaid renewals, refunds and disputes before live billing. Ownership, amount, currency and paid-state checks are implemented; real-provider completion remains pending.
 - [ ] Validate the implemented private payment status/return page with actual provider completion; add receipts. Returning from checkout alone must not grant access.
 
 **Provider validation and deployment:**

@@ -18,6 +18,12 @@ Use **Done** to track completed work by date and **Pending** to track the remain
 
 Checked items describe implemented/validated work or completed planning, with delivery noted separately. Real payments, rewards, language discovery, audio and the under-18 experience are not marked complete.
 
+### 2026-10-17: Clickable Stripe payout setup guidance
+
+- [x] Link “payout setup” to `/wallet` in both missing-account and incomplete-provider readiness errors; clarify that setup must be completed from the story author's account.
+- [x] Keep unrelated checkout failures as plain errors. Pass 196 standard tests, TypeScript and targeted lint; verify actual backend rejection, 390px layout and clicking through to the wallet. No payment was made.
+- [ ] Record deployment of the wallet guidance link.
+
 ### 2026-10-17: Shared form UI and subscription correction
 
 **Delivery:** Pushed app commit `b7b57c4` and deployed it as Fly v44.

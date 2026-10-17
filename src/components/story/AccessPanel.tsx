@@ -4,6 +4,7 @@ import { requestStripeCheckout } from "@/lib/payments/checkout-client";
 import { completeMockRequest } from "@/lib/mock-checkout";
 import { useRef, useState } from "react";
 import { useRouter } from "next/navigation";
+import Link from "next/link";
 import { currencySymbol, TIER_LABELS, formatPrice, type Tier } from "@/lib/pricing";
 
 type PriceMap = Partial<Record<Tier, number>>;
@@ -48,6 +49,10 @@ export function AccessPanel({
   const inFlight = useRef(false);
   const [busy, setBusy] = useState(false);
   const [error, setError] = useState<string | null>(null);
+  const needsPayoutSetup = stripeCheckout && (
+    error === "The author must complete Stripe payout setup before accepting payments." ||
+    error === "The author’s Stripe account is not ready to accept payments."
+  );
 
   if (offered.length === 0) return null;
 
@@ -216,7 +221,12 @@ export function AccessPanel({
         </p>
       )}
 
-      {error && <p role="alert" className="mt-3 text-sm text-danger">{error}</p>}
+      {error && <div role="alert" className="mt-3 text-sm text-danger">
+        {needsPayoutSetup ? <>
+          <p>The author must complete Stripe <Link href="/wallet" className="font-semibold underline decoration-2 underline-offset-4 hover:decoration-1">payout setup</Link> before accepting payments.</p>
+          <p className="mt-2 text-xs leading-relaxed text-muted">Only the story’s author can complete this setup from their wallet.</p>
+        </> : <p>{error}</p>}
+      </div>}
       {stripeCheckout && error?.includes('expired') && <button type="button" className="mt-3 min-h-11 text-sm underline" onClick={() => { checkoutAttempt.current = null; setError(null); }}>Start a new checkout</button>}
     </section>
   );

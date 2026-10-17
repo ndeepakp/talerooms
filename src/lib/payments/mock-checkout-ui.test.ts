@@ -83,3 +83,26 @@ describe('subscriptions while Stripe checkout is enabled',()=>{
     expect(window.confirm).not.toHaveBeenCalled();expect(fetch).not.toHaveBeenCalled();
   });
 });
+
+
+describe('Stripe author setup guidance',()=>{
+  it.each([
+    'The author must complete Stripe payout setup before accepting payments.',
+    'The author’s Stripe account is not ready to accept payments.',
+  ])('links payout setup to the wallet for readiness error: %s',async error=>{
+    vi.mocked(fetch).mockResolvedValue(Response.json({error},{status:409}));
+    render(createElement(AccessPanel,{...props,stripeCheckout:true}));
+    await userEvent.click(screen.getByRole('button',{name:'S$100'}));
+    await screen.findByRole('alert');
+    expect(screen.getByRole('link',{name:'payout setup'}).getAttribute('href')).toBe('/wallet');
+    expect(screen.getByText('Only the story’s author can complete this setup from their wallet.')).toBeTruthy();
+    expect(window.confirm).not.toHaveBeenCalled();expect(refresh).not.toHaveBeenCalled();
+  });
+  it('keeps unrelated checkout failures as plain errors without a misleading wallet link',async()=>{
+    vi.mocked(fetch).mockResolvedValue(Response.json({error:'Verify your email before continuing.'},{status:403}));
+    render(createElement(AccessPanel,{...props,stripeCheckout:true}));
+    await userEvent.click(screen.getByRole('button',{name:'S$100'}));
+    expect((await screen.findByRole('alert')).textContent).toBe('Verify your email before continuing.');
+    expect(screen.queryByRole('link',{name:'payout setup'})).toBeNull();
+  });
+});

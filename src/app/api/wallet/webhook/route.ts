@@ -1,3 +1,4 @@
+import { fulfillCheckoutEvent } from '@/lib/payments/orders';
 import type Stripe from 'stripe';
 import { sql } from '@/lib/db';
 import { verifyStripeEvent } from '@/lib/payments/stripe';
@@ -11,6 +12,10 @@ export const POST = walletRoute(async request => {
   let event;
   try { event = verifyStripeEvent(payload, request.headers.get('stripe-signature') || ''); }
   catch { throw new WalletError(400, 'Invalid event signature.'); }
+  if (['checkout.session.completed', 'checkout.session.async_payment_succeeded', 'checkout.session.async_payment_failed', 'checkout.session.expired'].includes(event.type)) {
+    await fulfillCheckoutEvent(event);
+    return walletJson({ received: true });
+  }
   if (!['payout.created', 'payout.updated', 'payout.paid', 'payout.failed', 'payout.canceled', 'account.updated', 'balance.available'].includes(event.type)) return walletJson({ received: true });
   if (!event.account) throw new WalletError(400, 'A connected-account event is required.');
   const mode = walletMode();

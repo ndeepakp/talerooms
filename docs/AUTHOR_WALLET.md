@@ -58,3 +58,24 @@ Mobile QA covers empty/populated fixture views and amount review at 320/390/430 
 References: [Connected-account payouts](https://docs.stripe.com/connect/payouts-connected-accounts), [payout schedules](https://docs.stripe.com/connect/manage-payout-schedule), [full-Dashboard platform controls](https://docs.stripe.com/connect/platform-controls-for-stripe-dashboard-accounts), [currency rules](https://docs.stripe.com/currencies).
 
 Final local result (2026-10-14): 127 unit tests passed, the separately enabled PostgreSQL integration test passed, eight local HTTP checks passed, lint/TypeScript/production build passed. Empty/populated/review mobile views had no horizontal overflow at 320/390/430 pixels; tablet/desktop checked at 768/1280 pixels and the dark mobile view visually checked. This is synthetic/local validation, not Stripe provider certification.
+
+
+## Local sandbox connection — 2026-10-17
+
+The saved test key successfully authenticated against the Singapore platform. Local `.env.local` enables `STRIPE_MODE=test`, `STRIPE_WALLET_ENABLED=true`, and `STRIPE_CONNECT_COUNTRIES=SG`. `STRIPE_PAYOUT_CONTROLS_ENABLED=false` deliberately keeps app withdrawals disabled. Singapore is the initial **sandbox** test country; this does not approve live author countries or international payouts.
+
+Run `npm run stripe:listen` alongside `npm run dev` for local Connect snapshot webhook forwarding. The pinned official Stripe CLI receives the test key through its environment rather than command arguments. The helper saves the CLI signing secret privately to the ignored `.env.local` file and suppresses it from output. The helper rejects live mode and live keys. Keep the listener running while testing; restart it after restarting the development environment. This is not a production webhook deployment.
+
+Validated with an isolated local QA author and an actual Stripe sandbox connected account:
+
+- Wallet and onboarding endpoints returned 200; hosted onboarding opened at `connect.stripe.com`, with Stripe's explicit test-data banner.
+- Reopening onboarding reused the same connected account. No sample-dashboard login or manually linked account ID was needed.
+- The real account snapshot reported charges/payouts disabled; the wallet displayed “Finish your payout setup”, and withdrawals remained unavailable.
+- A sandbox-only metadata update generated a real signed `account.updated` event. Stripe CLI forwarded it to `/api/wallet/webhook`, which returned 200 and persisted one event record.
+- Unauthenticated wallet access returned 401; foreign-origin onboarding 403; unsupported sandbox country 400; incomplete-account withdrawal 409; unsigned webhook 400.
+- Desktop and 390px mobile wallet/hosted-onboarding views checked; mobile wallet had no horizontal overflow.
+- 145 standard tests passed, plus TypeScript, helper lint/syntax checks and live-mode refusal. The five opt-in DB tests were not rerun for this tooling/configuration change.
+
+Still pending: author-controlled completion of Stripe onboarding, provider-observed pending/ready states, bank verification and payout-control testing, and real sandbox checkout/fulfillment. Opening or returning from onboarding does not establish readiness. No real funds, charges or withdrawals were used. Production settings were not changed.
+
+Expanded validation: [Stripe Connect sandbox stress report](STRIPE_CONNECT_QA_2026-10-17.md) — 155 standard tests, 10 local DB tests, 22 HTTP stress scenarios, 15 route smoke checks and four viewport widths. Provider completion and payouts remain pending.

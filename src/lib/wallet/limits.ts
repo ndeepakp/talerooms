@@ -1,6 +1,6 @@
 import { sql } from '@/lib/db';
 import { WalletError } from './types';
-export async function limitWallet(userId: string, action: 'read' | 'onboarding' | 'withdraw') {
+export async function limitWallet(userId: string, action: 'read' | 'onboarding' | 'withdraw' | 'checkout') {
   const duration = action === 'onboarding' ? 3600_000 : 60_000;
   const maximum = action === 'onboarding' ? 5 : action === 'read' ? 30 : 10;
   const window = new Date(Math.floor(Date.now() / duration) * duration);

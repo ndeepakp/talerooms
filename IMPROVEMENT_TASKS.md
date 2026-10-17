@@ -1,6 +1,6 @@
 # Talerooms Task Tracker
 
-Updated: **2026-10-14**. Complete and validate each task before advancing.
+Updated: **2026-10-17**. Complete and validate each task before advancing.
 
 ## Current state
 
@@ -17,6 +17,22 @@ Use **Done** to track completed work by date and **Pending** to track the remain
 ## Done
 
 Checked items describe implemented/validated work or completed planning, with delivery noted separately. Real payments, rewards, language discovery, audio and the under-18 experience are not marked complete.
+
+### 2026-10-17: Stripe sandbox connection
+
+**Delivery:** Local configuration and development tooling only; production billing remains disabled.
+
+- [x] Verify the Singapore Stripe sandbox key without exposing credentials; enable local wallet onboarding for SG while keeping app withdrawals disabled.
+- [x] Create an isolated QA author through the app and open actual Stripe-hosted onboarding on desktop/mobile; retries reuse the same connected account.
+- [x] Add pinned official Stripe CLI tooling with `npm run stripe:listen`; store its webhook secret only in ignored local settings and reject live-mode forwarding.
+- [x] Receive a real signed sandbox `account.updated` event, return 200 and persist the event once.
+- [x] Validate authentication/origin/country/signature guards and blocked withdrawals for an incomplete author; pass 145 standard tests, TypeScript and helper lint/syntax checks.
+- [x] Prepare feature-gated sandbox order persistence, Stripe Checkout creation, private order status and verified webhook fulfillment. Pass 178 standard tests, 13 DB integration tests, lint, TypeScript and production build. Actual-provider end-to-end purchase remains blocked by author onboarding; production checkout stays disabled.
+- [x] Expand stress coverage to 155 standard tests and 10 local database integration tests; pass 22 actual HTTP stress scenarios, 15 route smoke checks, full lint, TypeScript and production build. Check wallet layouts at 320/390/768/1280px and enforce local-only wallet integration testing.
+
+**Pending:** The author must complete Stripe onboarding. Provider-observed pending/ready states, bank/payout controls and sandbox checkout/fulfillment remain unverified. SG sandbox testing does not approve international live payouts.
+
+**Evidence:** [Wallet connection and setup](docs/AUTHOR_WALLET.md#local-sandbox-connection--2026-10-17), [sandbox stress validation](docs/STRIPE_CONNECT_QA_2026-10-17.md).
 
 ### 2026-10-14: Wallet and mock-payment validation
 
@@ -146,15 +162,15 @@ Payments must be completed and validated before administration. The protected un
 **Remaining implementation:**
 
 - [ ] Distinguish free, purchased, subscriber, expired, demo and unavailable checkout states. Preserve the no-charge notice while billing is mocked.
-- [ ] Persist orders and immutable price/item snapshots; separate legacy demo grants from verified paid orders.
-- [ ] Create real Checkout Sessions for chapters, whole stories and time-limited access.
+- [ ] Validate the new order ledger and immutable snapshots through actual Stripe checkout. The gated implementation separates order-linked provider grants from legacy demo grants.
+- [ ] Complete actual-provider end-to-end validation of the gated Checkout Session implementation for chapters, whole stories and time-limited access.
 - [ ] Add recurring author subscriptions and billing/customer-portal management; align displayed access terms with actual billing periods.
 - [ ] Fulfil access transactionally from verified payment/subscription webhooks. Check order ownership, amount, currency and paid state; handle duplicates, delayed events, unpaid renewals, refunds and disputes.
-- [ ] Add server-confirmed payment return/status pages and receipts. Returning from checkout alone must not grant access.
+- [ ] Validate the implemented private payment status/return page with actual provider completion; add receipts. Returning from checkout alone must not grant access.
 
 **Provider validation and deployment:**
 
-- [ ] Configure the Singapore merchant test account and confirm each launch author country's eligibility and account capabilities.
+- [ ] Complete Singapore sandbox author onboarding and confirm each launch author country's eligibility and account capabilities. The platform test key and local Connect webhook connection are validated.
 - [ ] Confirm full-Dashboard payout controls and earlier standard withdrawals while daily/weekly automatic payouts remain active. Permanent manual/monthly schedules are blocked by the current app flow.
 - [ ] Validate real test-mode onboarding, checkout, subscriptions, settlement, payout delivery/events, failures, cancellation, refunds/disputes and unknown-response retries.
 - [ ] Decide platform commission, subscription currency/terms and refund/tax responsibilities before live billing.

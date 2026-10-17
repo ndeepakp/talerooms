@@ -1,7 +1,8 @@
 "use client";
 
+import { requestStripeCheckout } from "@/lib/payments/checkout-client";
 import { completeMockRequest } from "@/lib/mock-checkout";
-import { useState } from "react";
+import { useRef, useState } from "react";
 import { useRouter } from "next/navigation";
 import { currencySymbol, TIER_LABELS, formatPrice, type Tier } from "@/lib/pricing";
 
@@ -13,9 +14,8 @@ type ChapterOption = {
   owned: boolean;
 };
 
-// Reader-facing buy flow for a story's private chapters. MOCK checkout — no real
-// money moves; on success the server records the grant and the page re-renders
-// with the unlocked content.
+// Stripe checkout redirects to the provider; only verified webhooks grant access.
+// The separately labelled legacy demo flow stays available when Stripe is disabled.
 export function AccessPanel({
   storyId,
   offered,
@@ -24,6 +24,7 @@ export function AccessPanel({
   currency,
   renewalDiscount,
   initialChapterIndex,
+  stripeCheckout = false,
 }: {
   storyId: string;
   offered: Tier[];
@@ -33,6 +34,7 @@ export function AccessPanel({
   // % off shown to a returning reader renewing access (applied server-side too).
   renewalDiscount?: number;
   initialChapterIndex?: number;
+  stripeCheckout?: boolean;
 }) {
   const router = useRouter();
   const target = chapters.find(c => c.index === initialChapterIndex && !c.owned);
@@ -42,6 +44,8 @@ export function AccessPanel({
   const [picked, setPicked] = useState<Set<number>>(() => new Set(
     target && typeof target.prices[initialTier] === "number" ? [target.index] : [],
   ));
+  const checkoutAttempt = useRef<{ selection: string; key: string } | null>(null);
+  const inFlight = useRef(false);
   const [busy, setBusy] = useState(false);
   const [error, setError] = useState<string | null>(null);
 
@@ -70,6 +74,16 @@ export function AccessPanel({
   }
 
   async function buy(payload: object, total: number) {
+    if (inFlight.current) return;
+    if (stripeCheckout) {
+      const selection = JSON.stringify(payload);
+      if (checkoutAttempt.current?.selection !== selection) checkoutAttempt.current = { selection, key: crypto.randomUUID() };
+      inFlight.current = true; setBusy(true); setError(null);
+      try { window.location.assign(await requestStripeCheckout(storyId, payload, checkoutAttempt.current.key)); }
+      catch (error) { setError(error instanceof Error ? error.message : 'Unable to open Stripe checkout.'); }
+      finally { inFlight.current = false; setBusy(false); }
+      return;
+    }
     if (!window.confirm(`Mock payment: pay ${formatPrice(total, currency)} for this access?`)) {
       return;
     }
@@ -95,7 +109,7 @@ export function AccessPanel({
       </h2>
       <p className="mt-1 text-sm text-muted">
         Pick how long you want access for, then buy the whole story or just the
-        chapters you want. (Payments are mocked for now — nothing is charged.)
+        chapters you want. {stripeCheckout ? "Stripe sandbox checkout uses test funds only." : "Payments are mocked for now — nothing is charged."}
       </p>
 
       {renewalDiscount ? (
@@ -203,6 +217,7 @@ export function AccessPanel({
       )}
 
       {error && <p role="alert" className="mt-3 text-sm text-danger">{error}</p>}
+      {stripeCheckout && error?.includes('expired') && <button type="button" className="mt-3 min-h-11 text-sm underline" onClick={() => { checkoutAttempt.current = null; setError(null); }}>Start a new checkout</button>}
     </section>
   );
 }

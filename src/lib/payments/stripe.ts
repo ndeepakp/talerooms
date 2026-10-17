@@ -11,9 +11,7 @@ export function stripeClient() {
   return new Stripe(key, { maxNetworkRetries: 2, timeout: 10000 });
 }
 
-/** Verification only. No event handlers or paid-access changes are exposed
- * until the persisted order ledger and fulfillment transaction are ready.
- */
+/** Verify the unmodified body and environment before dispatching any event. */
 export function verifyStripeEvent(payload: string, signature: string): Stripe.Event {
   const secret = process.env.STRIPE_WEBHOOK_SECRET;
   if (!secret?.startsWith("whsec_")) throw new Error("Stripe webhook verification is not configured.");
@@ -37,10 +35,8 @@ type CheckoutInput = {
   approvedCountries: string[];
 };
 
-/** Build one-time Checkout parameters for a direct charge on the author account.
- * This is an offline foundation, not a checkout API: no session is created,
- * no customer/author data is sent, and no grant is written here.
- */
+/** Build immutable, author-scoped Checkout parameters. Provider calls and
+ * transactional fulfillment live in orders.ts. */
 export function buildStoryCheckout(input: CheckoutInput): {
   params: Stripe.Checkout.SessionCreateParams;
   options: Stripe.RequestOptions;

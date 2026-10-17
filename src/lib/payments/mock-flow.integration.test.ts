@@ -1,4 +1,4 @@
-import { afterAll, describe, expect, it, vi } from 'vitest';
+import { beforeEach, afterEach, afterAll, describe, expect, it, vi } from 'vitest';
 import postgres from 'postgres';
 import { randomUUID } from 'node:crypto';
 const state=vi.hoisted(()=>({ tx: null as unknown as import('postgres').TransactionSql, userId: '' }));
@@ -11,6 +11,8 @@ vi.mock('@/lib/notify',()=>({notify:vi.fn()}));
 import { POST as purchase, DELETE as revoke } from '@/app/api/stories/[id]/purchase/route';
 import { POST as subscribe, DELETE as cancel } from '@/app/api/users/[id]/subscribe/route';
 const enabled=process.env.PAYMENTS_DB_TESTS==='true';
+beforeEach(() => vi.stubEnv('STRIPE_CHECKOUT_ENABLED', 'false'));
+afterEach(() => vi.unstubAllEnvs());
 if(enabled && !['localhost','127.0.0.1','[::1]'].includes(new URL(process.env.DATABASE_URL!).hostname))throw new Error('Payment DB tests require a local database.');
 const db=postgres(process.env.DATABASE_URL!,{max:2});
 afterAll(async()=>{await db.end();});

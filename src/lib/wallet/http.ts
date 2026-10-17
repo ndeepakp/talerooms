@@ -11,10 +11,10 @@ export function service() {
   return new WalletService(walletStore, stripeWalletProvider());
 }
 export async function mutation(request: Request) {
-  if (request.headers.get('origin') !== walletOrigin()) throw new WalletError(403, 'Open your wallet in Talerooms to continue.');
+  if (request.headers.get('origin') !== walletOrigin()) throw new WalletError(403, 'Open Talerooms to continue.');
   const session = await requireSession();
-  if (!(await sessionAccountState(session.user.id))?.emailVerified) throw new WalletError(403, 'Verify your email before setting up or withdrawing earnings.');
-  if (Date.now() - new Date(session.session.createdAt).getTime() > 30 * 60_000) throw new WalletError(403, 'Sign out and sign in again before managing payouts.');
+  if (!(await sessionAccountState(session.user.id))?.emailVerified) throw new WalletError(403, 'Verify your email before continuing.');
+  if (Date.now() - new Date(session.session.createdAt).getTime() > 30 * 60_000) throw new WalletError(403, 'Sign out and sign in again before continuing.');
   if (!request.headers.get('content-type')?.startsWith('application/json')) throw new WalletError(400, 'Send a JSON request.');
   const text = await limitedText(request, 2048);
   if (text.length > 2048) throw new WalletError(413, 'Request is too large.');

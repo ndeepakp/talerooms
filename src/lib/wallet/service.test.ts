@@ -84,3 +84,30 @@ describe('wallet ownership, balances and payout safety', () => {
   });
   it('retains older ambiguous reservations and applies a request quota', async () => { const f = fixture(); f.replaceRows(Array.from({ length: 5 }, () => ({ id: randomUUID(), accountId: f.account.id, requestKey: randomUUID(), amount: 100, currency: 'sgd', source: 'card', providerId: null, status: 'unknown', arrivalAt: null, createdAt: new Date() }))); await expect(f.service.withdraw('author', f.input())).rejects.toThrow('Too many'); });
 });
+
+describe('onboarding retry and readiness transitions', () => {
+  it('reuses the stored connected account when reopening or returning from onboarding', async () => {
+    const f = fixture(); const create = vi.spyOn(f.provider, 'createAccount');
+    await f.service.onboarding('author', 'author@example.test', 'SG', 'http://localhost:3000');
+    await f.service.onboarding('author', 'author@example.test', 'SG', 'http://localhost:3000');
+    expect(create).not.toHaveBeenCalled();
+    f.snapshot.chargesEnabled = false; f.snapshot.payoutsEnabled = false;
+    expect((await f.service.read('author')).canWithdraw).toBe(false);
+    f.snapshot.chargesEnabled = true; expect((await f.service.read('author')).canWithdraw).toBe(false);
+    f.snapshot.payoutsEnabled = true; expect((await f.service.read('author')).canWithdraw).toBe(true);
+    f.snapshot.payoutsEnabled = false; expect((await f.service.read('author')).canWithdraw).toBe(false);
+  });
+  it('recovers a failed account creation using the same stored account reference', async () => {
+    const f = fixture(); f.account.providerId = null;
+    const create = vi.spyOn(f.provider, 'createAccount').mockRejectedValueOnce(new Error('Lost response')).mockResolvedValueOnce('acct_recovered');
+    await expect(f.service.onboarding('author', 'author@example.test', 'SG', 'http://localhost:3000')).rejects.toThrow('Lost response');
+    expect(f.account.providerId).toBeNull();
+    await f.service.onboarding('author', 'author@example.test', 'SG', 'http://localhost:3000');
+    expect(create.mock.calls[0][0].id).toBe(create.mock.calls[1][0].id); expect(f.account.providerId).toBe('acct_recovered');
+  });
+  it('never blindly recreates an account after the provider idempotency window', async () => {
+    const f = fixture(); f.account.providerId = null; f.account.createdAt = new Date(Date.now() - 24*3600_000);
+    const create = vi.spyOn(f.provider, 'createAccount');
+    await expect(f.service.onboarding('author', 'author@example.test', 'SG', 'http://localhost:3000')).rejects.toThrow('reconciliation'); expect(create).not.toHaveBeenCalled();
+  });
+});

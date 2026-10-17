@@ -1,3 +1,4 @@
+import { stripeCheckoutEnabled } from "@/lib/payments/checkout-config";
 import Link from "next/link";
 import { notFound, redirect } from "next/navigation";
 import { getActiveSession } from "@/lib/account-session";
@@ -410,7 +411,7 @@ export default async function StoryPage({
   const storyHref = `/stories/${resolved.slug ?? story.id}`;
   const buyIndex = buyParam && /^\d+$/.test(buyParam) && Number(buyParam) < allChapters.length ? Number(buyParam) : undefined;
   const unlockAction = (i: number) => chapterUnlocked(i) ? undefined : chapterAccessAction({
-    storyHref, index: i, offered: story.offered_durations, prices: allChapters[i].prices ?? {},
+    stripeCheckout: stripeCheckoutEnabled(), storyHref, index: i, offered: story.offered_durations, prices: allChapters[i].prices ?? {},
     wholePrices: story.whole_prices, currency: story.currency, discount: returning ? RENEWAL_DISCOUNT_PCT : 0,
   });
   const selectedChapter = clampChapter(initialChapter, allChapters.length);
@@ -441,6 +442,7 @@ export default async function StoryPage({
             </div>
             {purchasable ? (
           <AccessPanel
+            stripeCheckout={stripeCheckoutEnabled()}
             key={buyIndex ?? "default"}
             initialChapterIndex={buyIndex}
             storyId={story.id}

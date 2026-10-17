@@ -9,7 +9,8 @@
     "lint": "eslint",
     "test": "vitest run",
     "test:watch": "vitest",
-    "test:payments:local": "PAYMENTS_DB_TESTS=true WALLET_DB_TESTS=true node --env-file=.env.local node_modules/vitest/vitest.mjs run src/lib/payments/mock-flow.integration.test.ts src/lib/wallet/store.integration.test.ts"
+    "test:payments:local": "PAYMENTS_DB_TESTS=true WALLET_DB_TESTS=true node --env-file=.env.local node_modules/vitest/vitest.mjs run src/lib/payments/mock-flow.integration.test.ts src/lib/wallet/store.integration.test.ts src/lib/wallet/webhook.integration.test.ts src/lib/payments/orders.integration.test.ts",
+    "stripe:listen": "node --env-file=.env.local scripts/stripe-listen.mjs"
   },
   "dependencies": {
     "@huggingface/transformers": "^4.3.1",
@@ -31,6 +32,7 @@
     "web-push": "^3.6.7"
   },
   "devDependencies": {
+    "@stripe/cli": "1.54.0",
     "@tailwindcss/postcss": "^4",
     "@testing-library/react": "^16.3.3",
     "@testing-library/user-event": "^14.6.8",

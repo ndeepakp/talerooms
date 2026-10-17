@@ -6,6 +6,7 @@ import type { Account, Withdrawal } from './types';
 // Explicit opt-in against the developer's local database. Financial fixtures
 // are retained for audit; never run against a deployed database.
 const enabled = process.env.WALLET_DB_TESTS === 'true';
+if (enabled && !['localhost', '127.0.0.1', '[::1]'].includes(new URL(process.env.DATABASE_URL!).hostname)) throw new Error('Wallet DB tests require a local database.');
 afterAll(async () => { if (enabled) await sql.end(); });
 describe.skipIf(!enabled)('wallet PostgreSQL concurrency and reconciliation', () => {
   it('serializes reservations across independent transactions and persists retries', async () => {

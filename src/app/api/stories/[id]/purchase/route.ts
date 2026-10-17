@@ -1,3 +1,4 @@
+import { stripeCheckoutEnabled } from "@/lib/payments/checkout-config";
 import { NextResponse } from "next/server";
 import { sql } from "@/lib/db";
 import { ApiError, requireSession, withErrors } from "@/lib/http";
@@ -26,6 +27,7 @@ export const POST = withErrors(async (
   req: Request,
   { params }: { params: Promise<{ id: string }> },
 ) => {
+  if (stripeCheckoutEnabled()) throw new ApiError(409, "Demo purchases are disabled. Use Stripe checkout.");
   const { id } = await params;
   if (!UUID_RE.test(id)) throw new ApiError(404, "Not found.");
 

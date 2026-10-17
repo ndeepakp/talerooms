@@ -471,3 +471,57 @@ input[type="checkbox"], input[type="radio"] { accent-color: var(--accent); }
   input:not([type="checkbox"]):not([type="radio"]):not([type="range"]):not([type="color"]):not([type="file"]):not([type="hidden"]):not([type="button"]):not([type="submit"]),
   textarea, select { font-size: 16px !important; }
 }
+
+/* Composite onboarding fields own the focus treatment, including the prefix. */
+.onboarding-input-shell {
+  transition: border-color 150ms ease, box-shadow 150ms ease;
+}
+.onboarding-input-shell:focus-within {
+  border-color: var(--accent);
+  box-shadow: 0 0 0 3px color-mix(in srgb, var(--accent) 14%, transparent);
+}
+.onboarding-input-shell[data-invalid="true"] { border-color: var(--danger); }
+.onboarding-input-shell[data-invalid="true"]:focus-within {
+  box-shadow: 0 0 0 3px color-mix(in srgb, var(--danger) 12%, transparent);
+}
+.onboarding-input-shell input:focus-visible { outline: none; }
+@media (forced-colors: active) {
+  .onboarding-input-shell:focus-within { outline: 2px solid Highlight; outline-offset: 2px; }
+}
+
+.story-toolbar {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px 20px;
+  margin-bottom: 32px;
+  padding-bottom: 20px;
+  border-bottom: 1px solid var(--border);
+}
+.story-toolbar-button, .story-back-link {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+  min-height: 44px;
+  border-radius: 12px;
+  font-size: 14px;
+  font-weight: 500;
+  line-height: 20px;
+  white-space: nowrap;
+  transition: background-color 150ms ease, border-color 150ms ease, color 150ms ease;
+}
+.story-toolbar-button {
+  padding: 0 16px;
+  border: 1px solid var(--border);
+  background: var(--surface-raised);
+  color: var(--foreground);
+}
+.story-toolbar-button:hover, .story-toolbar-button[aria-expanded="true"] {
+  background: var(--surface-soft);
+  border-color: var(--border-strong);
+}
+.story-back-link { padding: 0 10px 0 4px; color: var(--ink-soft); }
+.story-back-link:hover { color: var(--foreground); background: var(--surface-soft); }
+.story-toolbar-button svg, .story-back-link svg { flex-shrink: 0; }

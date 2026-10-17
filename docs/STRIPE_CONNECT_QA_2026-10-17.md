@@ -78,3 +78,9 @@ App commit `3887fa5` was pushed and deployed on 2026-10-17 as Fly v42 in Singapo
 Thirteen live checks passed: health, home, about, login, signup, a published story, wallet page/API authentication, private payment-return/status authentication, rejected disabled checkout, anonymous legacy purchase rejection and unsigned webhook rejection. Fly's health check passes. Production dependency audit reported zero known vulnerabilities.
 
 Deployment is complete. Actual-provider purchase validation is not complete; no successful Stripe checkout or author earnings from a purchase are asserted by this release record.
+
+## User-requested deployed sandbox activation
+
+The user will perform manual purchase verification and requested checkout activation on the deployed app. Stage `STRIPE_MODE=test`, test secret and dedicated endpoint signing secret, `STRIPE_WALLET_ENABLED=true`, `STRIPE_CHECKOUT_ENABLED=true`, `STRIPE_CONNECT_COUNTRIES=SG`, and `STRIPE_PAYOUT_CONTROLS_ENABLED=false` in Fly. Secrets are excluded from the repository and logs. A dedicated connected-account endpoint targets `https://talerooms.fly.dev/api/wallet/webhook` for 11 wallet/checkout events; the local CLI secret is not reused.
+
+This supersedes the earlier production-host checkout-off configuration, but does not enable live billing or certify the full purchase journey. Incomplete authors remain blocked by provider readiness checks. Local author/payment records do not transfer to the deployed database; complete onboarding from the deployed wallet for deployed purchases.

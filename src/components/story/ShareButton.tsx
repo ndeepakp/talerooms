@@ -30,9 +30,11 @@ export function ShareButton({ title }: { title: string }) {
     <button
       type="button"
       onClick={share}
-      className="inline-flex items-center gap-1.5 rounded-full border border-ui-strong px-3 py-1.5 text-sm font-medium text-ink-soft transition-colors hover:bg-surface-soft"
+      className="story-toolbar-button"
     >
-      <span aria-hidden="true">{copied ? "✓" : "↗"}</span>
+      <svg aria-hidden="true" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.7" strokeLinecap="round" strokeLinejoin="round">
+        {copied ? <path d="m5 12 4 4L19 6" /> : <><path d="M12 16V3m-4 4 4-4 4 4" /><path d="M5 13v6a2 2 0 0 0 2 2h10a2 2 0 0 0 2-2v-6" /></>}
+      </svg>
       {copied ? "Link copied" : "Share"}
     </button>
   );

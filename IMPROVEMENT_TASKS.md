@@ -4,11 +4,11 @@ Updated: **2026-10-17**. Complete and validate each task before advancing.
 
 ## Current state
 
-- **Active task:** Payments (`TASK-PAY-01`). Sandbox wallet connection and gated Stripe checkout code are deployed; production Stripe checkout is disabled and actual-provider end-to-end validation is pending.
+- **Active task:** Payments (`TASK-PAY-01`). Stripe sandbox checkout is being enabled on the deployed site for user-led manual validation. Live billing and app withdrawals remain disabled; actual-provider end-to-end validation is pending.
 - **Latest pushed app commit:** `3887fa5` — gated Stripe checkout/order fulfillment, sandbox connection tooling and expanded payment validation.
 - **Last recorded production release:** `3887fa5`, Fly v42 — migration `0051` applied; Stripe checkout explicitly disabled in production.
 - **Validation:** 178 standard tests and 13 local database integration tests passed; lint, TypeScript and production build passed. Thirteen live release smoke checks passed. These do not constitute a completed actual-provider purchase journey.
-- **Provider dependency:** Singapore Stripe merchant account, approved author countries and confirmed payout controls are needed for real provider testing. No real charges or payouts are enabled.
+- **Provider dependency:** Singapore Stripe merchant account, approved author countries and confirmed payout controls are needed for real provider testing. No live charges or payouts are enabled.
 
 Use **Done** to track completed work by date and **Pending** to track the remaining implementation, validation and release steps. A completed portion of an in-progress task does not mark the whole task complete. GitHub delivery and production deployment are tracked separately.
 
@@ -17,6 +17,16 @@ Use **Done** to track completed work by date and **Pending** to track the remain
 ## Done
 
 Checked items describe implemented/validated work or completed planning, with delivery noted separately. Real payments, rewards, language discovery, audio and the under-18 experience are not marked complete.
+
+### 2026-10-17: Deployed sandbox activation and UI polish
+
+**Release preparation:** User requested sandbox activation and will verify the purchase flow manually. Stage only test-mode credentials in Fly; register a dedicated connected-account webhook for the deployed site. Enable checkout and wallet onboarding for SG, with app withdrawals disabled. Full purchase validation remains pending and must not be described as passed.
+
+- [x] Replace onboarding's overlapping focus outline and native required tooltip with a rounded field focus treatment, associated inline validation and first-invalid-field focus.
+- [x] Align story action buttons with matching 44px controls and SVG icons; replace “Your feed” with a clear “Back to feed” link. Apply the same navigation treatment to public stories.
+- [x] Validate desktop/320px/390px layouts, collection-picker opening/Escape, TypeScript, targeted lint and 181 standard tests (13 opt-in DB tests skipped in this pass).
+- [x] Register a dedicated test-mode connected-account webhook for 11 wallet/checkout events and stage Fly configuration securely. Do not reuse the local CLI webhook secret.
+- [ ] Record deployed activation health/configuration checks; user to complete Stripe author onboarding and manually verify actual sandbox purchase, signed fulfillment, chapter access and earnings.
 
 ### 2026-10-17: Stripe sandbox connection
 

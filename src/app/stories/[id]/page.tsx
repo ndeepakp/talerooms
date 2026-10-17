@@ -1,3 +1,4 @@
+import { StoryBackLink } from "@/components/story/StoryBackLink";
 import { stripeCheckoutEnabled } from "@/lib/payments/checkout-config";
 import Link from "next/link";
 import { notFound, redirect } from "next/navigation";
@@ -422,9 +423,9 @@ export default async function StoryPage({
     <main className="min-h-screen w-full bg-[var(--page)] px-5 py-8 text-ink sm:px-8 sm:py-12">
       {!isAuthor && <ViewTracker storyId={story.id} />}
       <article className="mx-auto w-full max-w-6xl">
-        <div className="mb-8 flex flex-wrap items-center justify-between gap-4">
-          <Link href="/feed" className="py-2 text-sm text-muted hover:text-ink">← Your feed</Link>
-          <div className="flex flex-wrap items-center gap-4">
+        <div className="story-toolbar">
+          <StoryBackLink href="/feed">Back to feed</StoryBackLink>
+          <div className="flex flex-wrap items-center gap-2">
             <ShareButton title={story.title} />
             {story.status === "published" && <SaveToCollection storyId={story.id} />}
             {isAuthor && <><Link href={`/stories/${story.id}/edit`} className="py-2 text-sm font-medium hover:underline">Edit story</Link><DeleteStoryButton storyId={story.id} redirectTo="/feed" /></>}

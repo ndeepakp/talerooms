@@ -1,6 +1,6 @@
 "use client";
 
-import { useEffect, useState } from "react";
+import { useEffect, useRef, useState } from "react";
 import { useRouter } from "next/navigation";
 
 type Genre = { id: number; name: string };
@@ -13,6 +13,9 @@ export function OnboardingForm({ genres, initialName }: { genres: Genre[]; initi
   const [username, setUsername] = useState("");
   const [selected, setSelected] = useState<number[]>([]);
   const [error, setError] = useState<string | null>(null);
+  const nameInput = useRef<HTMLInputElement>(null);
+  const handleInput = useRef<HTMLInputElement>(null);
+  const [fieldErrors, setFieldErrors] = useState<{ name?: string; handle?: string }>({});
   const [loading, setLoading] = useState(false);
   // Realtime handle availability: { user, available } for the latest checked
   // handle. Derived display compares against the current input.
@@ -56,6 +59,16 @@ export function OnboardingForm({ genres, initialName }: { genres: Genre[]; initi
   async function handleSubmit(e: React.FormEvent) {
     e.preventDefault();
     setError(null);
+    const errors = {
+      name: name.trim() ? undefined : "What should we call you? Enter your display name.",
+      handle: !handle ? "Choose a handle so readers can find you."
+        : !/^[A-Za-z0-9_]{3,20}$/.test(handle) ? "Use 3–20 letters, numbers or underscores." : undefined,
+    };
+    setFieldErrors(errors);
+    if (errors.name || errors.handle) {
+      (errors.name ? nameInput : handleInput).current?.focus();
+      return;
+    }
 
     if (selected.length < MIN_GENRES) {
       setError(`Please pick at least ${MIN_GENRES} genres you enjoy.`);
@@ -66,18 +79,19 @@ export function OnboardingForm({ genres, initialName }: { genres: Genre[]; initi
 
     try {
     // Check the handle is free before saving the profile.
-    const check = await fetch(`/api/username-check?u=${encodeURIComponent(username)}`);
+    const check = await fetch(`/api/username-check?u=${encodeURIComponent(handle)}`);
     const checkData = await check.json().catch(() => ({}));
     if (!checkData.available) {
       setLoading(false);
-      setError(checkData.error ?? `$${username} is already taken.`);
+      setFieldErrors({ handle: checkData.error ?? `$${handle} is already taken. Try another handle.` });
+      handleInput.current?.focus();
       return;
     }
 
     const res = await fetch("/api/me/profile", {
       method: "PUT",
       headers: { "Content-Type": "application/json" },
-      body: JSON.stringify({ name, username, bio: "", genreIds: selected }),
+      body: JSON.stringify({ name: name.trim(), username: handle, bio: "", genreIds: selected }),
     });
     setLoading(false);
     if (!res.ok) {
@@ -98,42 +112,40 @@ export function OnboardingForm({ genres, initialName }: { genres: Genre[]; initi
         <h1 className="text-center text-2xl font-bold text-ink">
           Make yourself at home
         </h1>
-        <form onSubmit={handleSubmit} className="mt-8 flex flex-col gap-4">
-          <Field label="Display name" value={name} onChange={setName} type="text" placeholder="Jane Writer" />
+        <form noValidate onSubmit={handleSubmit} className="mt-8 flex flex-col gap-4">
+          <Field label="Display name" value={name} inputRef={nameInput} error={fieldErrors.name}
+            onChange={(value) => { setName(value); setFieldErrors((prev) => ({ ...prev, name: undefined })); }}
+            type="text" placeholder="Jane Writer" />
 
           <label className="flex flex-col gap-1.5 text-left">
-            <span className="text-sm font-medium text-ink-soft">Handle</span>
-            <div className="flex items-center rounded-lg border border-ui-strong bg-surface-raised pl-3 focus-within:border-zinc-900 dark:bg-zinc-950 dark:focus-within:border-ui-strong">
-              <span className="text-muted">$</span>
+            <span id="onboarding-handle-label" className="text-sm font-medium text-ink-soft">Handle</span>
+            <div className="onboarding-input-shell flex items-center gap-1 rounded-xl border border-ui-strong bg-surface-raised px-3" data-invalid={!!fieldErrors.handle || handleHint?.tone === "bad"}>
+              <span aria-hidden="true" className="select-none text-muted">$</span>
               <input
+                ref={handleInput}
                 type="text"
+                name="username"
+                aria-labelledby="onboarding-handle-label"
+                autoCapitalize="none"
+                autoCorrect="off"
+                spellCheck={false}
+                aria-describedby="onboarding-handle-hint"
+                aria-invalid={!!fieldErrors.handle || handleHint?.tone === "bad"}
                 value={username}
-                onChange={(e) => setUsername(e.target.value.replace(/[^A-Za-z0-9_]/g, ""))}
+                onChange={(e) => { setUsername(e.target.value.replace(/[^A-Za-z0-9_]/g, "")); setFieldErrors((prev) => ({ ...prev, handle: undefined })); }}
                 placeholder="JaneWriter"
                 required
                 minLength={3}
                 maxLength={20}
-                className="h-11 flex-1 bg-transparent px-1 text-ink outline-none dark:text-zinc-100"
+                className="h-12 min-w-0 flex-1 bg-transparent text-ink placeholder:text-subtle"
               />
             </div>
-            {handleHint ? (
-              <span
-                className={
-                  "text-xs " +
-                  (handleHint.tone === "ok"
-                    ? "text-success"
-                    : handleHint.tone === "bad"
-                      ? "text-danger"
-                      : "text-muted")
-                }
-              >
-                {handleHint.text}
-              </span>
-            ) : (
-              <span className="text-xs text-muted">
-                People find you with ${username || "handle"}.
-              </span>
-            )}
+            <span id="onboarding-handle-hint" aria-live="polite" className={
+              "text-xs leading-relaxed " + (fieldErrors.handle || handleHint?.tone === "bad"
+                ? "text-danger" : handleHint?.tone === "ok" ? "text-success" : "text-muted")
+            }>
+              {fieldErrors.handle ?? handleHint?.text ?? "Your unique name on Talerooms. Letters, numbers and underscores."}
+            </span>
           </label>
 
 
@@ -167,7 +179,7 @@ export function OnboardingForm({ genres, initialName }: { genres: Genre[]; initi
             </div>
           </div>
 
-          {error && <p className="text-sm text-danger">{error}</p>}
+          {error && <p role="alert" className="text-sm text-danger">{error}</p>}
           <button
             type="submit"
             disabled={loading || handleHint?.tone === "bad"}
@@ -188,24 +200,36 @@ function Field({
   onChange,
   type,
   placeholder,
+  inputRef,
+  error,
 }: {
   label: string;
   value: string;
   onChange: (v: string) => void;
   type: string;
   placeholder?: string;
+  inputRef: React.Ref<HTMLInputElement>;
+  error?: string;
 }) {
   return (
     <label className="flex flex-col gap-1.5 text-left">
-      <span className="text-sm font-medium text-ink-soft">{label}</span>
-      <input
-        type={type}
-        value={value}
-        onChange={(e) => onChange(e.target.value)}
-        placeholder={placeholder}
-        required
-        className="h-11 rounded-lg border border-ui-strong bg-surface-raised px-3 text-ink outline-none focus:border-zinc-900 dark:bg-zinc-950 dark:text-zinc-100 dark:focus:border-ui-strong"
-      />
+      <span id="onboarding-name-label" className="text-sm font-medium text-ink-soft">{label}</span>
+      <div className="onboarding-input-shell rounded-xl border border-ui-strong bg-surface-raised px-3" data-invalid={!!error}>
+        <input
+          ref={inputRef}
+          aria-labelledby="onboarding-name-label"
+          type={type}
+          value={value}
+          onChange={(e) => onChange(e.target.value)}
+          placeholder={placeholder}
+          required
+          autoComplete="name"
+          aria-invalid={!!error}
+          aria-describedby={error ? "onboarding-name-error" : undefined}
+          className="h-12 w-full min-w-0 bg-transparent text-ink placeholder:text-subtle"
+        />
+      </div>
+      {error && <span id="onboarding-name-error" role="alert" className="text-xs leading-relaxed text-danger">{error}</span>}
     </label>
   );
 }

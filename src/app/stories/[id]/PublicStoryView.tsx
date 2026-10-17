@@ -1,3 +1,4 @@
+import { StoryBackLink } from "@/components/story/StoryBackLink";
 import Link from "next/link";
 import { PublicNavigation, PublicFooter } from "@/components/layout/PublicNavigation";
 import { ChapterReader } from "@/components/reader/ChapterReader";
@@ -50,7 +51,7 @@ export function PublicStoryView({ story, chapters, readMinutes, totalWords, view
     <PublicNavigation />
     <main className="mx-auto w-full max-w-6xl px-5 pb-12 pt-4 sm:px-8 sm:pb-20">
       <article>
-        <div className="mb-8 flex items-center justify-between gap-4"><Link href="/#stories" className="py-2 text-sm text-muted hover:text-ink">← Explore stories</Link><ShareButton title={story.title} /></div>
+        <div className="story-toolbar"><StoryBackLink href="/#stories">Explore stories</StoryBackLink><ShareButton title={story.title} /></div>
         <StoryOverview
           story={{title:story.title,author:story.author,authorHref,authorImage:story.author_image,coverUrl:story.cover_url,coverStyle:story.cover_style,genres:story.genres}}
           readMinutes={readMinutes} totalWords={totalWords} views={views}

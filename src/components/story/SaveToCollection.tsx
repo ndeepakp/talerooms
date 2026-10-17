@@ -90,9 +90,9 @@ export function SaveToCollection({ storyId }: { storyId: string }) {
         type="button"
         onClick={toggleOpen}
         aria-expanded={open}
-        className="flex h-11 items-center gap-2 rounded-full border border-ui-strong px-4 text-sm font-medium text-ink-soft transition-colors hover:bg-surface-soft"
+        className="story-toolbar-button"
       >
-        <span aria-hidden="true">＋</span>
+        <svg aria-hidden="true" width="18" height="18" viewBox="0 0 24 24" fill={loaded && savedCount > 0 ? "currentColor" : "none"} stroke="currentColor" strokeWidth="1.7" strokeLinecap="round" strokeLinejoin="round"><path d="M6 4a1 1 0 0 1 1-1h10a1 1 0 0 1 1 1v17l-6-4-6 4Z" /></svg>
         {loaded && savedCount > 0 ? `Saved (${savedCount})` : "Save to collection"}
       </button>
 

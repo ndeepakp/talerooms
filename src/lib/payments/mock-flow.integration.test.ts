@@ -29,6 +29,16 @@ async function fixture(test:(tx:postgres.TransactionSql,ids:{author:string;reade
 function req(body:unknown){return new Request('http://localhost:3000/api/test',{method:'POST',headers:{'content-type':'application/json'},body:JSON.stringify(body)});}
 function params(id:string){return {params:Promise.resolve({id})};}
 describe.skipIf(!enabled)('mock payment flow through actual handlers and PostgreSQL',()=>{
+  it('blocks mock subscriptions in Stripe mode without granting or renewing access',async()=>fixture(async(tx,{author,reader})=>{
+    vi.stubEnv('STRIPE_CHECKOUT_ENABLED','true');
+    expect((await subscribe(req({}),params(author))).status).toBe(409);
+    expect(await tx`SELECT * FROM subscriptions WHERE author_id=${author} AND subscriber_id=${reader}`).toHaveLength(0);
+    await tx`INSERT INTO subscriptions(subscriber_id,author_id,amount,expires_at,cancelled) VALUES(${reader},${author},25,now()+interval '2 days',true)`;
+    const [before]=await tx`SELECT * FROM subscriptions WHERE author_id=${author} AND subscriber_id=${reader}`;
+    expect((await subscribe(req({}),params(author))).status).toBe(409);
+    const [after]=await tx`SELECT * FROM subscriptions WHERE author_id=${author} AND subscriber_id=${reader}`;
+    expect(after.expires_at).toEqual(before.expires_at);expect(after.cancelled).toBe(true);
+  }));
   it('whole-story payment uses server prices, grants access and supports discounted expired renewal',async()=>fixture(async(tx,{story,reader})=>{
     const response=await purchase(req({scope:'whole',duration:'1h',amount:1,currency:'USD'}),params(story));expect(response.status).toBe(200);expect(await response.json()).toEqual({ok:true,total:100});
     const [grant]=await tx`SELECT * FROM access_grants WHERE story_id=${story} AND user_id=${reader}`;expect(grant.scope).toBe('whole');expect(grant.amount).toBe(100);expect(grant.expires_at.getTime()-Date.now()).toBeGreaterThan(3500000);

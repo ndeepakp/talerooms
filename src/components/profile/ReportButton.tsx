@@ -79,7 +79,7 @@ export function ReportButton({ userId }: { userId: string }) {
         <select
           value={reason}
           onChange={(e) => setReason(e.target.value)}
-          className="mt-1 h-9 w-full rounded-lg border border-ui-strong bg-surface-raised px-2 text-sm text-ink outline-none"
+          className="mt-1 min-h-11 w-full rounded-lg border border-ui-strong bg-surface-raised px-2 text-sm text-ink outline-none"
         >
           {REASONS.map((r) => (
             <option key={r} value={r}>
@@ -90,6 +90,7 @@ export function ReportButton({ userId }: { userId: string }) {
       </label>
 
       <textarea
+        aria-label="Report details (optional)"
         value={details}
         onChange={(e) => setDetails(e.target.value)}
         rows={3}
@@ -105,14 +106,14 @@ export function ReportButton({ userId }: { userId: string }) {
           type="button"
           onClick={submit}
           disabled={submitting}
-          className="rounded-full btn-primary px-4 py-1.5 text-xs font-medium disabled:opacity-50"
+          className="min-h-11 rounded-full btn-primary px-4 py-1.5 text-xs font-medium disabled:opacity-50"
         >
           {submitting ? "Submitting…" : "Submit report"}
         </button>
         <button
           type="button"
           onClick={() => setOpen(false)}
-          className="rounded-full px-3 py-1.5 text-xs font-medium text-muted hover:bg-surface-soft"
+          className="min-h-11 rounded-full px-3 py-1.5 text-xs font-medium text-muted hover:bg-surface-soft"
         >
           Cancel
         </button>

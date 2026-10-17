@@ -16,11 +16,13 @@ export function SubscribeButton({
   price,
   initialDaysLeft,
   initialCancelled,
+  stripeCheckout = false,
 }: {
   authorId: string;
   price: number;
   initialDaysLeft: number | null;
   initialCancelled: boolean;
+  stripeCheckout?: boolean;
 }) {
   const router = useRouter();
   const [daysLeft, setDaysLeft] = useState(initialDaysLeft);
@@ -30,6 +32,7 @@ export function SubscribeButton({
   const active = daysLeft !== null && daysLeft > 0;
 
   async function subscribe() {
+    if (stripeCheckout) return;
     // No payment prompt while access is still active (e.g. resuming a cancel).
     if (!active) {
       if (!window.confirm(`Mock payment: subscribe for ${formatPrice(price)} / 30 days?`)) {
@@ -65,6 +68,13 @@ export function SubscribeButton({
     } else { setError(res.error); }
   }
 
+  if (stripeCheckout && !active) {
+    return <div className="flex w-full flex-col gap-3">
+      <a href="#works" className="btn-primary">Explore stories</a>
+      <p className="text-xs text-muted">Subscriptions coming soon</p>
+    </div>;
+  }
+
   if (active) {
     return (
       <div className="flex max-w-full flex-col items-start gap-1 sm:items-end">
@@ -74,19 +84,20 @@ export function SubscribeButton({
             <span className="rounded-full bg-warning-soft px-3 py-1 text-xs font-medium text-warning">
               Access for {daysLeft}d · won&apos;t renew
             </span>
-            <button
+            {!stripeCheckout && <button
               type="button"
               onClick={subscribe}
               disabled={loading}
               className="min-h-11 px-1 text-xs text-muted underline hover:text-ink-soft disabled:opacity-50"
             >
               Resume subscription
-            </button>
+            </button>}
+            {stripeCheckout && <span className="text-xs leading-relaxed text-muted">Existing demo access remains until it expires. Renewal is unavailable.</span>}
           </>
         ) : (
           <>
             <span className="rounded-full bg-success-soft px-3 py-1 text-xs font-medium text-success">
-              Subscribed · {daysLeft}d left
+              {stripeCheckout ? "Demo access" : "Subscribed"} · {daysLeft}d left
             </span>
             <button
               type="button"

@@ -1,6 +1,6 @@
 "use client";
 
-import { useState } from "react";
+import { useRef, useState } from "react";
 import { useRouter } from "next/navigation";
 import { CURRENCY } from "@/lib/pricing";
 import { AvatarUpload } from "@/components/profile/AvatarUpload";
@@ -39,6 +39,10 @@ export function ProfileForm({
   );
   const [selected, setSelected] = useState<number[]>(profile.genreIds);
   const [error, setError] = useState<string | null>(null);
+  const nameInput = useRef<HTMLInputElement>(null);
+  const handleInput = useRef<HTMLInputElement>(null);
+  const priceInput = useRef<HTMLInputElement>(null);
+  const [fieldErrors, setFieldErrors] = useState<{ name?: string; handle?: string; price?: string }>({});
   const [loading, setLoading] = useState(false);
 
   function toggleGenre(id: number) {
@@ -50,6 +54,17 @@ export function ProfileForm({
   async function handleSubmit(e: React.FormEvent) {
     e.preventDefault();
     setError(null);
+    const errors = {
+      name: name.trim() ? undefined : "Enter your display name.",
+      handle: /^[A-Za-z0-9_]{3,20}$/.test(username) ? undefined : "Use 3–20 letters, numbers or underscores.",
+      price: subscriptionPrice === "" || (/^\d+$/.test(subscriptionPrice) && Number.isSafeInteger(Number(subscriptionPrice)) && Number(subscriptionPrice) <= 2147483647)
+        ? undefined : "Enter a whole number of 0 or more.",
+    };
+    setFieldErrors(errors);
+    if (errors.name || errors.handle || errors.price) {
+      (errors.name ? nameInput : errors.handle ? handleInput : priceInput).current?.focus();
+      return;
+    }
 
     if (selected.length < MIN_GENRES) {
       setError(`Please pick at least ${MIN_GENRES} genres you enjoy.`);
@@ -57,11 +72,12 @@ export function ProfileForm({
     }
 
     setLoading(true);
+    try {
     const res = await fetch("/api/me/profile", {
       method: "PUT",
       headers: { "Content-Type": "application/json" },
       body: JSON.stringify({
-        name,
+        name: name.trim(),
         username,
         bio,
         about,
@@ -78,6 +94,8 @@ export function ProfileForm({
 
     router.push(`/${username || profile.id}`);
     router.refresh();
+    } catch { setError("Could not connect. Please try again."); }
+    finally { setLoading(false); }
   }
 
   return (
@@ -96,37 +114,52 @@ export function ProfileForm({
           </div>
         </div>
 
-        <form onSubmit={handleSubmit} className="mt-6 flex flex-col gap-4">
+        <form noValidate onSubmit={handleSubmit} className="mt-6 flex flex-col gap-4">
           <label className="flex flex-col gap-1.5 text-left">
             <span className="text-sm font-medium text-ink-soft">
               Display name
             </span>
             <input
+              ref={nameInput}
+              aria-label="Display name"
+              aria-invalid={!!fieldErrors.name}
+              aria-describedby={fieldErrors.name ? "profile-name-error" : undefined}
+              autoComplete="name"
               type="text"
               value={name}
-              onChange={(e) => setName(e.target.value)}
+              onChange={(e) => { setName(e.target.value); setFieldErrors(prev => ({ ...prev, name: undefined })); }}
               required
               className="h-11 rounded-lg border border-ui-strong bg-surface-raised px-3 text-ink outline-none focus:border-accent"
             />
+            {fieldErrors.name && <span id="profile-name-error" role="alert" className="text-xs text-danger">{fieldErrors.name}</span>}
           </label>
 
           <label className="flex flex-col gap-1.5 text-left">
             <span className="text-sm font-medium text-ink-soft">
               Handle
             </span>
-            <div className="flex items-center rounded-lg border border-ui-strong bg-surface-raised pl-3 focus-within:border-accent">
-              <span className="text-muted">$</span>
+            <div className="field-shell flex items-center rounded-xl border border-ui-strong bg-surface-raised pl-3" data-invalid={!!fieldErrors.handle}>
+              <span aria-hidden="true" className="shrink-0 select-none text-muted">$</span>
               <input
+                ref={handleInput}
+                aria-label="Handle"
+                aria-describedby="profile-handle-hint"
+                aria-invalid={!!fieldErrors.handle}
+                autoCapitalize="none"
+                autoCorrect="off"
+                spellCheck={false}
+                minLength={3}
+                maxLength={20}
                 type="text"
                 value={username}
-                onChange={(e) => setUsername(e.target.value.replace(/[^A-Za-z0-9_]/g, ""))}
+                onChange={(e) => { setUsername(e.target.value.replace(/[^A-Za-z0-9_]/g, "")); setFieldErrors(prev => ({ ...prev, handle: undefined })); }}
                 required
                 placeholder="Deepak"
-                className="h-11 flex-1 bg-transparent px-1 text-ink outline-none"
+                className="h-12 min-w-0 flex-1 bg-transparent px-2 text-ink"
               />
             </div>
-            <span className="text-xs text-muted">
-              3–20 letters, numbers, or underscores. People find you with ${username || "handle"}.
+            <span id="profile-handle-hint" aria-live="polite" className={`text-xs leading-relaxed ${fieldErrors.handle ? "text-danger" : "text-muted"}`}>
+              {fieldErrors.handle ?? `3–20 letters, numbers or underscores. People find you with $${username || "handle"}.`}
             </span>
           </label>
 
@@ -168,22 +201,25 @@ export function ProfileForm({
               Subscription price{" "}
               <span className="font-normal text-muted">(optional)</span>
             </span>
-            <div className="flex items-center rounded-lg border border-ui-strong bg-surface-raised pl-3 focus-within:border-accent">
-              <span className="text-muted">{CURRENCY}</span>
+            <div className="field-shell flex items-center gap-2 rounded-xl border border-ui-strong bg-surface-raised px-3" data-invalid={!!fieldErrors.price}>
+              <span aria-hidden="true" className="shrink-0 text-muted">{CURRENCY}</span>
               <input
-                type="number"
-                min={0}
+                ref={priceInput}
+                aria-label="Subscription price"
+                aria-describedby="profile-price-hint"
+                aria-invalid={!!fieldErrors.price}
+                type="text"
+                inputMode="numeric"
+                autoComplete="off"
                 value={subscriptionPrice}
-                onChange={(e) => setSubscriptionPrice(e.target.value)}
+                onChange={(e) => { setSubscriptionPrice(e.target.value); setFieldErrors(prev => ({ ...prev, price: undefined })); }}
                 placeholder="0"
-                className="h-11 flex-1 bg-transparent px-2 text-ink outline-none"
+                className="h-12 min-w-0 flex-1 bg-transparent text-ink"
               />
-              <span className="px-3 text-sm text-muted">/ 30 days</span>
+              <span className="shrink-0 border-l border-ui pl-3 text-sm text-muted">/ 30 days</span>
             </div>
-            <span className="text-xs text-muted">
-              Set a price to offer a subscription. Subscribers can read all your
-              private chapters while their subscription is active. Leave blank or
-              0 to not offer one.
+            <span id="profile-price-hint" aria-live="polite" className={`text-xs leading-relaxed ${fieldErrors.price ? "text-danger" : "text-muted"}`}>
+              {fieldErrors.price ?? "Planned price in INR for 30 days. Recurring Stripe subscriptions are coming soon; saving a price does not enable checkout. Leave blank or enter 0 to turn it off."}
             </span>
           </label>
 
@@ -201,6 +237,7 @@ export function ProfileForm({
                   <button
                     type="button"
                     key={g.id}
+                    aria-pressed={active}
                     onClick={() => toggleGenre(g.id)}
                     className={
                       "rounded-full border px-3 py-1.5 text-sm transition-colors " +
@@ -216,7 +253,7 @@ export function ProfileForm({
             </div>
           </div>
 
-          {error && <p className="text-sm text-danger">{error}</p>}
+          {error && <p role="alert" className="text-sm text-danger">{error}</p>}
           <button
             type="submit"
             disabled={loading}

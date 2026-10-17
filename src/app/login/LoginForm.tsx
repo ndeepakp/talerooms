@@ -1,4 +1,5 @@
 "use client";
+import { ValidatedForm } from "@/components/auth/ValidatedForm";
 
 import { useState } from "react";
 import { useRouter } from "next/navigation";
@@ -37,7 +38,7 @@ export function LoginForm({ googleEnabled, googleError }: { googleEnabled: boole
           Log in to Talerooms
         </h1>
         <GoogleButton enabled={googleEnabled}/>{googleError && <p role="alert" className="text-sm text-danger">Google sign-in was cancelled or could not complete. If you have an email/password account, log in with it; accounts are not merged automatically.</p>}
-        <form onSubmit={handleSubmit} className="mt-8 flex flex-col gap-4">
+        <ValidatedForm onSubmit={handleSubmit} className="mt-8 flex flex-col gap-4">
           <Field label="Email" value={email} onChange={setEmail} type="email" placeholder="you@example.com" />
           <Field label="Password" value={password} onChange={setPassword} type="password" placeholder="Your password" />
           {error && <p className="text-sm text-danger">{error}</p>}
@@ -48,7 +49,7 @@ export function LoginForm({ googleEnabled, googleError }: { googleEnabled: boole
           >
             {loading ? "Logging in…" : "Log in"}
           </button>
-        </form>
+        </ValidatedForm>
         <p className="mt-6 text-center text-sm text-muted">
           New here?{" "}
           <Link href="/signup" className="font-medium text-ink underline">

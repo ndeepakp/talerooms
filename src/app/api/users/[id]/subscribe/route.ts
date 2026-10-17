@@ -1,3 +1,4 @@
+import { stripeCheckoutEnabled } from "@/lib/payments/checkout-config";
 import { NextResponse } from "next/server";
 import { sql } from "@/lib/db";
 import { ApiError, requireSession, withErrors } from "@/lib/http";
@@ -11,6 +12,7 @@ export const POST = withErrors(async (
   _req: Request,
   { params }: { params: Promise<{ id: string }> },
 ) => {
+  if (stripeCheckoutEnabled()) throw new ApiError(409, "Author subscriptions are not available yet. You can purchase chapters or a whole story through Stripe checkout.");
   const { id } = await params;
   const session = await requireSession();
   const me = session.user.id;

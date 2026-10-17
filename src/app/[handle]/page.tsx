@@ -1,3 +1,4 @@
+import { stripeCheckoutEnabled } from "@/lib/payments/checkout-config";
 import Link from "next/link";
 import { notFound } from "next/navigation";
 import type { Metadata } from "next";
@@ -78,6 +79,7 @@ export default async function ProfilePage({
 
   const id = user.id;
   const h = user.username ?? handle;
+  const stripeCheckout = stripeCheckoutEnabled();
   const isSelf = userId === id;
 
   // The viewer's active subscription to this author (days remaining + whether
@@ -193,15 +195,15 @@ export default async function ProfilePage({
           </div>
           {hasSidebar && <aside className={styles.sidebar} aria-label="About and membership">
             {user.subscription_price && user.subscription_price > 0 ? <section id="membership" className={styles.membership} aria-labelledby="membership-heading">
-              <p className={styles.eyebrow}>The reader’s circle</p><h2 id="membership-heading">Stay close to the story.</h2>
-              <p className={styles.price}>{formatPrice(user.subscription_price)} <small>/ 30 days</small></p>
+              <p className={styles.eyebrow}>The reader’s circle</p><h2 id="membership-heading">{stripeCheckout ? "Read at your own pace." : "Stay close to the story."}</h2>
+              {!stripeCheckout && <><p className={styles.price}>{formatPrice(user.subscription_price)} <small>/ 30 days</small></p>
               <ul className={styles.perks}>
                 <li>{restrictedCount > 0 ? `${restrictedCount} ${restrictedCount === 1 ? "story with" : "stories with"} members-only chapters` : "Members-only stories will appear here when published"}</li>
                 <li>Access to this author’s restricted chapters during your membership</li>
-              </ul>
-              <div className={styles.memberAction}>{isSelf ? <Link href={`/${h}/edit`} className="btn-primary">Manage membership</Link> : session ? <SubscribeButton authorId={id} price={user.subscription_price} initialDaysLeft={subDaysLeft} initialCancelled={subCancelled} /> : <Link href="/login" className="btn-primary">Log in to subscribe</Link>}</div>
-              <p className={styles.finePrint}>Membership checkout is currently a demo. No real payment is taken.</p>
-            </section> : isSelf ? <section className={styles.membership}><p className={styles.eyebrow}>Your reader’s circle</p><h2>Make room for your readers.</h2><p className={styles.finePrint}>Add a membership price in your profile when you’re ready to offer members-only chapters.</p><div className={`${styles.memberAction} mt-5`}><Link href={`/${h}/edit`} className="btn-primary">Set up membership</Link></div></section> : null}
+              </ul></>}
+              <div className={`${styles.memberAction} mt-5`}>{isSelf ? <Link href={stripeCheckout ? "/drafts" : `/${h}/edit`} className="btn-primary">{stripeCheckout ? "Manage your stories" : "Manage membership"}</Link> : session ? <SubscribeButton authorId={id} price={user.subscription_price} initialDaysLeft={subDaysLeft} initialCancelled={subCancelled} stripeCheckout={stripeCheckout} /> : stripeCheckout ? <a href="#works" className="btn-primary">Explore stories</a> : <Link href="/login" className="btn-primary">Log in to subscribe</Link>}</div>
+              <p className={styles.finePrint}>{stripeCheckout ? "Recurring memberships are not available yet. Individual chapters and whole stories use Stripe sandbox checkout." : "Membership checkout is currently a demo. No real payment is taken."}</p>
+            </section> : isSelf ? <section className={styles.membership}><p className={styles.eyebrow}>Your reader’s circle</p><h2>Make room for your readers.</h2><p className={styles.finePrint}>{stripeCheckout ? "Recurring memberships are coming soon. You can set prices for individual chapters and whole stories in the writing studio." : "Add a membership price in your profile when you’re ready to offer members-only chapters."}</p><div className={`${styles.memberAction} mt-5`}><Link href={stripeCheckout ? "/write" : `/${h}/edit`} className="btn-primary">{stripeCheckout ? "Write a story" : "Set up membership"}</Link></div></section> : null}
             {user.about && <section className={styles.about}><p className={styles.eyebrow}>Behind the words</p><h2>Meet this voice.</h2><p>{user.about}</p></section>}
           </aside>}
         </div>

@@ -1,4 +1,5 @@
 "use client";
+import { ValidatedForm } from "@/components/auth/ValidatedForm";
 import { useState } from "react";
 import { useRouter } from "next/navigation";
 import Link from "next/link";
@@ -14,7 +15,7 @@ export function SignupForm({ googleEnabled, emailEnabled }: { googleEnabled: boo
       <h1 className="text-center text-3xl font-bold text-ink">Find your people.</h1>
       <p className="mt-3 text-center text-sm text-muted">Create your Talerooms account. Your email is verified before you join the reading room.</p>
       <GoogleButton enabled={googleEnabled}/>
-      <form className="flex flex-col gap-4" onSubmit={async e => {
+      <ValidatedForm className="flex flex-col gap-4" onSubmit={async e => {
         e.preventDefault(); setBusy(true); setError(null);
         const form = new FormData(e.currentTarget);
         try {
@@ -29,7 +30,7 @@ export function SignupForm({ googleEnabled, emailEnabled }: { googleEnabled: boo
         {error && <p role="alert" className="text-sm text-danger">{error}</p>}
         {!emailEnabled && <p className="text-sm text-warning">Email signup is temporarily unavailable. Please try again later.</p>}
         <button disabled={busy || !emailEnabled} className="min-h-12 rounded-full btn-primary px-4 py-3 font-medium disabled:opacity-50">{busy ? "Creating your account…" : "Create account"}</button>
-      </form>
+      </ValidatedForm>
       <p className="mt-6 text-center text-sm text-muted">Already have an account? <Link href="/login" className="text-ink underline">Log in</Link></p>
     </div>
   </main>;

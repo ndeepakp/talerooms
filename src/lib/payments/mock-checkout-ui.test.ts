@@ -67,3 +67,19 @@ describe('mock membership UI flow',()=>{
     vi.mocked(fetch).mockResolvedValue(Response.json({error:'Verify your email'},{status:403}));render(createElement(SubscribeButton,{authorId:'author-qa',price:25,initialDaysLeft:null,initialCancelled:false}));await userEvent.click(screen.getByRole('button',{name:'Subscribe · ₹25/30d'}));expect((await screen.findByRole('alert')).textContent).toBe('Verify your email');expect((screen.getByRole('button',{name:'Subscribe · ₹25/30d'}) as HTMLButtonElement).disabled).toBe(false);expect(refresh).not.toHaveBeenCalled();
   });
 });
+
+
+describe('subscriptions while Stripe checkout is enabled',()=>{
+  it.each([null,0])('never offers a mock purchase for inactive days %s',async days=>{
+    render(createElement(SubscribeButton,{authorId:'author-qa',price:25,initialDaysLeft:days,initialCancelled:false,stripeCheckout:true}));
+    expect(screen.getByText('Subscriptions coming soon')).toBeTruthy();
+    expect(screen.queryByRole('button',{name:/Subscribe/})).toBeNull();
+    expect(window.confirm).not.toHaveBeenCalled();expect(fetch).not.toHaveBeenCalled();
+  });
+  it('preserves existing demo access but never offers mock renewal',()=>{
+    render(createElement(SubscribeButton,{authorId:'author-qa',price:25,initialDaysLeft:2,initialCancelled:true,stripeCheckout:true}));
+    expect(screen.getByText(/Access for 2d/)).toBeTruthy();
+    expect(screen.queryByRole('button',{name:'Resume subscription'})).toBeNull();
+    expect(window.confirm).not.toHaveBeenCalled();expect(fetch).not.toHaveBeenCalled();
+  });
+});

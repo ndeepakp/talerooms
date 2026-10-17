@@ -135,6 +135,7 @@ export function SaveToCollection({ storyId }: { storyId: string }) {
               value={newName}
               onChange={(e) => setNewName(e.target.value)}
               onKeyDown={(e) => e.key === "Enter" && createAndAdd()}
+              aria-label="New collection name"
               placeholder="New collection…"
               maxLength={80}
               className="h-11 min-w-0 flex-1 rounded-lg border border-ui-strong bg-surface-raised px-2 text-sm text-ink outline-none focus:border-accent"

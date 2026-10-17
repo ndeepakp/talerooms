@@ -63,7 +63,7 @@ export function LibraryShelf({ stories, collections }: { stories: LibraryStory[]
           </button>)}
         </nav>
         <div className={styles.tools}>
-          <label className={styles.search}><span aria-hidden="true">⌕</span><input aria-label="Search your library" placeholder="Search books or authors…" value={search} onChange={e => setSearch(e.target.value)} type="search" /></label>
+          <label className={`${styles.search} field-shell`}><span aria-hidden="true">⌕</span><input aria-label="Search your library" placeholder="Search books or authors…" value={search} onChange={e => setSearch(e.target.value)} type="search" /></label>
           {collections.length > 0 && <label className={styles.collection}><span className="sr-only">Choose a collection</span><select value={collection} onChange={e => { setCollection(e.target.value); if (e.target.value) setFilter("collections"); }}><option value="">All collections</option>{collections.map(c => <option key={c.id} value={c.id}>{c.name}</option>)}</select></label>}
         </div>
         {filter === "purchased" && <p className={styles.note}>Access can cover a chapter or the whole story. Expired purchases stay on this shelf.</p>}

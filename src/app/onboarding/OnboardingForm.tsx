@@ -119,7 +119,7 @@ export function OnboardingForm({ genres, initialName }: { genres: Genre[]; initi
 
           <label className="flex flex-col gap-1.5 text-left">
             <span id="onboarding-handle-label" className="text-sm font-medium text-ink-soft">Handle</span>
-            <div className="onboarding-input-shell flex items-center gap-1 rounded-xl border border-ui-strong bg-surface-raised px-3" data-invalid={!!fieldErrors.handle || handleHint?.tone === "bad"}>
+            <div className="field-shell flex items-center gap-1 rounded-xl border border-ui-strong bg-surface-raised px-3" data-invalid={!!fieldErrors.handle || handleHint?.tone === "bad"}>
               <span aria-hidden="true" className="select-none text-muted">$</span>
               <input
                 ref={handleInput}
@@ -214,7 +214,7 @@ function Field({
   return (
     <label className="flex flex-col gap-1.5 text-left">
       <span id="onboarding-name-label" className="text-sm font-medium text-ink-soft">{label}</span>
-      <div className="onboarding-input-shell rounded-xl border border-ui-strong bg-surface-raised px-3" data-invalid={!!error}>
+      <div className="field-shell rounded-xl border border-ui-strong bg-surface-raised px-3" data-invalid={!!error}>
         <input
           ref={inputRef}
           aria-labelledby="onboarding-name-label"

@@ -144,16 +144,32 @@ body {
 input::placeholder, textarea::placeholder { color: var(--muted); opacity: 1; }
 input, textarea { caret-color: var(--accent); }
 input[type="checkbox"], input[type="radio"] { accent-color: var(--accent); }
+/* Keep number fields consistent across browsers; arrow-key stepping remains. */
+input[type="number"] { appearance: textfield; }
+input[type="number"]::-webkit-inner-spin-button,
+input[type="number"]::-webkit-outer-spin-button { appearance: none; margin: 0; }
 
 /* Status borders are quieter than the corresponding readable status text. */
 @utility border-success { border-color: var(--success-border); }
 @utility border-warning { border-color: var(--warning-border); }
 @utility border-danger { border-color: var(--danger-border); }
 
-/* Visible keyboard focus is shared by links, controls and shelf previews. */
-:where(a, button, input, textarea, select, summary):focus-visible {
+/* Text fields use a ring on their own rounded boundary. Composite controls
+   put that ring on .field-shell instead, never on the inner input. */
+:where(a, button, summary, input[type="checkbox"], input[type="radio"], input[type="range"], input[type="file"]):focus-visible {
   outline: 2px solid var(--accent);
-  outline-offset: 4px;
+  outline-offset: 3px;
+}
+:where(input, textarea, select):not([type="checkbox"], [type="radio"], [type="range"], [type="file"], [type="hidden"]):focus-visible {
+  outline: 2px solid transparent;
+  outline-offset: 2px;
+  border-color: var(--accent);
+  box-shadow: 0 0 0 3px color-mix(in srgb, var(--accent) 16%, transparent);
+}
+:where(input, textarea, select) { min-width: 0; }
+:where(input, textarea, select)[aria-invalid="true"] { border-color: var(--danger); }
+:where(input, textarea, select)[aria-invalid="true"]:focus-visible {
+  box-shadow: 0 0 0 3px color-mix(in srgb, var(--danger) 14%, transparent);
 }
 
 .app-header {
@@ -468,25 +484,29 @@ input[type="checkbox"], input[type="radio"] { accent-color: var(--accent); }
 /* iOS Safari zooms focused text controls below 16px. Keep mobile forms at
    the page scale, including compact search and editor controls. */
 @media (max-width: 767px), (max-width: 900px) and (max-height: 500px) {
-  input:not([type="checkbox"]):not([type="radio"]):not([type="range"]):not([type="color"]):not([type="file"]):not([type="hidden"]):not([type="button"]):not([type="submit"]),
+  input:not([type="checkbox"]):not([type="radio"]):not([type="range"]):not([type="color"]):not([type="file"]):not([type="hidden"]):not([type="button"]):not([type="submit"]):not([autocomplete="one-time-code"]),
   textarea, select { font-size: 16px !important; }
 }
 
-/* Composite onboarding fields own the focus treatment, including the prefix. */
-.onboarding-input-shell {
+/* Shared composite fields own focus treatment, including prefixes/suffixes. */
+.field-shell {
   transition: border-color 150ms ease, box-shadow 150ms ease;
 }
-.onboarding-input-shell:focus-within {
+.field-shell:focus-within {
   border-color: var(--accent);
   box-shadow: 0 0 0 3px color-mix(in srgb, var(--accent) 14%, transparent);
 }
-.onboarding-input-shell[data-invalid="true"] { border-color: var(--danger); }
-.onboarding-input-shell[data-invalid="true"]:focus-within {
+.field-shell[data-invalid="true"] { border-color: var(--danger); }
+.field-shell[data-invalid="true"]:focus-within {
   box-shadow: 0 0 0 3px color-mix(in srgb, var(--danger) 12%, transparent);
 }
-.onboarding-input-shell input:focus-visible { outline: none; }
+.field-shell input:focus-visible { outline: none; box-shadow: none; }
+.richtext-editor:focus-within { border-color: var(--accent); box-shadow: 0 0 0 3px color-mix(in srgb, var(--accent) 16%, transparent); }
+.richtext-editor .ProseMirror:focus-visible { outline: none; }
+.richtext-editor :is(input, select):focus-visible { box-shadow: none; }
 @media (forced-colors: active) {
-  .onboarding-input-shell:focus-within { outline: 2px solid Highlight; outline-offset: 2px; }
+  :where(input, textarea, select):not([type="hidden"]):focus-visible, .field-shell:focus-within, .richtext-editor:focus-within { outline: 2px solid Highlight; outline-offset: 2px; }
+  .field-shell input:focus-visible { outline: none; }
 }
 
 .story-toolbar {

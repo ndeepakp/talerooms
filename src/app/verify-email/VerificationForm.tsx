@@ -1,4 +1,5 @@
 "use client";
+import { ValidatedForm } from "@/components/auth/ValidatedForm";
 import { useEffect, useRef, useState } from "react";
 import Link from "next/link";
 import { useRouter } from "next/navigation";
@@ -56,7 +57,7 @@ export function VerificationForm({ email, deliveryEnabled, graceUntil }: { email
       <p className="mt-2 text-sm leading-6 text-muted">{graceUntil ? "Verify now to keep your access after the transition period." : "Your account stays inactive until verification is complete."}</p>
       {graceUntil && <p className="mt-4 rounded-xl border border-warning bg-warning-soft p-3 text-sm text-warning">Your existing account keeps access until {new Date(graceUntil).toLocaleDateString("en-GB", { timeZone: "UTC" })}. Verify before then to keep using Talerooms.</p>}
       {!deliveryEnabled && <p role="alert" className="mt-4 text-sm text-warning">Email delivery is temporarily unavailable. Your account is saved; log in again to continue when delivery is available.</p>}
-      <form className="mt-6 flex flex-col gap-4" onSubmit={async e => {
+      <ValidatedForm className="mt-6 flex flex-col gap-4" onSubmit={async e => {
         e.preventDefault(); setBusy(true); setError(null); setMessage(null);
         try {
           const result = changing ? await authClient.emailOtp.changeEmail({ newEmail: target, otp }) : await authClient.emailOtp.verifyEmail({ email, otp });
@@ -71,14 +72,14 @@ export function VerificationForm({ email, deliveryEnabled, graceUntil }: { email
         {error && <p role="alert" className="text-sm text-danger">{error}</p>}
         {message && <p role="status" className="text-sm text-success">{message}</p>}
         <button disabled={busy || otp.length!==6 || !deliveryEnabled} className="min-h-12 rounded-full btn-primary px-4 py-3 font-medium disabled:opacity-50">{busy ? "Working…" : "Verify and continue"}</button>
-      </form>
+      </ValidatedForm>
       <button type="button" disabled={busy || cooldown>0 || !deliveryEnabled} onClick={()=>void sendCode()} className="mt-4 min-h-11 w-full rounded-full border border-ui-strong px-3 text-sm text-ink disabled:opacity-50">{cooldown>0 ? `Resend in ${cooldown}s` : "Resend code"}</button>
       <button type="button" onClick={()=>setEditing(v=>!v)} className="mt-3 min-h-11 text-sm text-ink underline">Wrong email address?</button>
-      {editing && <form className="mt-3 flex flex-col gap-3" onSubmit={e=>{e.preventDefault();void sendCode(newEmail.trim().toLowerCase(),true);}}>
+      {editing && <ValidatedForm className="mt-3 flex flex-col gap-3" onSubmit={e=>{e.preventDefault();void sendCode(newEmail.trim().toLowerCase(),true);}}>
         <label className="flex flex-col gap-2 text-sm text-ink-soft">Correct email address<input type="email" autoComplete="email" required maxLength={254} value={newEmail} onChange={e=>setNewEmail(e.target.value)} className="h-12 rounded-lg border border-ui-strong bg-surface-raised px-3 text-ink"/></label>
         <p className="text-xs text-muted">Your email changes only after you verify a code sent to the new address. If your session is too old, log out and log in again first.</p>
         <button disabled={busy || cooldown>0 || !deliveryEnabled} className="min-h-11 rounded-full border border-ui-strong text-sm text-ink disabled:opacity-50">Send code to this address</button>
-      </form>}
+      </ValidatedForm>}
       <div className="mt-6 flex flex-wrap items-center gap-5 text-sm text-muted">
         <Link href="/" className="min-h-11 content-center underline">Browse public stories</Link>
         <button type="button" className="min-h-11 underline" onClick={async()=>{await signOut();router.replace("/login");router.refresh();}}>Sign out</button>

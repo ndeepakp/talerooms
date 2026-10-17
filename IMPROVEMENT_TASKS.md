@@ -18,6 +18,16 @@ Use **Done** to track completed work by date and **Pending** to track the remain
 
 Checked items describe implemented/validated work or completed planning, with delivery noted separately. Real payments, rewards, language discovery, audio and the under-18 experience are not marked complete.
 
+### 2026-10-17: Shared form UI and subscription correction
+
+**Delivery:** Corrective patch prepared after v43; deploy after the production build succeeds.
+
+- [x] Fix text-control focus globally and use a shared container focus treatment for profile/onboarding handles, subscription pricing and library search; preserve keyboard/high-contrast focus.
+- [x] Add inline auth/profile validation, first-invalid-field focus, price suffix spacing and consistent numeric controls; fix report touch targets and missing control labels.
+- [x] Remove the mock subscription action in Stripe mode and block mock subscription creation/renewal on the server. Existing access is preserved; recurring Stripe billing remains pending.
+- [x] Pass 193 standard tests, 14 local payment/wallet database tests, lint and TypeScript. Check 22 representative routes at 320/390/1280px, signed-out landing at all three widths and additional interactive/light/dark states. See [UI validation report](docs/UI_QA_2026-10-17.md).
+- [ ] Record the corrective deployment and verify the deployed membership gate.
+
 ### 2026-10-17: Deployed sandbox activation and UI polish
 
 **Delivery:** App commit `ce34a28` deployed as Fly v43. User requested sandbox activation and will verify the purchase flow manually. Dedicated test credentials and a connected-account webhook are configured for the deployed site. Checkout and wallet onboarding are enabled for SG; app withdrawals and live billing remain disabled. Full purchase validation remains pending.

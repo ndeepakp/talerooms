@@ -5,9 +5,9 @@ Updated: **2026-10-17**. Complete and validate each task before advancing.
 ## Current state
 
 - **Active task:** Payments (`TASK-PAY-01`). Stripe sandbox checkout is enabled on the deployed site for user-led manual validation. Live billing and app withdrawals remain disabled; actual-provider end-to-end validation is pending.
-- **Latest app commit:** `ce34a28` — onboarding/story toolbar polish and deployed sandbox activation notes.
-- **Last recorded production release:** `ce34a28`, Fly v43 — sandbox checkout and wallet onboarding enabled for SG; live billing and app withdrawals disabled.
-- **Validation:** 181 standard tests, lint, TypeScript and production image build passed for v43; 13 deployed release smoke checks passed. The prior payment pass included 13 local DB integration tests. Actual-provider purchase completion remains pending manual verification.
+- **Latest app commit:** `b7b57c4` — shared form UI corrections and blocked mock subscriptions in Stripe mode.
+- **Last recorded production release:** `b7b57c4`, Fly v44 — shared UI corrections; mock subscriptions blocked; Stripe sandbox story/chapter checkout and SG wallet onboarding enabled. Live billing and app withdrawals remain disabled.
+- **Validation:** 193 standard tests, 14 local payment/wallet DB tests, lint, TypeScript and the production build passed for v44; 14 deployed release smoke checks passed. UI checks cover 22 representative routes at 320/390/1280px plus signed-out landing and interactive/light/dark states. Actual-provider purchase completion remains pending manual verification.
 - **Provider dependency:** Singapore Stripe merchant account, approved author countries and confirmed payout controls are needed for real provider testing. No live charges or payouts are enabled.
 
 Use **Done** to track completed work by date and **Pending** to track the remaining implementation, validation and release steps. A completed portion of an in-progress task does not mark the whole task complete. GitHub delivery and production deployment are tracked separately.
@@ -20,13 +20,13 @@ Checked items describe implemented/validated work or completed planning, with de
 
 ### 2026-10-17: Shared form UI and subscription correction
 
-**Delivery:** Corrective patch prepared after v43; deploy after the production build succeeds.
+**Delivery:** Pushed app commit `b7b57c4` and deployed it as Fly v44.
 
 - [x] Fix text-control focus globally and use a shared container focus treatment for profile/onboarding handles, subscription pricing and library search; preserve keyboard/high-contrast focus.
 - [x] Add inline auth/profile validation, first-invalid-field focus, price suffix spacing and consistent numeric controls; fix report touch targets and missing control labels.
 - [x] Remove the mock subscription action in Stripe mode and block mock subscription creation/renewal on the server. Existing access is preserved; recurring Stripe billing remains pending.
 - [x] Pass 193 standard tests, 14 local payment/wallet database tests, lint and TypeScript. Check 22 representative routes at 320/390/1280px, signed-out landing at all three widths and additional interactive/light/dark states. See [UI validation report](docs/UI_QA_2026-10-17.md).
-- [ ] Record the corrective deployment and verify the deployed membership gate.
+- [x] Deploy Fly v44, confirm healthy/runtime sandbox configuration, pass 14 release checks and verify the public author profile no longer displays the demo membership sales pitch. New mock subscriptions and mock renewals are rejected with 409.
 
 ### 2026-10-17: Deployed sandbox activation and UI polish
 

@@ -3,7 +3,7 @@ app = "talerooms-dev"
 primary_region = "sin"   # Singapore — closest to the target market
 
 [build]
-  dockerfile = "Dockerfile"
+  dockerfile = "../../Dockerfile"
   # Web Push public key (non-secret) — inlined into the client bundle at build.
   # The matching VAPID_PRIVATE_KEY + VAPID_SUBJECT are runtime Fly secrets.
   [build.args]

@@ -6,9 +6,11 @@ import { useRouter } from "next/navigation";
 export function DeleteStoryButton({
   storyId,
   redirectTo,
+  className,
 }: {
   storyId: string;
   redirectTo?: string;
+  className?: string;
 }) {
   const router = useRouter();
   const [loading, setLoading] = useState(false);
@@ -31,7 +33,7 @@ export function DeleteStoryButton({
       type="button"
       onClick={handleDelete}
       disabled={loading}
-      className="text-sm font-medium text-danger hover:underline disabled:opacity-50"
+      className={className || "text-sm font-medium text-danger hover:underline disabled:opacity-50"}
     >
       {loading ? "Deleting…" : "Delete"}
     </button>

@@ -58,7 +58,7 @@ export function PostComposer({
   }
 
   return (
-    <div className="rounded-2xl border border-ui bg-surface-raised p-4">
+    <div className="rounded-2xl border border-ui bg-surface-raised p-4 sm:p-5">
       {answer ? (
         <p className="mb-2 inline-flex items-center gap-1.5 rounded-full bg-accent/10 px-2.5 py-1 text-xs font-medium text-accent">
           <span aria-hidden="true">💬</span>
@@ -79,18 +79,18 @@ export function PostComposer({
         rows={3}
         maxLength={2000}
         placeholder={answer ? "Write your answer… type @ to tag someone" : placeholder}
-        className="w-full resize-none rounded-lg border border-ui-strong bg-surface-raised px-3 py-2 text-sm text-ink outline-none focus:border-accent"
+        className="block min-h-28 w-full resize-y rounded-xl border border-ui bg-surface px-4 py-3 text-sm leading-6 text-ink outline-none focus:border-accent"
       />
       {error && <p className="mt-1 text-sm text-danger">{error}</p>}
-      <div className="mt-2 flex items-center justify-between gap-3">
-        <span className="text-xs text-subtle">
+      <div className="mt-4 flex items-center justify-between gap-3">
+        <span className="hidden text-xs text-subtle sm:inline">
           Tip: press Ctrl + Enter to post
         </span>
         <button
           type="button"
           onClick={submit}
           disabled={busy || !body.trim()}
-          className="rounded-full btn-primary px-4 py-2 text-sm font-medium disabled:opacity-50"
+          className="btn-primary ml-auto inline-flex min-h-11 items-center justify-center rounded-full px-5 py-2 text-sm font-medium disabled:opacity-50"
         >
           {answer ? "Post answer" : "Post"}
         </button>

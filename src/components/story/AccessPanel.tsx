@@ -224,7 +224,7 @@ export function AccessPanel({
       {error && <div role="alert" className="mt-3 text-sm text-danger">
         {needsPayoutSetup ? <>
           <p>The author must complete Stripe <Link href="/wallet" className="font-semibold underline decoration-2 underline-offset-4 hover:decoration-1">payout setup</Link> before accepting payments.</p>
-          <p className="mt-2 text-xs leading-relaxed text-muted">Only the story’s author can complete this setup from their wallet.</p>
+          <p className="mt-2 text-xs leading-relaxed text-muted">This refers to the story’s author, not the reader. The author must sign in to their own account to complete setup; setting up another account’s wallet will not enable this story.</p>
         </> : <p>{error}</p>}
       </div>}
       {stripeCheckout && error?.includes('expired') && <button type="button" className="mt-3 min-h-11 text-sm underline" onClick={() => { checkoutAttempt.current = null; setError(null); }}>Start a new checkout</button>}

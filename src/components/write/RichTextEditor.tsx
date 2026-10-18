@@ -139,6 +139,7 @@ function Toolbar({ editor }: { editor: Editor }) {
 
       <select
         title="Font"
+        aria-label="Font"
         onMouseDown={(e) => e.stopPropagation()}
         value={
           FONTS.find((f) => f.value && editor.isActive("textStyle", { fontFamily: f.value }))
@@ -152,7 +153,7 @@ function Toolbar({ editor }: { editor: Editor }) {
             editor.chain().focus().unsetFontFamily().run();
           }
         }}
-        className="h-8 rounded border border-ui-strong bg-surface-raised px-2 text-sm text-ink-soft"
+        className="h-11 rounded border border-ui-strong bg-surface-raised px-2 text-sm text-ink-soft"
       >
         {FONTS.map((f) => (
           <option key={f.label} value={f.value}>

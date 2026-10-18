@@ -35,7 +35,7 @@
 .toolbar { display:flex; align-items:center; gap:18px; margin-bottom:24px; }
 .toolbar::after { content:""; height:1px; flex:1; background:var(--border); }
 .tabs { display:flex; border:1px solid var(--border); border-radius:999px; background:var(--surface-raised); }
-.tabs button { padding:11px 22px; border-radius:999px; font-size:13px; font-weight:500; color:var(--foreground); cursor:pointer; }
+.tabs button { min-height:44px; padding:11px 22px; border-radius:999px; font-size:13px; font-weight:500; color:var(--foreground); cursor:pointer; }
 .tabs button[aria-selected=true] { background:var(--foreground); color:var(--page); }
 .tabs button:hover { text-decoration:underline; text-underline-offset:4px; }
 .resume, .week { border:1px solid var(--border); background:var(--surface-raised); border-radius:18px; padding:20px; min-width:0; }
@@ -43,10 +43,10 @@
 .resumeCover { width:96px; height:144px; flex-shrink:0; }
 .resumeDetails { min-width:0; flex:1; }
 .resumeDetails h2 { display:-webkit-box; -webkit-line-clamp:3; -webkit-box-orient:vertical; overflow:hidden; font-family:var(--font-newsreader),Georgia,serif; font-size:24px; line-height:1.2; margin:8px 0; overflow-wrap:anywhere; }
-.resume .kicker { font-size:9px; }
+.resume .kicker { font-size:9px; padding-right:16px; }
 .resumeMeta { overflow-wrap:anywhere; color:var(--muted); font-size:11px; line-height:1.6; }
 .resumeDetails a { display:inline-flex; min-height:44px; align-items:center; justify-content:center; border-radius:999px; padding:10px 16px; font-size:12px; font-weight:600; width:100%; }
-.dismiss { position:absolute; top:4px; right:4px; width:28px; height:28px; border-radius:50%; color:var(--muted); cursor:pointer; }
+.dismiss { position:absolute; top:4px; right:4px; width:44px; height:44px; border-radius:50%; color:var(--muted); cursor:pointer; }
 .dismiss:hover { background:var(--surface-soft); }
 .progress { height:3px; border-radius:999px; overflow:hidden; background:var(--surface-soft); margin:12px 0; }
 .progress div { height:100%; background:var(--accent); border-radius:999px; }
@@ -68,9 +68,14 @@
 .weekStats strong { display:block; font-family:var(--font-newsreader),Georgia,serif; font-size:24px; font-weight:400; }
 .weekStats small { display:block; font-size:9px; color:var(--muted); margin-top:4px; }
 .accuracy { font-size:11px; margin-top:12px; color:var(--muted); }
-.community { margin-top:28px; }
+.community { min-width:0; }
 @media(max-width:1050px) { .layout { grid-template-columns:minmax(0,1fr); grid-template-areas:"hero" "sidebar" "feed"; }.rail { position:static; width:auto; max-height:none; overflow:visible; display:grid; grid-template-columns:repeat(2,minmax(0,1fr)); margin-bottom:28px; }.rail > :only-child { grid-column:1/-1; }.header { padding-top:0; }.header h1 { font-size:clamp(38px,6vw,64px); } }
 @media(max-width:600px) { .page { padding:24px 16px 44px; }.header { padding-bottom:28px; }.header p { font-size:22px; }.rail { grid-template-columns:1fr; gap:14px; }.bookRail { gap:28px; padding-inline:8px; }.withFilters { grid-template-columns:minmax(0,1fr); gap:16px; }.withFilters > .filterGroup { grid-column:1/-1; grid-row:2; max-width:none; }.filters { grid-template-columns:repeat(2,minmax(0,1fr)); gap:8px; }.card { width:140px; }.sectionHeader h2 { font-size:25px; }.wallpaper { padding:16px; }.resume,.week { padding:18px; }.resumeCover { width:84px; height:126px; }.resumeDetails h2 { font-size:22px; }.tabs button { padding:10px 20px; } }
 @media(prefers-reduced-motion:reduce) { .bookRail { scroll-behavior:auto; } }
+
+@media(max-width:1050px) {
+  .layout:has([id="feed-community-tab"][aria-selected="true"]) { grid-template-areas:"hero" "feed" "sidebar"; }
+  .layout:has([id="feed-community-tab"][aria-selected="true"]) .rail { margin-top:28px; margin-bottom:0; }
+}
 
 @media(max-width:600px) { .resume { display:grid; grid-template-columns:84px minmax(0,1fr); align-items:start; }.resumeDetails { display:contents; }.resume .kicker, .resumeDetails h2, .resumeMeta { grid-column:2; }.resumeCover { grid-column:1; grid-row:1/4; align-self:center; }.resumeDetails h2 { margin:0; font-size:21px; }.resumeMeta { font-size:11px; }.resume .progress, .resumeDetails a { grid-column:1/-1; }.resume .progress { margin:0; }.resume { column-gap:14px; row-gap:10px; } }

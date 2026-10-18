@@ -84,13 +84,13 @@ export function PostCard({ post }: { post: PostRow }) {
   }
 
   return (
-    <div className="rounded-2xl border border-ui bg-surface-raised p-4">
+    <div className="min-w-0 rounded-2xl border border-ui bg-surface-raised p-4 sm:p-5">
       <div className="flex items-start justify-between gap-3">
-        <div className="flex items-center gap-3">
+        <div className="flex min-w-0 items-center gap-3">
           <Link href={`/${post.handle ?? post.author_id}`} aria-label={`${post.author ?? "Author"}'s profile`}>
             <Avatar src={post.image} name={post.author} size={36} />
           </Link>
-          <div>
+          <div className="min-w-0 break-words">
             <Link
               href={`/${post.handle ?? post.author_id}`}
               className="text-sm font-medium text-ink hover:underline"

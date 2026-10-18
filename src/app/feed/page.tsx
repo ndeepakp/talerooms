@@ -135,7 +135,7 @@ export default async function FeedPage() {
             <NewChapters stories={newChapters}/>
             <DiscoveryFeed stories={stories} preferredGenres={prefs.map(p => p.name)}/>
           </>}
-          community={<div className="mx-auto max-w-2xl"><PostsFeed posts={posts}/></div>}
+          community={<PostsFeed posts={posts}/>}
         /></div>
         <div className={styles.rail} aria-label="Reading activity and saved story">
           <WeekPanel stats={weekStats}/>

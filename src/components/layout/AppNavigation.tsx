@@ -14,24 +14,22 @@ export function AppNavigation({ profileHref, user, notifications = <Notification
 }) {
   return (
     <header className="app-header sticky top-0 z-40">
-      <div className="mx-auto flex min-h-18 w-full max-w-[1328px] flex-wrap items-center gap-2 px-4 py-3 max-[360px]:gap-1 max-[360px]:px-2 sm:flex-nowrap sm:gap-5 sm:px-6">
+      <div className="mx-auto flex min-h-18 w-full max-w-[1328px] flex-wrap items-center gap-2 px-4 py-3 max-[360px]:gap-1 max-[360px]:px-2 sm:flex-nowrap sm:gap-4 sm:px-6 lg:gap-6">
         <Brand href="/feed" compact />
         <Link
           href={profileHref}
           aria-label="View profile"
-          className="order-3 flex min-h-11 min-w-11 shrink-0 items-center justify-center rounded-full ring-ui-strong transition-shadow hover:ring-2"
+          className="order-3 flex h-11 w-11 shrink-0 items-center justify-center rounded-full border border-ui p-0.5 transition-colors hover:border-ui-strong"
         >
-          <Avatar src={user.image} name={user.name} size={34} />
+          <Avatar src={user.image} name={user.name} size={38} />
         </Link>
-        <div className="order-4 w-full min-w-0 sm:order-none sm:flex sm:flex-1 sm:justify-center">
-          <div className="w-full max-w-md">
-            <SearchBar />
-          </div>
+        <div className="order-4 w-full min-w-0 sm:order-none sm:flex-1">
+          <SearchBar />
         </div>
-        <div className="ml-auto flex shrink-0 items-center gap-2 max-[360px]:gap-1 sm:ml-0">
+        <div className="app-nav-actions ml-auto flex shrink-0 items-center gap-2 max-[360px]:gap-1 sm:ml-0">
           <HeaderWriteAction />
           {notifications}
-          <NavMenu profileHref={profileHref} />
+          <NavMenu />
         </div>
       </div>
     </header>

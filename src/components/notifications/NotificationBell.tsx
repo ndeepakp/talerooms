@@ -79,7 +79,7 @@ export function NotificationBell() {
         onClick={toggleOpen}
         aria-label="Notifications"
         aria-expanded={open}
-        className="relative flex h-11 w-11 items-center justify-center rounded-full border border-ui-strong text-ink transition-colors hover:bg-surface-soft"
+        className="header-icon-button relative flex h-11 w-11 items-center justify-center rounded-full text-ink transition-colors hover:bg-surface-soft"
       >
         <svg
           xmlns="http://www.w3.org/2000/svg"

@@ -1,12 +1,12 @@
 import type { MetadataRoute } from "next";
 import { sql } from "@/lib/db";
 
-const BASE = "https://talerooms.fly.dev";
-
 export const dynamic = "force-dynamic";
 
 // Public welcome/about pages, published stories, and their authors.
 export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
+  if (process.env.DEPLOYMENT_ENV === "dev") return [];
+  const BASE = process.env.BETTER_AUTH_URL || "https://talerooms.fly.dev";
   let stories: { slug: string | null; id: string; created_at: string }[] = [];
   let authors: { username: string }[] = [];
   try {

@@ -95,7 +95,7 @@ describe('Stripe author setup guidance',()=>{
     await userEvent.click(screen.getByRole('button',{name:'S$100'}));
     await screen.findByRole('alert');
     expect(screen.getByRole('link',{name:'payout setup'}).getAttribute('href')).toBe('/wallet');
-    expect(screen.getByText('Only the story’s author can complete this setup from their wallet.')).toBeTruthy();
+    expect(screen.getByText(/This refers to the story’s author, not the reader/)).toBeTruthy();
     expect(window.confirm).not.toHaveBeenCalled();expect(refresh).not.toHaveBeenCalled();
   });
   it('keeps unrelated checkout failures as plain errors without a misleading wallet link',async()=>{

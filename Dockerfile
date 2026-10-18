@@ -19,6 +19,8 @@ ENV NEXT_TELEMETRY_DISABLED=1
 # Next inlines NEXT_PUBLIC_* into the client bundle. Passed via fly.toml [build.args].
 ARG NEXT_PUBLIC_VAPID_PUBLIC_KEY
 ENV NEXT_PUBLIC_VAPID_PUBLIC_KEY=$NEXT_PUBLIC_VAPID_PUBLIC_KEY
+ARG DEPLOYMENT_ENV
+ENV DEPLOYMENT_ENV=$DEPLOYMENT_ENV
 COPY --from=deps /app/node_modules ./node_modules
 COPY . .
 RUN npm run build

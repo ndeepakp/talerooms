@@ -65,7 +65,8 @@ export function SearchBar({ initial = "" }: { initial?: string }) {
 
   return (
     <div className="relative" ref={ref}>
-      <form onSubmit={submit}>
+      <form onSubmit={submit} className="relative">
+        <svg aria-hidden="true" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.7" strokeLinecap="round" className="pointer-events-none absolute left-4 top-1/2 h-[18px] w-[18px] -translate-y-1/2 text-muted"><circle cx="10.5" cy="10.5" r="6.5" /><path d="m16 16 4.5 4.5" /></svg>
         <input
           type="search"
           aria-label="Search stories, genres, or authors"
@@ -82,7 +83,7 @@ export function SearchBar({ initial = "" }: { initial?: string }) {
           onFocus={() => q.trim() && setOpen(true)}
           onKeyDown={(e) => e.key === "Escape" && setOpen(false)}
           placeholder="Search stories or $handles…"
-          className="h-11 w-full rounded-full border border-ui bg-surface-soft px-4 text-sm text-ink placeholder:text-muted focus:border-ui-strong"
+          className="h-11 w-full rounded-full border border-ui bg-surface-soft pl-11 pr-4 text-sm text-ink placeholder:text-muted focus:border-ui-strong"
         />
       </form>
 

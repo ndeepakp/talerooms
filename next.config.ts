@@ -4,6 +4,12 @@ const nextConfig: NextConfig = {
   // Emit a self-contained server bundle (.next/standalone) so the Docker image
   // only needs Node + that folder, not the whole node_modules tree.
   output: "standalone",
+  async headers() {
+    return process.env.DEPLOYMENT_ENV === "dev" ? [{
+      source: "/:path*",
+      headers: [{ key: "X-Robots-Tag", value: "noindex, nofollow, noarchive" }],
+    }] : [];
+  },
   // Load these as normal Node modules instead of bundling them — better-auth's
   // database adapter (kysely/pg) doesn't bundle cleanly under Turbopack.
   serverExternalPackages: [

@@ -27,6 +27,17 @@ describe('wallet UI recovery and withdrawal boundaries', () => {
     expect((screen.getByRole('button', { name: 'Manage payout setup' }) as HTMLButtonElement).disabled).toBe(false);
     expect(fetch).toHaveBeenCalledExactlyOnceWith('/api/wallet/onboarding', expect.objectContaining({ body: JSON.stringify({ country: 'SG' }), method: 'POST' }));
   });
+  it('does not ask a verified author to repeat setup when app withdrawals are disabled', () => {
+    const initialData = data(true);
+    initialData.canWithdraw = false;
+    initialData.snapshot!.schedule = 'manual';
+    render(createElement(Wallet, { initialData }));
+    expect(screen.getAllByText('Your Stripe account is ready. Withdrawals through Talerooms are not enabled yet; you do not need to repeat setup.').length).toBeGreaterThan(0);
+    expect(screen.getByText('Stripe payout schedule: manual.')).toBeTruthy();
+    expect(screen.queryByText(/Complete payout verification before withdrawing/)).toBeNull();
+    expect(screen.queryByText(/Automatic payouts remain active/)).toBeNull();
+    expect(screen.queryByRole('button', { name: 'Review withdrawal' })).toBeNull();
+  });
   it('disables actions during refresh and recovers after a lost response', async () => {
     let reject!: (e: Error) => void; vi.mocked(fetch).mockReturnValue(new Promise((_, fail) => { reject = fail; }));
     render(createElement(Wallet, { initialData: data() })); await userEvent.click(screen.getByRole('button', { name: 'Refresh wallet' }));

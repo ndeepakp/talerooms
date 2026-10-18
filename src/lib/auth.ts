@@ -11,7 +11,9 @@ import { deleteAvatarsForUser } from "@/lib/avatar";
 // different localhost port, or a public demo tunnel — fails with "Invalid
 // origin". Dev/prod localhost and Cloudflare quick-tunnel subdomains are always
 // allowed; set BETTER_AUTH_TRUSTED_ORIGINS (comma-separated) for real domains.
-export const trustedOrigins = [
+export const trustedOrigins = process.env.DEPLOYMENT_ENV === "dev" ? [
+  "https://talerooms-dev.fly.dev",
+] : [
   "http://localhost:3000",
   "http://localhost:3001",
   "https://talerooms.com",

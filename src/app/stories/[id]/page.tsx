@@ -18,7 +18,7 @@ import { PostCard } from "@/components/post/PostCard";
 import { PostComposer } from "@/components/post/PostComposer";
 import { getStoryPosts } from "@/lib/posts";
 import { resolveStory, isUuid } from "@/lib/slug";
-import { DeleteStoryButton } from "@/components/story/DeleteStoryButton";
+import { StoryAuthorActions } from "@/components/story/StoryAuthorActions";
 import { chapterAccessAction } from "@/lib/chapter-access";
 import { AccessPanel } from "@/components/story/AccessPanel";
 import { ApprovedReadersList } from "@/components/story/ApprovedReadersList";
@@ -425,10 +425,10 @@ export default async function StoryPage({
       <article className="mx-auto w-full max-w-6xl">
         <div className="story-toolbar">
           <StoryBackLink href="/feed">Back to feed</StoryBackLink>
-          <div className="flex flex-wrap items-center gap-2">
+          <div className="story-toolbar-actions">
             <ShareButton title={story.title} />
             {story.status === "published" && <SaveToCollection storyId={story.id} />}
-            {isAuthor && <><Link href={`/stories/${story.id}/edit`} className="py-2 text-sm font-medium hover:underline">Edit story</Link><DeleteStoryButton storyId={story.id} redirectTo="/feed" /></>}
+            {isAuthor && <StoryAuthorActions storyId={story.id} />}
           </div>
         </div>
         <StoryOverview

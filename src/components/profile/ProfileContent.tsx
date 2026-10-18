@@ -8,24 +8,31 @@ export function ProfileContent({ works, posts }: { works: ReactNode; posts: Reac
   const id = useId();
   const buttons = useRef<(HTMLButtonElement | null)[]>([]);
   useEffect(() => {
-    const showWorks = () => { if (window.location.hash === "#works") setActive(0); };
     let frame = 0;
-    const jumpToWorks = (event: MouseEvent) => {
-      if (!(event.target instanceof Element) || !event.target.closest('a[href="#works"]')) return;
-      setActive(0);
-      frame = requestAnimationFrame(() => document.getElementById("works")?.scrollIntoView({ block: "start" }));
+    const showSection = (hash: string) => {
+      if (hash !== "#works" && hash !== "#thoughts") return;
+      setActive(hash === "#thoughts" ? 1 : 0);
+      cancelAnimationFrame(frame);
+      frame = requestAnimationFrame(() => document.getElementById(hash.slice(1))?.scrollIntoView({ block: "start" }));
     };
-    window.addEventListener("hashchange", showWorks);
-    document.addEventListener("click", jumpToWorks);
+    const showHash = () => showSection(window.location.hash);
+    const jumpToSection = (event: MouseEvent) => {
+      if (!(event.target instanceof Element)) return;
+      const anchor = event.target.closest('a[href="#works"], a[href="#thoughts"]');
+      if (anchor) showSection(anchor.getAttribute("href")!);
+    };
+    frame = requestAnimationFrame(showHash);
+    window.addEventListener("hashchange", showHash);
+    document.addEventListener("click", jumpToSection);
     return () => {
       cancelAnimationFrame(frame);
-      window.removeEventListener("hashchange", showWorks);
-      document.removeEventListener("click", jumpToWorks);
+      window.removeEventListener("hashchange", showHash);
+      document.removeEventListener("click", jumpToSection);
     };
   }, []);
   return <div className={s.content}>
     <div className={s.tabs} role="tablist" aria-label="Author portfolio">
-      {["Stories", "Posts"].map((label, i) => <button key={label} ref={el => { buttons.current[i] = el; }} type="button" id={`${id}-tab-${i}`} role="tab" aria-selected={active === i} aria-controls={`${id}-panel-${i}`} tabIndex={active === i ? 0 : -1} onClick={() => setActive(i)} onKeyDown={event => {
+      {["Stories", "Thoughts"].map((label, i) => <button key={label} ref={el => { buttons.current[i] = el; }} type="button" id={`${id}-tab-${i}`} role="tab" aria-selected={active === i} aria-controls={`${id}-panel-${i}`} tabIndex={active === i ? 0 : -1} onClick={() => setActive(i)} onKeyDown={event => {
         if (!["ArrowLeft", "ArrowRight", "Home", "End"].includes(event.key)) return;
         event.preventDefault();
         const next = event.key === "Home" ? 0 : event.key === "End" ? 1 : 1 - i;
@@ -33,6 +40,6 @@ export function ProfileContent({ works, posts }: { works: ReactNode; posts: Reac
       }}>{label}</button>)}
     </div>
     <div id={`${id}-panel-0`} role="tabpanel" aria-labelledby={`${id}-tab-0`} hidden={active !== 0}>{works}</div>
-    <div id={`${id}-panel-1`} role="tabpanel" aria-labelledby={`${id}-tab-1`} hidden={active !== 1} className={s.posts}><h2>From this voice.</h2>{posts}</div>
+    <div id={`${id}-panel-1`} role="tabpanel" aria-labelledby={`${id}-tab-1`} hidden={active !== 1} className={s.posts}><h2 id="thoughts" className={s.works}>Thoughts from this voice.</h2>{posts}</div>
   </div>;
 }

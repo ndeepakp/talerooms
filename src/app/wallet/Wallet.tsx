@@ -48,6 +48,12 @@ export function Wallet({ initialData }: { initialData?: WalletData }) {
   const choices = balances.flatMap(balance => Object.entries(balance.sources).filter(([, value]) => value > 0 && supportedCurrency(balance.currency)).map(([source, available]) => ({ currency: balance.currency, source, available: Math.min(available, balance.amount), key: `${balance.currency}:${source}` })));
   const selected = choices.find(item => item.key === choice) || choices[0];
   const destination = data?.snapshot?.banks.find(bank => bank.currency === selected?.currency);
+  const accountReady = !!data?.snapshot?.chargesEnabled && !!data?.snapshot?.payoutsEnabled;
+  const withdrawalStatus = !accountReady
+    ? 'Complete payout verification before withdrawing.'
+    : !data?.canWithdraw
+      ? 'Your Stripe account is ready. Withdrawals through Talerooms are not enabled yet; you do not need to repeat setup.'
+      : 'Your account is ready for withdrawals.';
   async function run(action: () => Promise<void>) {
     setBusy(true); setError(''); setNotice('');
     try { await action(); } catch (e) { setError(e instanceof Error ? e.message : 'Please try again.'); }
@@ -66,9 +72,13 @@ export function Wallet({ initialData }: { initialData?: WalletData }) {
     await refresh();
   }
   return <main className="mx-auto w-full max-w-6xl px-4 py-8 sm:px-6 sm:py-12">
-    <div className="mb-8 flex flex-wrap items-start justify-between gap-4">
-      <div><p className="mb-2 text-sm font-medium uppercase tracking-widest text-muted">For your next chapter</p><h1 className="font-serif text-4xl text-ink sm:text-5xl">Your author wallet</h1><p className="mt-3 max-w-xl text-muted">Your earnings, from story to bank account.</p></div>
-      <button type="button" disabled={busy} className="min-h-11 rounded-full border border-ui px-5 text-sm text-ink disabled:opacity-50" onClick={() => run(refresh)}>Refresh wallet</button>
+    <div className="mb-8">
+      <p className="mb-2 text-sm font-medium uppercase tracking-widest text-muted">For your next chapter</p>
+      <div className="flex flex-wrap items-center justify-between gap-3">
+        <h1 className="font-serif text-4xl text-ink sm:text-5xl">Wallet</h1>
+        <button type="button" disabled={busy} className="inline-flex min-h-11 shrink-0 items-center justify-center rounded-full border border-ui px-5 text-sm text-ink disabled:opacity-50" onClick={() => run(refresh)}>Refresh wallet</button>
+      </div>
+      <p className="mt-3 max-w-xl text-muted">Your earnings, from story to bank account.</p>
     </div>
     {error && <div role="alert" className="mb-6 rounded-xl border border-ui bg-surface-raised p-4 text-danger">{error}{!data && <button onClick={() => run(refresh)} className="ml-3 min-h-11 underline">Try again</button>}</div>}
     {notice && <p role="status" className="mb-6 rounded-xl border border-ui p-4 text-success">{notice}</p>}
@@ -80,10 +90,15 @@ export function Wallet({ initialData }: { initialData?: WalletData }) {
           <div className="min-w-0 max-w-xl"><h2 id="setup-title" className="font-serif text-2xl text-ink">{!data.configured ? 'Earnings are coming soon' : !data.snapshot ? 'Set up your payouts' : data.snapshot.payoutsEnabled && data.snapshot.chargesEnabled ? 'Your payout account' : 'Finish your payout setup'}</h2>
             <p className="mt-2 text-sm leading-6 text-muted">{!data.configured ? 'Payment setup is in progress. Your wallet will show confirmed earnings once paid purchases are connected.' : 'Stripe securely handles identity checks and bank details. Talerooms never asks you to enter bank details here.'}</p>
             {data.snapshot?.banks.map(bank => <p key={bank.currency} className="mt-2 break-words text-sm text-ink">{bank.label} · {bank.currency.toUpperCase()}</p>)}
-            {data.snapshot && <p className="mt-2 text-sm text-muted">Automatic payouts: {data.snapshot.schedule}. {!data.canWithdraw && 'Withdrawals are waiting for verified payout readiness.'}</p>}
+            {data.snapshot && <>
+              <p className="mt-2 text-sm text-muted">{data.snapshot.schedule === 'manual' ? 'Stripe payout schedule: manual.' : `Stripe payout schedule: ${data.snapshot.schedule}.`}</p>
+              <p className="mt-2 text-sm text-muted">{withdrawalStatus}</p>
+            </>}
           </div>
           {data.configured && <div className="flex w-full flex-col gap-3 sm:w-auto">
-            {!data.account && <label className="text-sm text-muted">Payout country<select className="mt-1 block min-h-11 w-full rounded-xl border border-ui bg-surface-raised px-3 text-ink" value={country} onChange={e => setCountry(e.target.value)}>{data.countries.map(value => <option key={value} value={value}>{new Intl.DisplayNames(['en'], { type: 'region' }).of(value)}</option>)}</select></label>}
+            {!data.account && <label className="text-sm text-muted">Payout country
+              <select disabled={busy} className="mt-2 block h-12 w-full rounded-xl border border-ui bg-surface-raised pl-4 text-ink disabled:opacity-50" value={country} onChange={e => setCountry(e.target.value)}>{data.countries.map(value => <option key={value} value={value}>{new Intl.DisplayNames(['en'], { type: 'region' }).of(value)}</option>)}</select>
+            </label>}
             <button disabled={busy || !country} className="btn-primary min-h-11 rounded-full px-5 py-3 disabled:opacity-50" onClick={() => run(async () => { const result = await api('/api/wallet/onboarding', { country }); window.location.assign(result.url); })}>{data.snapshot ? 'Manage payout setup' : 'Set up with Stripe'} <span aria-hidden="true">↗</span></button>
           </div>}
         </div>
@@ -94,13 +109,13 @@ export function Wallet({ initialData }: { initialData?: WalletData }) {
           <p className="mt-3 text-sm leading-6 text-muted">{card.description}</p></section>)}
       </div>
       {data.snapshot && <section aria-labelledby="withdraw-title" className="mb-8 rounded-2xl border border-ui p-5 sm:p-7">
-        <h2 id="withdraw-title" className="font-serif text-2xl text-ink">Withdraw to your bank</h2><p className="mt-2 max-w-2xl text-sm leading-6 text-muted">Delivery depends on your bank and country. Automatic payouts remain active as your fallback. Refunds and disputes can reduce your balance.</p>
+        <h2 id="withdraw-title" className="font-serif text-2xl text-ink">Withdraw to your bank</h2><p className="mt-2 max-w-2xl text-sm leading-6 text-muted">Delivery depends on your bank and country. {['daily', 'weekly', 'monthly'].includes(data.snapshot.schedule) ? 'Stripe automatic payouts follow your account schedule. ' : ''}Refunds and disputes can reduce your balance.</p>
         {data.canWithdraw && selected && destination ? <form className="mt-5 max-w-lg" onSubmit={e => { e.preventDefault(); setError(''); setConfirm(true); }}>
           <div className="grid gap-4 sm:grid-cols-2"><label className="text-sm text-muted">Balance<select disabled={busy || !!attempt} className="mt-1 min-h-12 w-full rounded-xl border border-ui bg-surface-raised px-3 text-ink" value={selected.key} onChange={e => { setChoice(e.target.value); setConfirm(false); }}>{choices.map(item => <option key={item.key} value={item.key}>{item.currency.toUpperCase()} · {item.source === 'card' ? 'Card payments' : item.source.replace('_', ' ')}</option>)}</select></label>
           <label className="text-sm text-muted">Amount ({selected.currency.toUpperCase()})<input disabled={busy || !!attempt} required inputMode="decimal" autoComplete="off" className="mt-1 min-h-12 w-full rounded-xl border border-ui bg-surface-raised px-3 text-ink" placeholder="0" value={amount} onChange={e => { setAmount(e.target.value); setConfirm(false); }} /></label></div>
           <p className="mt-3 text-sm text-muted">Up to {formatMoney(selected.available, selected.currency)} · {destination.label}</p>
           {confirm && !attempt ? <div className="mt-4 rounded-xl bg-surface-soft p-4"><p className="mb-3 text-sm text-ink">Send {amount} {selected.currency.toUpperCase()} to {destination.label}?</p><div className="flex flex-wrap gap-3"><button type="button" disabled={busy} className="btn-primary min-h-11 rounded-full px-5 py-2" onClick={() => run(() => withdraw({ key: crypto.randomUUID(), amount, currency: selected.currency, source: selected.source }))}>{busy ? 'Submitting…' : 'Confirm withdrawal'}</button><button type="button" disabled={busy} className="min-h-11 rounded-full border border-ui px-5" onClick={() => setConfirm(false)}>Cancel</button></div></div> : !attempt && <button disabled={busy} className="btn-primary mt-4 min-h-11 rounded-full px-5 py-3">Review withdrawal</button>}
-        </form> : <p className="mt-4 text-sm text-muted">{data.canWithdraw ? 'No supported settled balance and matching bank account are available yet. Automatic Stripe payouts remain active.' : 'Complete payout verification before withdrawing.'}</p>}
+        </form> : <p className="mt-4 text-sm text-muted">{data.canWithdraw ? 'No supported settled balance and matching bank account are available yet.' : withdrawalStatus}</p>}
         {attempt && <button disabled={busy} className="mt-4 min-h-11 rounded-full border border-ui px-5" onClick={() => run(() => withdraw(attempt))}>Check the same withdrawal</button>}
       </section>}
       <section className="mb-8" aria-labelledby="history-title"><h2 id="history-title" className="mb-4 font-serif text-2xl text-ink">Withdrawal history</h2>

@@ -152,6 +152,7 @@ export default async function ProfilePage({
   // This user's community posts. An empty viewer id leaves the per-viewer flags
   // (liked/mine) false for logged-out visitors.
   const posts = await getPosts({ viewerId: userId ?? "", authorId: id });
+  const [thoughtsCount] = await sql<{ count: number }[]>`SELECT COUNT(*)::int AS count FROM posts WHERE author_id = ${id}`;
 
   return <>
     {!session && <PublicNavigation />}
@@ -159,7 +160,7 @@ export default async function ProfilePage({
       <div className={styles.inner}>
         <header className={styles.hero}>
           <div className={styles.banner}>
-            <p>{stories.length > 0 ? "Original stories. A singular voice." : "Every voice has a place."}</p>
+            <p>Stories, thoughts, and a voice of your own.</p>
             <svg viewBox="0 0 80 56" fill="none" stroke="currentColor" strokeWidth="1.4" aria-hidden="true"><path d="M40 12C28 4 14 6 4 10v36c12-4 26-4 36 4 10-8 24-8 36-4V10C64 6 52 4 40 12Z"/><path d="M40 12v38M13 18c6-2 13-1 20 2M13 25c6-2 13-1 20 2M47 20c7-3 14-4 20-2M47 27c7-3 14-4 20-2"/></svg>
           </div>
           <div className={styles.identity}>
@@ -171,6 +172,7 @@ export default async function ProfilePage({
             {user.bio && <p className={styles.bio}>{user.bio}</p>}
             <div className={styles.stats} aria-label="Profile statistics">
               <a href="#works"><strong>{stories.length}</strong> {stories.length === 1 ? "story" : "stories"}</a>
+              <a href="#thoughts"><strong>{thoughtsCount.count}</strong> {thoughtsCount.count === 1 ? "thought" : "thoughts"}</a>
               <Link href={`/${h}/connections?tab=followers`}><strong>{followers}</strong> {followers === 1 ? "follower" : "followers"}</Link>
               <Link href={`/${h}/connections?tab=following`}><strong>{following}</strong> following</Link>
               <span><strong>{subscriberCount}</strong> {subscriberCount === 1 ? "subscriber" : "subscribers"}</span>
@@ -180,7 +182,7 @@ export default async function ProfilePage({
 
         <div className={`${styles.layout} ${hasSidebar ? "" : styles.wide}`}>
           <div>
-            <ProfileContent works={<AuthorWorks stories={stories} isSelf={isSelf} />} posts={<PostsSection posts={posts} emptyText={isSelf ? "You haven't posted yet." : "No posts yet."} />} />
+            <ProfileContent works={<AuthorWorks stories={stories} isSelf={isSelf} />} posts={<PostsSection posts={posts} emptyText={isSelf ? "You haven't shared any thoughts yet." : "No thoughts yet."} />} />
             {notes.length > 0 && <section className={styles.notes} aria-labelledby="reader-notes-heading">
               <p className={styles.eyebrow}>Selected by the author</p><h2 id="reader-notes-heading">In the readers’ words.</h2>
               <div className={styles.notesGrid}>{notes.map(note => <figure key={note.id} className={styles.quote}>

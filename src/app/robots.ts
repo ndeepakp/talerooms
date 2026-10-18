@@ -1,9 +1,13 @@
 import type { MetadataRoute } from "next";
 
-const BASE = "https://talerooms.fly.dev";
+export const dynamic = "force-dynamic";
 
 // Let search engines crawl public content; keep private/authoring areas out.
 export default function robots(): MetadataRoute.Robots {
+  if (process.env.DEPLOYMENT_ENV === "dev") {
+    return { rules: { userAgent: "*", disallow: "/" } };
+  }
+  const base = process.env.BETTER_AUTH_URL || "https://talerooms.fly.dev";
   return {
     rules: [
       {
@@ -12,6 +16,6 @@ export default function robots(): MetadataRoute.Robots {
         disallow: ["/api/", "/settings", "/write", "/drafts", "/login", "/signup"],
       },
     ],
-    sitemap: `${BASE}/sitemap.xml`,
+    sitemap: `${base}/sitemap.xml`,
   };
 }

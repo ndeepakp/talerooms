@@ -7,10 +7,10 @@ import type { PostRow } from "@/lib/posts";
 
 function chipCls(on: boolean): string {
   return (
-    "rounded-full px-3 py-1 text-sm font-medium transition-colors " +
+    "inline-flex min-h-11 items-center justify-center rounded-full border px-4 py-2 text-sm font-medium transition-colors " +
     (on
-      ? "chip-active"
-      : "border border-ui-strong text-muted hover:bg-surface-soft")
+      ? "chip-active border-transparent"
+      : "border-ui-strong text-muted hover:bg-surface-soft")
   );
 }
 
@@ -20,7 +20,7 @@ export function PostsFeed({ posts }: { posts: PostRow[] }) {
   const shown = filter === "mentioned" ? posts.filter((p) => p.mentions_me) : posts;
 
   return (
-    <div className="flex flex-col gap-4">
+    <div className="flex min-w-0 flex-col gap-5">
       <PostComposer />
       <div className="flex gap-2">
         <button type="button" onClick={() => setFilter("all")} className={chipCls(filter === "all")}>

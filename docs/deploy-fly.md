@@ -277,9 +277,9 @@ An image rollback does **not** roll back database changes, secrets, volumes, DNS
 ## 10. What we need before proceeding
 
 - [x] Dev resource names/configuration and isolated schema bootstrap prepared; see [dev setup](../deploy/dev/README.md).
-- [ ] Fly access/billing available for the extra dev app/database/volumes.
+- [x] Fly access/billing available; dev app/database/volumes provisioned.
 - [ ] Dev Google OAuth client, Resend sender/access and Stripe sandbox webhook configured through protected settings.
-- [ ] Candidate reviewed and pushed; explicit dev deployment completed.
+- [x] Candidate reviewed and pushed; explicit dev deployment completed (record below).
 - [ ] Dev desktop/mobile and actual Stripe sandbox acceptance evidence recorded.
 - [ ] Production-readiness fixes, backup/restore drill and release decision completed.
 - [ ] Access to `talerooms.com` authoritative DNS and production provider dashboards ready.
@@ -295,4 +295,10 @@ The initial documentation pass performed read-only inspection only. The user sub
 - Created a separate Stripe sandbox Connect webhook at `https://talerooms-dev.fly.dev/api/wallet/webhook`; its signing secret is installed only on dev. Existing Stripe sandbox API access and the Resend sender are reused, rather than claiming full provider-account isolation.
 - Dev uses exact-origin auth and build/runtime crawler exclusion. Google OAuth setup is pending; Google credentials are not installed until the dev callback is configured.
 - Candidate checks: 201 tests passed, 14 opt-in database tests skipped; lint, TypeScript and the dev production build passed.
-- Final deployment identity and deployed checks are recorded after release below. Production app/database and `talerooms.com` DNS remain unchanged.
+- GitHub code candidate: `fadfbf5` (UI/infrastructure change `34019b4`, followed by the Fly config-relative Dockerfile path correction).
+- Deployed URL: **https://talerooms-dev.fly.dev**. Fly release **v1**, machine `7845746cd79d18`, image `registry.fly.io/talerooms-dev:dev-fadfbf5`, digest `sha256:734391ad05a652a609852ed5031816f091bb0b975c9cf83bb9eca22d54177107`. Health check passing. Dev database reports Postgres 17.11 and pgvector 0.8.7.
+- **40 deployed HTTPS smoke assertions passed:** public pages, database readiness, crawler exclusions/empty sitemap, friendly missing page, protected routes, foreign-origin rejection, real password login/session/logout, signed-in Feed/Library/Wallet/Write/Notifications rendering, thought/collection writes and read-after-write, active Stripe sandbox configuration, mock-purchase rejection and webhook signature boundaries. The positive webhook check used a locally signed ignored test event; it is not proof of a completed provider purchase or Stripe-originated delivery.
+- Deployed login page checked in the browser at 1280/390/320px: no horizontal overflow; `noindex, nofollow` metadata present. Full interactive UI checks remain the earlier local QA evidence, not a claim that every signed-in dev page was visually re-tested.
+- Removed the disposable verified QA account and cascading posts/collections after checking login/data writes; final dev counts are zero users, zero posts and zero collections. Private temporary credentials were removed after setup.
+- Google OAuth is pending the dev callback/client setup; its button is disabled rather than showing a broken login flow. Email service credentials are configured, but delivery was not re-tested in this rollout. Real Stripe sandbox purchase/settlement remains pending.
+- Production was verified unchanged: `talerooms` remains **v45**, image `deployment-01M54R7XFW3GR2QSTCWXQQDAD8`, health passing. No production database or `talerooms.com` DNS changes.
